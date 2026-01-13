@@ -1,0 +1,264 @@
+---
+alwaysApply: true
+---
+
+## Mandate
+
+All agentic systems must maintain comprehensive audit trails, compliance checks, and detailed logging to ensure accountability, traceability, and regulatory compliance. This protocol applies to all operations and must be enforced continuously.
+
+## 1. Audit Trail Requirements
+
+### Mandatory Audit Events
+
+* **All Actions Must Be Logged:**
+  * **Tool Calls:** Log every tool invocation with full context (tool name, parameters, user/agent ID, timestamp).
+  * **State Changes:** Log all state modifications in LangGraph workflows (before/after values, node name).
+  * **API Requests:** Log all incoming API requests (endpoint, method, user ID, tenant ID, IP address).
+  * **Data Access:** Log all database queries and data access operations (table, operation type, affected rows).
+  * **Authentication Events:** Log login attempts, token generation, token refresh, logout events.
+  * **Authorization Decisions:** Log all authorization checks (user, resource, action, result).
+
+### Audit Log Structure
+
+* **Required Fields:**
+  * `timestamp`: ISO 8601 format with timezone
+  * `event_type`: Categorized event type (tool_call, state_change, api_request, etc.)
+  * `actor_id`: User ID or agent ID who performed the action
+  * `actor_type`: "user" | "agent" | "system"
+  * `resource`: Resource being accessed or modified
+  * `action`: Specific action performed
+  * `result`: "success" | "failure" | "denied"
+  * `correlation_id`: Request/transaction ID for tracing
+  * `tenant_id`: Tenant identifier (if multi-tenant)
+  * `metadata`: Additional context (JSON object)
+
+* **Immutable Logs:**
+  * Audit logs must be append-only (no updates or deletions).
+  * Use write-once storage (WORM - Write Once Read Many).
+  * Implement cryptographic hashing for log integrity verification.
+
+### Audit Log Storage
+
+* **Centralized Storage:** Store audit logs in a centralized, secure system (e.g., dedicated audit database, SIEM system).
+* **Retention Policy:** Retain audit logs according to regulatory requirements (minimum 7 years for financial data, 3 years for general business).
+* **Backup:** Regularly backup audit logs to immutable storage.
+* **Access Control:** Restrict access to audit logs (read-only for auditors, no deletion permissions).
+
+## 2. Compliance Checks
+
+### Regulatory Compliance
+
+* **GDPR Compliance:**
+  * **Data Subject Rights:** Log all data access, modification, and deletion requests.
+  * **Consent Management:** Track user consent status and changes.
+  * **Data Processing Records:** Maintain records of data processing activities.
+  * **Breach Notification:** Log all potential data breaches for notification requirements.
+
+* **HIPAA Compliance (if applicable):**
+  * **PHI Access Logging:** Log all access to Protected Health Information.
+  * **Access Controls:** Verify access controls are enforced and logged.
+  * **Audit Trail Requirements:** Maintain detailed audit trails for all PHI access.
+
+* **SOC 2 Compliance:**
+  * **Access Controls:** Log all access control changes and verifications.
+  * **System Changes:** Log all system configuration and code changes.
+  * **Incident Response:** Log all security incidents and responses.
+
+### Automated Compliance Checks
+
+* **Real-Time Validation:**
+  * **Input Validation:** Verify all inputs comply with data protection regulations (PII masking, data classification).
+  * **Output Validation:** Ensure outputs don't leak sensitive information.
+  * **Access Control:** Verify users have proper authorization before data access.
+
+* **Periodic Audits:**
+  * **Access Review:** Regularly review user access permissions (quarterly).
+  * **Data Retention:** Verify data retention policies are followed.
+  * **Configuration Compliance:** Check system configurations against compliance requirements.
+
+* **Compliance Reporting:**
+  * **Automated Reports:** Generate compliance reports (access logs, data processing records).
+  * **Audit Reports:** Create audit reports for external auditors.
+  * **Incident Reports:** Document security incidents for compliance reporting.
+
+## 3. Logging & Tracing Standards
+
+### Structured Logging
+
+* **Log Format:** Use structured JSON logging for all audit-related logs.
+  * **Consistency:** Maintain consistent log structure across all services.
+  * **Parsing:** Enable easy parsing and querying of logs.
+
+* **Log Levels:**
+  * **AUDIT:** For all audit trail events (mandatory for compliance).
+  * **SECURITY:** For security-related events (authentication, authorization, breaches).
+  * **COMPLIANCE:** For compliance-related events (data access, consent changes).
+
+* **Correlation IDs:**
+  * **Propagation:** Propagate correlation IDs across all service boundaries (HTTP headers, message queues, async operations).
+  * **Inclusion:** Include correlation ID in all log entries to enable end-to-end tracing.
+  * **Format:** Use UUID format for correlation IDs.
+
+### Distributed Tracing
+
+* **OpenTelemetry Integration:**
+  * **Span Creation:** Create spans for all significant operations (tool calls, API requests, database queries).
+  * **Span Attributes:** Add audit-related attributes to spans (user ID, tenant ID, action type).
+  * **Trace Context:** Propagate trace context across all service boundaries.
+
+* **Trace Retention:**
+  * **Duration:** Retain traces for at least 30 days (longer for compliance requirements).
+  * **Sampling:** Use intelligent sampling (100% for audit events, lower for general operations).
+
+### Log Aggregation
+
+* **Centralized Logging:**
+  * **SIEM Integration:** Send audit logs to Security Information and Event Management (SIEM) systems.
+  * **Real-Time Monitoring:** Enable real-time monitoring of audit events for anomalies.
+  * **Alerting:** Set up alerts for suspicious patterns (unusual access, failed authorization attempts).
+
+* **Log Analysis:**
+  * **Query Interface:** Provide query interface for auditors to search and analyze audit logs.
+  * **Visualization:** Create dashboards for audit log analysis and compliance reporting.
+  * **Machine Learning:** Use ML for anomaly detection in audit logs.
+
+## 4. Agent-Specific Audit Requirements
+
+### Tool Call Auditing
+
+* **Mandatory Logging:**
+  * **Tool Registry:** Log which tools are available to each agent.
+  * **Tool Selection:** Log tool selection decisions (which tool was chosen and why).
+  * **Tool Execution:** Log tool execution with full parameters (sanitized for sensitive data).
+  * **Tool Results:** Log tool execution results (success/failure, duration, resource usage).
+
+* **Tool Access Control:**
+  * **Whitelisting:** Log all tool whitelist changes.
+  * **Access Denials:** Log all tool access denials with reason.
+  * **Sandboxing:** Log when tools are executed in sandboxed environments.
+
+### State Change Auditing
+
+* **LangGraph State Auditing:**
+  * **State Transitions:** Log all state transitions in LangGraph workflows.
+  * **Node Execution:** Log all node executions (node name, input state, output state).
+  * **Error States:** Log all error states and recovery actions.
+  * **Human-in-the-Loop:** Log all human intervention points and decisions.
+
+* **State Integrity:**
+  * **Before/After Values:** Log state values before and after modifications.
+  * **State Validation:** Log state validation results.
+  * **State Rollback:** Log all state rollbacks with reason.
+
+### LLM Operation Auditing
+
+* **LLM Call Logging:**
+  * **Prompt Logging:** Log all prompts sent to LLMs (with PII masking).
+  * **Response Logging:** Log LLM responses (with sensitive data masking).
+  * **Token Usage:** Log token usage (input tokens, output tokens, total cost).
+  * **Model Information:** Log model name, version, and configuration.
+
+* **LLM Security:**
+  * **Prompt Injection Attempts:** Log all potential prompt injection attempts.
+  * **Output Validation:** Log output validation results.
+  * **Content Filtering:** Log content filtering decisions.
+
+## 5. Data Protection & Privacy
+
+### PII Handling
+
+* **PII Detection:**
+  * **Automatic Detection:** Automatically detect PII in logs and audit trails.
+  * **Masking:** Mask PII in logs (email addresses, phone numbers, SSNs).
+  * **Encryption:** Encrypt PII in audit logs at rest.
+
+* **Data Minimization:**
+  * **Minimal Logging:** Log only necessary information for audit purposes.
+  * **Data Retention:** Automatically delete audit logs after retention period (if allowed by regulations).
+  * **Anonymization:** Anonymize data in audit logs when possible.
+
+### Access to Audit Logs
+
+* **Access Control:**
+  * **Read-Only Access:** Grant read-only access to audit logs for auditors.
+  * **No Deletion:** Prevent deletion of audit logs (even by administrators).
+  * **Access Logging:** Log all access to audit logs themselves.
+
+* **Auditor Access:**
+  * **Dedicated Accounts:** Create dedicated accounts for auditors with read-only access.
+  * **Audit Trail:** Maintain separate audit trail for auditor access.
+  * **Time-Limited Access:** Grant time-limited access for external auditors.
+
+## 6. Incident Response & Forensics
+
+### Security Incident Logging
+
+* **Incident Detection:**
+  * **Automated Detection:** Use automated tools to detect security incidents in audit logs.
+  * **Anomaly Detection:** Flag unusual patterns (unusual access times, multiple failed attempts).
+  * **Alert Generation:** Generate alerts for potential security incidents.
+
+* **Incident Response:**
+  * **Incident Logging:** Log all security incidents with full context.
+  * **Response Actions:** Log all response actions taken during incidents.
+  * **Recovery Actions:** Log all recovery actions and system restoration steps.
+
+### Forensic Analysis
+
+* **Investigation Support:**
+  * **Timeline Reconstruction:** Enable timeline reconstruction from audit logs.
+  * **User Activity Tracking:** Track all user activities across sessions.
+  * **System State Reconstruction:** Reconstruct system state at any point in time.
+
+* **Evidence Preservation:**
+  * **Chain of Custody:** Maintain chain of custody for audit logs used in investigations.
+  * **Integrity Verification:** Verify log integrity using cryptographic hashes.
+  * **Legal Hold:** Preserve audit logs under legal hold orders.
+
+## 7. Integration with Other Systems
+
+### Integration Points
+
+* **Security Systems:**
+  * **SIEM Integration:** Integrate with SIEM systems for centralized security monitoring.
+  * **IAM Integration:** Integrate with Identity and Access Management systems for user context.
+  * **Threat Intelligence:** Feed audit data into threat intelligence systems.
+
+* **Compliance Systems:**
+  * **GRC Platforms:** Integrate with Governance, Risk, and Compliance (GRC) platforms.
+  * **Compliance Reporting:** Automatically generate compliance reports from audit logs.
+  * **Regulatory Reporting:** Support regulatory reporting requirements.
+
+* **Monitoring Systems:**
+  * **See:** `monitoring-and-observability.md` for comprehensive monitoring strategies.
+  * **See:** `security-governance-and-observability.md` for security governance requirements.
+
+## 8. Best Practices
+
+### Audit Log Design
+
+* **Performance:**
+  * **Asynchronous Logging:** Use asynchronous logging to avoid blocking operations.
+  * **Batching:** Batch audit log writes for better performance.
+  * **Sampling:** Use intelligent sampling for high-volume operations (never sample audit events).
+
+* **Reliability:**
+  * **Durability:** Ensure audit logs are durably written (fsync, replication).
+  * **Redundancy:** Replicate audit logs to multiple locations for disaster recovery.
+  * **Verification:** Regularly verify audit log integrity.
+
+* **Scalability:**
+  * **Partitioning:** Partition audit logs by time or tenant for scalability.
+  * **Archival:** Archive old audit logs to cold storage.
+  * **Compression:** Compress archived audit logs to save storage.
+
+### Continuous Improvement
+
+* **Regular Reviews:**
+  * **Audit Log Quality:** Regularly review audit log quality and completeness.
+  * **Compliance Gaps:** Identify and address compliance gaps.
+  * **Performance Optimization:** Optimize audit logging performance based on metrics.
+
+* **Training:**
+  * **Team Training:** Train team on audit requirements and best practices.
+  * **Auditor Training:** Provide training for auditors on accessing and analyzing audit logs.

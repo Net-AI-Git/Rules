@@ -1,0 +1,170 @@
+---
+description: "Multi-agent system architecture patterns including Orchestrator/Worker/Synthesizer"
+alwaysApply: false
+---
+
+## Mandate
+All agentic systems in this codebase are designed as **Multi-Agent Systems**. This document defines the standard architecture patterns and rules for orchestrating multiple agents.
+
+## 1. Core Architecture Components
+
+### Orchestrator (Planner)
+* **Role:** Decompose user requests into sub-tasks and decide how many workers are needed.
+* **When to Use:**
+  * Task structure is not known in advance
+  * High variability in task complexity
+  * Need dynamic scaling (2-10+ sub-tasks)
+* **Responsibilities:**
+  * Parse user request
+  * Create SECTIONS list
+  * Attach structured fields per section
+  * **MUST NOT:** Execute work or produce final output
+
+### Worker Agents (Specialists)
+* **Role:** Execute specialized sub-tasks.
+* **Principle:** Specialization - each worker focuses on one domain.
+* **Note:** Not every sub-task needs a full agent; sometimes a function/tool is sufficient.
+* **Responsibilities:**
+  * Read assigned SECTION
+  * Execute specialized work
+  * Write to designated output key
+  * **MUST NOT:** Modify SECTIONS list or write to another worker's SECTION
+
+### Synthesizer
+* **Role:** Unify worker outputs into a single coherent final output.
+* **When to Use:**
+  * Need unified document/answer
+  * Conflicts between outputs require resolution
+* **Responsibilities:**
+  * Read collected worker outputs
+  * Merge into FINAL_OUTPUT
+  * Resolve conflicts
+  * **MUST NOT:** Create new tasks or call workers again
+
+## 2. SECTIONS Pattern
+
+### Definition
+* **SECTIONS** are the mandatory unit of work in multi-agent systems.
+* A SECTION is a task contract that defines exactly what one worker must produce.
+* Each SECTION must be owned by exactly one worker and must not be shared for writing.
+
+### SECTION Structure
+A SECTION must contain:
+* **Identifiers:** section_id, task_id
+* **Scope:** What to produce
+* **Inputs:** Required data
+* **Constraints:** Limitations, rules
+* **Expected Output Shape:** Schema definition
+
+### Rules
+* Workers must treat SECTION as the single source of truth for what they are responsible to generate.
+* Each SECTION must be sent to one worker as `worker_state.section`.
+* Workers may read shared context from `SHARED_STATE`, but they must operate only on their assigned SECTION.
+* Workers must never modify the SECTIONS list.
+* Workers must never write into another worker's SECTION.
+
+## 3. FAN-OUT / FAN-IN Patterns
+
+### FAN-OUT (Task Distribution)
+* **Implementation:** Map the SECTIONS list to workers.
+* **Pattern:** Each SECTION → One Worker
+* **State:** Each worker receives `worker_state.section` with its assigned SECTION.
+* **Concurrency:** Independent tasks run in parallel.
+
+### FAN-IN (Result Collection)
+* **Implementation:** Collect worker outputs into a shared agreed key.
+* **Pattern:** Each worker writes to its designated output key (e.g., `RESULTS`, `COMPLETED_MENU`).
+* **Format:** List of per-section results.
+* **Rule:** **Read Many, Write One**
+  * Workers may read many shared keys
+  * Each worker writes to exactly one output target
+  * Output target is append-only
+  * Two workers must never write to the same scalar key
+  * Any shared collection must be append-only with per-section items
+
+## 4. State Management
+
+### Shared State
+* **Purpose:** Common context for all agents (input, intermediate results, documentation, decisions).
+* **Mandate:** Almost mandatory in complex systems; without it, you have separate chats, not a system.
+* **Usage:** Read-only for workers (except designated write keys).
+* **Aggregation:** Add agent summaries (e.g., `summary_for_supervisor`) to the `messages` list in Global State.
+
+### Worker State
+* **Purpose:** Store task-specific details for each worker without polluting shared state.
+* **When to Use:**
+  * Many workers running in parallel
+  * Each worker has different payload
+  * Want to avoid race conditions/logical conflicts
+* **Structure:** `worker_state.section` contains the assigned SECTION.
+
+### State Field Ownership
+* **Rule:** Assign each state field to a single "owner" node to avoid accidental overwrites.
+* **Benefit:** Makes tracing failures easy.
+
+## 5. Core Control Roles
+
+### ORCHESTRATOR
+* **Responsibility:** Understand request and decompose into SECTIONS.
+* **Decisions:** How many SECTIONS, what each SECTION contains.
+* **MUST NOT:** Execute work or produce final output.
+
+### ASSIGN WORKERS Node
+* **Responsibility:** Execution dispatch only.
+* **Action:** Read SECTIONS list and create FAN-OUT by sending each SECTION to a worker.
+* **MUST NOT:** Analyze, evaluate, or modify the SECTIONS.
+
+### SUPERVISOR (Optional)
+* **Responsibility:** Decision-making between agents.
+* **Actions:** Choose which agent acts, in what order, whether to continue or stop.
+* **MUST NOT:** Decompose tasks or perform FAN-OUT.
+
+## 6. Stability & Reliability Rules
+
+### Iteration Limits
+* **Mandate:** Hard iteration limit for any loop.
+* **Rule:** Never allow infinite refinement.
+* **Implementation:** Set `max_iterations` and enforce termination.
+
+### Deterministic Control Flow
+* **Rule:** Workflow must be deterministic in control flow.
+* **Requirements:**
+  * Explicit start point
+  * Explicit end point
+  * Explicit conditional routing decisions
+* **State Updates:** Performed by graph orchestration layer, not by workers directly.
+
+### Failure Handling
+* **Partial Results:** If a worker fails, return partial result with clear section-level failures.
+* **State Protection:** Do not corrupt shared state on worker failure.
+* **Error Isolation:** Worker failures must not cascade to other workers.
+
+### Fallback Agent
+* **Purpose:** Ensure system doesn't crash when primary agents fail.
+* **Implementation:** Implement fallback agent to handle failures gracefully.
+* **See:** `error-handling-and-resilience.md` for comprehensive error handling patterns.
+
+## 7. Performance Optimization
+
+### Parallel Execution
+* **Independent Tasks:** Independent tasks run in parallel, then unified.
+* **Implementation:** Use `asyncio.gather()` or LangGraph's parallel execution.
+* **Benefit:** Improved throughput and reduced latency.
+
+### Throughput Mindset
+* **Mandate:** Always think about throughput efficiency when writing code.
+* **Considerations:**
+  * Minimize sequential dependencies
+  * Batch operations where possible
+  * Cache expensive computations
+  * Use connection pooling
+
+* **See:** `performance-optimization.md` for comprehensive performance strategies.
+
+## 8. GraphState Consultation
+
+* **Rule:** Before choosing a GraphState structure, consult with the team.
+* **Rationale:** State design is critical for multi-agent systems and affects all components.
+* **Process:** Propose state structure, get approval, then implement.
+
+* **See:** `langgraph-architecture-and-nodes.md` for state design guidelines.
