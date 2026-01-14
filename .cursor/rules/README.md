@@ -1,16 +1,16 @@
 # Cursor Rules Documentation
 
-This directory contains Cursor AI Rules - system-level instructions that provide persistent, reusable context to guide the Cursor Agent.
+This directory contains Cursor Rules - system-level instructions for the Cursor AI Agent. Rules define coding standards, architectural patterns, security requirements, and development workflows that guide the AI's behavior.
 
 ## What are Cursor Rules?
 
-Rules are markdown files that bundle prompts, standards, and best practices together. They are included at the start of the model context, giving the AI consistent guidance for generating code, interpreting edits, or helping with workflows.
+Cursor Rules provide system-level instructions to the Cursor AI Agent. They bundle prompts, scripts, and more together, making it easy to manage and share workflows across your team. Rules are stored in `.cursor/rules` and are version-controlled.
 
-Rules are version-controlled and scoped to your codebase, making it easy to share standards and workflows across your team.
+Rules are included at the start of the model context, giving the AI consistent guidance for generating code, interpreting edits, or helping with workflows.
 
 ## Directory Structure
 
-Rules are organized by category:
+Rules in this repository are organized by category:
 
 ```
 .cursor/rules/
@@ -18,11 +18,11 @@ Rules are organized by category:
 ├── security/          # Security and governance rules
 ├── agents/            # Agent-specific rules (multi-agent, LangGraph, agentic logic)
 ├── infrastructure/    # Deployment, monitoring, performance
-├── development/      # Testing, code review, versioning
-├── api/              # API-related rules
-├── data/             # Data schemas, migrations
-├── evaluation/       # LLM evaluation, judging, auditing
-├── configuration/    # Configuration, dependency injection, prompts
+├── development/       # Testing, code review, versioning
+├── api/               # API-related rules
+├── data/              # Data schemas, migrations
+├── evaluation/        # LLM evaluation, judging, auditing
+├── configuration/     # Configuration, dependency injection, prompts
 ├── rules-management/ # Meta-rule for managing rules
 └── commands-management/ # Meta-rule for managing commands
 ```
@@ -40,14 +40,15 @@ Each rule is a **folder** containing a `RULE.md` file:
 
 **Important:**
 - Each rule must be in its own folder
-- Folder name should be kebab-case (e.g., `core-python-standards`)
-- File inside must be named exactly `RULE.md` (capital letters)
+- The folder name should be kebab-case (e.g., `core-python-standards`)
+- The file inside must be named exactly `RULE.md` (capital letters)
 
 ## Rule Types
 
-Rules are applied automatically based on their configuration. There are 4 types:
+Rules are applied automatically based on their type, defined in the YAML frontmatter at the start of each `RULE.md` file:
 
 ### 1. Always Apply
+
 Applied to every chat session automatically.
 
 **Frontmatter:**
@@ -60,13 +61,15 @@ alwaysApply: true
 **Use when:** The rule should always be active (e.g., core coding standards, security requirements).
 
 **Examples:**
-- `core-python-standards`
-- `error-handling-and-resilience`
-- `security-governance-and-observability`
-- `final-review-protocol`
+- `core-python-standards` - Python coding standards
+- `error-handling-and-resilience` - Error handling patterns
+- `security-governance-and-observability` - Security standards
+- `audit-protocol` - Audit procedures
+- `final-review-protocol` - Final review process
 
 ### 2. Apply Intelligently
-Applied when Agent decides it's relevant based on the description.
+
+Applied when the Agent decides it's relevant based on the description.
 
 **Frontmatter:**
 ```yaml
@@ -76,16 +79,17 @@ alwaysApply: false
 ---
 ```
 
-**Use when:** The rule is relevant in specific contexts but not always needed (e.g., deployment standards, monitoring practices).
+**Use when:** The rule is contextually relevant but not always needed (e.g., API documentation when working on APIs, multi-agent patterns when building agents).
 
 **Examples:**
-- `deployment-and-infrastructure`
-- `monitoring-and-observability`
-- `code-review-and-collaboration`
-- `llm-judge-protocol`
+- `code-review-and-collaboration` - Code review standards
+- `multi-agent-systems` - Multi-agent architecture patterns
+- `llm-judge-protocol` - LLM-as-a-Judge evaluation
+- `performance-optimization` - Performance best practices
 
 ### 3. Apply to Specific Files
-Applied when working on files matching specified patterns.
+
+Applied when working on files that match the specified glob patterns.
 
 **Frontmatter:**
 ```yaml
@@ -97,16 +101,17 @@ alwaysApply: false
 ---
 ```
 
-**Use when:** The rule is only relevant for specific file types or locations (e.g., API endpoints, test files, migrations).
+**Use when:** The rule is only relevant for specific file types or locations.
 
 **Examples:**
-- `api-documentation-standards` (applies to API files)
-- `tests-and-validation` (applies to test files)
-- `rules-management` (applies to RULE.md files)
-- `commands-management` (applies to command files)
+- `api-documentation-standards` - Applied when working on API files
+- `api-interface-and-streaming` - Applied when working on API routes
+- `tests-and-validation` - Applied when working on test files
+- `langgraph-architecture-and-nodes` - Applied when working on LangGraph nodes
 
 ### 4. Apply Manually
-Applied only when @-mentioned in chat (e.g., `@rule-name`).
+
+Applied only when explicitly mentioned in chat (e.g., `@rule-name`).
 
 **Frontmatter:**
 ```yaml
@@ -115,218 +120,269 @@ alwaysApply: false
 ---
 ```
 
-**Use when:** The rule is rarely needed and should only be applied on demand (e.g., special audit protocols).
+**Use when:** The rule is rarely needed and should only be applied on demand (e.g., special audit protocols, meta-rules).
 
-## How Rules are Applied
+**Note:** Currently, no rules use this type. Meta-rules (`rules-management`, `commands-management`) use "Apply to Specific Files" instead.
 
-Rules are automatically selected and applied by Cursor based on:
+## How Rules Are Applied
 
-1. **Always Apply rules** - Always active in every chat session
-2. **Apply Intelligently rules** - Agent evaluates the description and decides if relevant
-3. **Apply to Specific Files rules** - Active when you're working on files matching the glob patterns
-4. **Apply Manually rules** - Only when you explicitly tag them with `@rule-name`
+1. **Always Apply rules** are automatically included in every chat session
+2. **Apply Intelligently rules** are considered by the Agent based on the conversation context and the rule's description
+3. **Apply to Specific Files rules** are automatically included when you're working on files matching the glob patterns
+4. **Apply Manually rules** are only included when you explicitly mention them (e.g., `@rule-name`)
 
-## Categories
+The Agent combines relevant rules to provide comprehensive guidance for your specific task.
 
-### Core (`core/`)
-Essential rules that should be in every project:
+## Rule Categories
 
-- **`core-python-standards`** - Python coding standards (Always Apply)
-  - Code quality, function length, type hints, logging
-  - Concurrency patterns (async/await, threading)
-  
-- **`error-handling-and-resilience`** - Error handling patterns (Always Apply)
-  - Error classification, retry strategies, circuit breakers
-  - Resilience patterns and graceful degradation
+### Core Rules (`core/`)
 
-### Security (`security/`)
+Essential rules for all projects:
+
+- **`core-python-standards`** (Always Apply)
+  - Python coding standards, best practices, and methodology
+  - System planning, code generation, and review processes
+
+- **`error-handling-and-resilience`** (Always Apply)
+  - Error handling patterns and resilience strategies
+  - Blast radius containment and failure recovery
+
+### Security Rules (`security/`)
+
 Security and governance:
 
-- **`security-governance-and-observability`** - Security standards (Always Apply)
-  - OWASP Top 10 for LLM Applications
-  - NIST AI RMF compliance
-  - Blast radius containment
-  
-- **`audit-protocol`** - Audit procedures (Always Apply)
-  - Audit trail requirements
-  - Compliance checks
-  - Log structure standards
+- **`security-governance-and-observability`** (Always Apply)
+  - Security standards and governance requirements
+  - Security best practices and compliance
 
-### Agents (`agents/`)
+- **`audit-protocol`** (Always Apply)
+  - Audit procedures and compliance verification
+  - Security incident tracking and analysis
+
+### Agent Rules (`agents/`)
+
 Agent-specific architecture:
 
-- **`multi-agent-systems`** - Multi-agent patterns (Apply Intelligently)
+- **`multi-agent-systems`** (Apply Intelligently)
+  - Multi-agent system architecture patterns
   - Orchestrator/Worker/Synthesizer patterns
-  - SECTIONS pattern for task decomposition
-  
-- **`langgraph-architecture-and-nodes`** - LangGraph workflows (Apply to Specific Files)
-  - Workflow design, state management
-  - Node implementation (READ → DO → WRITE → CONTROL)
-  
-- **`agentic-logic-and-tools`** - Agent tools and logic (Apply Intelligently)
-  - LangChain fundamentals
-  - Tool definitions and binding
 
-### Infrastructure (`infrastructure/`)
+- **`langgraph-architecture-and-nodes`** (Apply to Specific Files)
+  - LangGraph workflow architecture
+  - Node structure (READ → DO → WRITE → CONTROL)
+  - Applied to LangGraph node files
+
+- **`agentic-logic-and-tools`** (Apply Intelligently)
+  - LangChain fundamentals and tool definitions
+  - Agent internals and tool implementation
+
+### Infrastructure Rules (`infrastructure/`)
+
 Deployment and operations:
 
-- **`deployment-and-infrastructure`** - CI/CD, Docker, K8s (Apply Intelligently)
-  - Deployment strategies, blue-green, rollback
-  - Infrastructure as Code
-  
-- **`monitoring-and-observability`** - Monitoring and logging (Apply Intelligently)
-  - Metrics collection (Prometheus, StatsD)
-  - Distributed tracing (OpenTelemetry)
-  - LangSmith integration
-  
-- **`performance-optimization`** - Performance best practices (Apply Intelligently)
-  - Caching strategies, query optimization
-  - Resource pooling
-  
-- **`multi-tenancy-and-isolation`** - Multi-tenancy patterns (Apply Intelligently)
-  - Data isolation strategies
-  - Tenant management
+- **`deployment-and-infrastructure`** (Apply Intelligently)
+  - CI/CD, Docker, Kubernetes standards
+  - Infrastructure deployment patterns
 
-### Development (`development/`)
+- **`monitoring-and-observability`** (Apply Intelligently)
+  - Metrics, logging, tracing standards
+  - Observability best practices
+
+- **`performance-optimization`** (Apply Intelligently)
+  - Performance optimization strategies
+  - Caching, query optimization, resource pooling
+
+- **`multi-tenancy-and-isolation`** (Apply Intelligently)
+  - Multi-tenant architecture patterns
+  - Data isolation strategies
+
+### Development Rules (`development/`)
+
 Development workflow:
 
-- **`tests-and-validation`** - Testing standards (Apply to Specific Files)
-  - Pytest framework, atomic tests
-  - Test structure and organization
-  
-- **`code-review-and-collaboration`** - Code review process (Apply Intelligently)
-  - PR review checklist
-  - Git workflow standards
-  
-- **`versioning-and-release-management`** - Versioning strategy (Apply Intelligently)
-  - Semantic versioning
-  - Changelog standards
+- **`tests-and-validation`** (Apply to Specific Files)
+  - Testing framework standards
+  - Validation requirements
+  - Applied to test files
 
-### API (`api/`)
+- **`code-review-and-collaboration`** (Apply Intelligently)
+  - Code review standards
+  - Git workflow and collaboration practices
+
+- **`versioning-and-release-management`** (Apply Intelligently)
+  - Semantic versioning standards
+  - Changelog and release management
+
+### API Rules (`api/`)
+
 API development:
 
-- **`api-interface-and-streaming`** - API design (Apply to Specific Files)
-  - RESTful principles, streaming
-  - Error responses, rate limiting
-  
-- **`api-documentation-standards`** - API docs (Apply to Specific Files)
-  - OpenAPI/Swagger specifications
-  - API versioning
+- **`api-interface-and-streaming`** (Apply to Specific Files)
+  - API design and interface standards
+  - Streaming patterns
+  - Applied to API route files
 
-### Data (`data/`)
+- **`api-documentation-standards`** (Apply to Specific Files)
+  - OpenAPI/Swagger specifications
+  - API documentation requirements
+  - Applied to API files
+
+### Data Rules (`data/`)
+
 Data management:
 
-- **`data-schemas-and-interfaces`** - Data schemas (Apply Intelligently)
-  - Pydantic models, type hints
-  - Structured interfaces
-  
-- **`data-migration-and-compatibility`** - Migrations (Apply to Specific Files)
-  - Alembic migrations
-  - Backward compatibility
+- **`data-schemas-and-interfaces`** (Apply Intelligently)
+  - Pydantic schemas and data models
+  - Structured interfaces and validation
 
-### Evaluation (`evaluation/`)
+- **`data-migration-and-compatibility`** (Apply to Specific Files)
+  - Data migration patterns
+  - Compatibility and versioning strategies
+  - Applied to migration files
+
+### Evaluation Rules (`evaluation/`)
+
 LLM evaluation and testing:
 
-- **`llm-evaluation-and-metrics`** - Evaluation metrics (Apply to Specific Files)
-  - Faithfulness, relevance, precision
-  - Golden datasets
-  
-- **`llm-judge-protocol`** - LLM judging (Apply Intelligently)
-  - Supreme AI Adjudicator protocol
-  - Evaluation rubric and structured output
-  
-- **`final-review-protocol`** - Final review (Always Apply)
-  - Pre-commit compliance checks
-  - Governance verification
+- **`llm-evaluation-and-metrics`** (Apply to Specific Files)
+  - LLM evaluation frameworks
+  - Metrics and scoring standards
+  - Applied to evaluation files
 
-### Configuration (`configuration/`)
+- **`llm-judge-protocol`** (Apply Intelligently)
+  - LLM-as-a-Judge evaluation protocol
+  - Performance, safety, and logic analysis
+
+- **`final-review-protocol`** (Always Apply)
+  - Final review process before commit
+  - Compliance verification
+
+### Configuration Rules (`configuration/`)
+
 Configuration and setup:
 
-- **`configuration-and-dependency-injection`** - DI patterns (Apply Intelligently)
-  - Pydantic settings
+- **`configuration-and-dependency-injection`** (Apply Intelligently)
+  - Configuration management using pydantic-settings
   - Dependency injection patterns
-  
-- **`prompt-engineering-and-management`** - Prompt management (Apply to Specific Files)
-  - Prompt as code
-  - Versioning and templating
 
-### Management Rules
+- **`prompt-engineering-and-management`** (Apply to Specific Files)
+  - Prompt engineering standards
+  - Prompt management and versioning
+  - Applied to prompt files
 
-- **`rules-management`** - Meta-rule for managing rules (Apply to Specific Files)
-  - Automatically applied when working on `RULE.md` files
-  - Complete guide for creating/updating rules
-  
-- **`commands-management`** - Meta-rule for managing commands (Apply to Specific Files)
-  - Automatically applied when working on command files
-  - Complete guide for creating/updating commands
+### Meta-Rules
 
-## How to Use
+Rules for managing rules and commands:
 
-### Option 1: Copy Everything
+- **`rules-management`** (Apply to Specific Files)
+  - Format and structure for creating/updating Rules
+  - Applied when working on `RULE.md` files
 
-Simply copy the entire `.cursor/rules` folder to your project:
+- **`commands-management`** (Apply to Specific Files)
+  - Format and structure for creating/updating Commands
+  - Applied when working on command files
 
-```bash
-cp -r .cursor/rules /path/to/your/project/.cursor/
-```
+## Usage
 
-Cursor will automatically select which rules to apply based on their configuration.
+### Copying Rules to Your Project
 
-### Option 2: Copy by Category
+#### Option 1: Copy Everything
+Copy the entire `.cursor/rules` folder to your project root. Cursor will automatically:
+- Apply "Always Apply" rules to every session
+- Apply "Apply to Specific Files" rules when working on matching files
+- Consider "Apply Intelligently" rules based on context
 
-Copy only the category folders you need for your project:
+#### Option 2: Copy by Category
+Copy only the category folders you need:
 
-- **All projects**: Copy `core/` and `security/`
-- **Agent projects**: Also copy `agents/` and `evaluation/`
-- **API projects**: Also copy `api/`
-- **Production projects**: Also copy `infrastructure/`
+**For all projects:**
+- `core/` - Essential coding standards
+- `security/` - Security and governance
 
-### Option 3: Copy Individual Rules
+**For agent projects:**
+- `agents/` - Multi-agent patterns
+- `evaluation/` - LLM evaluation
 
-Copy specific rule folders based on your needs:
+**For API projects:**
+- `api/` - API design and documentation
 
-```bash
-cp -r .cursor/rules/core/core-python-standards /path/to/your/project/.cursor/rules/core/
-```
+**For production projects:**
+- `infrastructure/` - Deployment and monitoring
+
+### Rule Application Examples
+
+**Example 1: Working on API code**
+- `core-python-standards` (Always Apply) - Active
+- `error-handling-and-resilience` (Always Apply) - Active
+- `api-interface-and-streaming` (Apply to Specific Files) - Active (matches `**/api/**/*.py`)
+- `api-documentation-standards` (Apply to Specific Files) - Active (matches `**/api/**/*.py`)
+
+**Example 2: Working on test files**
+- `core-python-standards` (Always Apply) - Active
+- `error-handling-and-resilience` (Always Apply) - Active
+- `tests-and-validation` (Apply to Specific Files) - Active (matches test files)
+
+**Example 3: Building a multi-agent system**
+- `core-python-standards` (Always Apply) - Active
+- `error-handling-and-resilience` (Always Apply) - Active
+- `multi-agent-systems` (Apply Intelligently) - Considered (relevant to conversation)
+- `langgraph-architecture-and-nodes` (Apply to Specific Files) - Active (if working on node files)
 
 ## Creating and Updating Rules
 
-The `rules-management` rule is automatically applied when you work on `RULE.md` files. It provides complete guidance on:
+When creating or updating Rules, follow the format defined in `.cursor/rules/rules-management/RULE.md`:
 
-- Rule file format and structure
-- Frontmatter configuration for each rule type
-- Step-by-step creation process
-- Best practices and validation
+1. **Choose the appropriate category** folder
+2. **Create the folder structure**: `category-name/rule-name/RULE.md`
+3. **Write the frontmatter** based on the rule type:
+   - Always Apply: `alwaysApply: true`
+   - Apply Intelligently: `description: "..."` and `alwaysApply: false`
+   - Apply to Specific Files: `globs: [...]` and `alwaysApply: false`
+   - Apply Manually: `alwaysApply: false` (no description or globs)
+4. **Write the rule content** following the structure and format guidelines
 
-You can also manually apply it:
+See `.cursor/rules/rules-management/RULE.md` for detailed format specifications and examples.
 
-```
-@rules-management create a new rule for database patterns
-```
+## Rule File Format
 
-See [`.cursor/rules/rules-management/RULE.md`](rules-management/RULE.md) for the complete guide.
+Every `RULE.md` file must follow this structure:
+
+1. **Frontmatter** (YAML between `---` markers)
+   - Defines rule type and application behavior
+   - Must be at the very start of the file
+
+2. **Rule Content** (Markdown)
+   - Mandate/Overview section
+   - Detailed guidelines and standards
+   - Examples and best practices
+
+See `.cursor/rules/rules-management/RULE.md` for complete format specifications.
 
 ## Integration with Commands
 
-Rules are referenced in Commands through the "Rules Applied" section. Commands use Rules to:
+Rules work together with Commands (`.cursor/commands/`) to provide comprehensive workflows:
 
-- Apply consistent standards and best practices
-- Ensure compliance with governance requirements
-- Provide comprehensive analysis based on project rules
+- **Rules** define standards and patterns that guide the AI's behavior
+- **Commands** define workflows that use these standards
+- Commands reference Rules in their "Rules Applied" section
+- The Agent automatically applies relevant Rules when executing Commands
 
-Rules are automatically applied based on their type - you don't need to manually activate them in commands.
+For example, the `/testing/run-test-suite` command references `tests-and-validation` and `core-python-standards` rules. When you run the command, the Agent automatically applies these rules (if they match the rule type criteria).
 
 ## Best Practices
 
-1. **Keep Rules Focused** - Each rule should cover one specific domain
-2. **Length Limit** - Keep rules under 500 lines (split if larger)
-3. **Be Actionable** - Provide concrete, actionable guidance
-4. **Reference, Don't Copy** - Use `@filename` to reference files instead of copying content
-5. **Clear Structure** - Use markdown headers for organization
+1. **Use Appropriate Rule Types**: Choose the right type based on when the rule should be active
+2. **Keep Rules Focused**: Each rule should cover a specific domain or concern
+3. **Use Clear Descriptions**: For "Apply Intelligently" rules, write clear, specific descriptions
+4. **Use Specific Glob Patterns**: For "Apply to Specific Files" rules, use precise glob patterns
+5. **Update Rules Regularly**: Keep rules updated as standards and requirements evolve
+6. **Test Rule Application**: Verify that rules are applied correctly in different contexts
 
 ## Related Documentation
 
-- [Cursor Rules Documentation](https://cursor.com/docs/context/rules)
-- [Rules Management Guide](rules-management/RULE.md) - How to create/update rules
-- [Commands Documentation](../commands/README.md) - How commands use rules
-- [Main README](../../README.md) - Project overview
+- **[Root README](../README.md)** - Overview of the entire repository
+- **[Commands Documentation](../commands/README.md)** - Complete guide to Cursor Commands
+- **[Rules Management Rule](rules-management/RULE.md)** - Format specifications for creating/updating rules
+- **[Commands Management Rule](commands-management/RULE.md)** - Format specifications for creating/updating commands
+- **[Cursor Rules Documentation](https://cursor.com/docs/context/rules)** - Official Cursor documentation
+- **[Cursor Commands Documentation](https://cursor.com/docs/agent/chat/commands)** - Official Cursor documentation

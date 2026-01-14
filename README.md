@@ -1,183 +1,159 @@
 # Cursor Rules & Commands Repository
 
-A comprehensive collection of Cursor AI Rules and Commands for Python development, agentic systems, and production deployments. This repository provides standardized workflows, coding standards, and best practices that can be easily integrated into any project.
+A comprehensive collection of Cursor AI Rules and Commands for Python development, agent systems, and production deployments. This repository provides standardized workflows, coding standards, and best practices that can be easily integrated into any project.
 
 ## Overview
 
 This repository contains two main components:
 
-- **Rules** (`.cursor/rules/`) - System-level instructions that guide the Cursor Agent with coding standards, best practices, and domain-specific knowledge
-- **Commands** (`.cursor/commands/`) - Reusable workflows that can be triggered with a `/` prefix to automate common development tasks
+### 📋 Rules (`.cursor/rules/`)
+System-level instructions for the Cursor AI Agent. Rules define coding standards, architectural patterns, security requirements, and development workflows. They are automatically applied based on their configuration (always, intelligently, or for specific files).
 
-Together, Rules and Commands provide a complete framework for maintaining code quality, security, and consistency across your projects.
+### ⚡ Commands (`.cursor/commands/`)
+Reusable workflows that can be triggered with a `/` prefix in the chat. Commands provide standardized processes for testing, security audits, code reviews, deployment, and agent development.
 
 ## Quick Start
 
 ### Option 1: Copy Everything
+Simply copy the entire `.cursor` folder to your project root. Cursor will automatically:
+- Apply rules based on their configuration
+- Make commands available via `/` prefix
 
-Copy both `.cursor/rules` and `.cursor/commands` folders to your project root:
-
-```bash
-cp -r .cursor/ /path/to/your/project/
-```
-
-### Option 2: Copy by Need
+### Option 2: Copy by Category
+Copy only what you need:
 
 **For all projects:**
-- Copy `.cursor/rules/core/` and `.cursor/rules/security/`
-- Copy `.cursor/commands/review/` and `.cursor/commands/security/`
+- `.cursor/rules/core/` - Essential coding standards
+- `.cursor/rules/security/` - Security and governance
 
 **For agent projects:**
-- Also copy `.cursor/rules/agents/` and `.cursor/rules/evaluation/`
-- Also copy `.cursor/commands/agents/` and `.cursor/commands/testing/`
+- `.cursor/rules/agents/` - Multi-agent patterns
+- `.cursor/rules/evaluation/` - LLM evaluation
 
 **For API projects:**
-- Also copy `.cursor/rules/api/`
-- Also copy relevant commands from `.cursor/commands/`
+- `.cursor/rules/api/` - API design and documentation
 
 **For production projects:**
-- Also copy `.cursor/rules/infrastructure/`
-- Also copy `.cursor/commands/deployment/` and `.cursor/commands/monitoring/`
+- `.cursor/rules/infrastructure/` - Deployment and monitoring
 
-## Structure
+## Directory Structure
 
 ```
-.cursor/
-├── rules/              # System-level instructions for Cursor Agent
-│   ├── core/          # Always-applied core rules
-│   ├── security/      # Security and governance
-│   ├── agents/         # Agent-specific patterns
-│   ├── infrastructure/# Deployment and operations
-│   ├── development/   # Testing and code review
-│   ├── api/           # API development
-│   ├── data/          # Data management
-│   ├── evaluation/    # LLM evaluation
-│   └── configuration/# Configuration management
-└── commands/          # Reusable workflows
-    ├── testing/       # Testing and evaluation
-    ├── security/      # Security audits
-    ├── review/        # Code review
-    ├── monitoring/    # Observability
-    ├── deployment/    # Deployment workflows
-    └── agents/         # Agent development
+Rules/
+├── .cursor/
+│   ├── rules/          # Cursor Rules (see .cursor/rules/README.md)
+│   │   ├── core/       # Always-applied core rules
+│   │   ├── security/   # Security and governance
+│   │   ├── agents/     # Agent-specific rules
+│   │   ├── infrastructure/  # Deployment, monitoring, performance
+│   │   ├── development/     # Testing, code review, versioning
+│   │   ├── api/        # API-related rules
+│   │   ├── data/       # Data schemas, migrations
+│   │   ├── evaluation/ # LLM evaluation, judging
+│   │   └── configuration/  # Configuration, DI, prompts
+│   └── commands/       # Cursor Commands (see .cursor/commands/README.md)
+│       ├── testing/    # Testing and evaluation
+│       ├── security/   # Security audit and compliance
+│       ├── review/     # Code review and compliance
+│       ├── monitoring/ # Monitoring and observability
+│       ├── deployment/ # Deployment workflows
+│       └── agents/    # Agent development
+└── README.md          # This file
 ```
 
-## Rules
+## How Rules Work
 
-Rules provide persistent, reusable context at the prompt level. They are automatically applied based on their configuration:
+Rules are applied automatically based on their type:
 
-- **Always Apply** - Active in every chat session
-- **Apply Intelligently** - Applied when Agent decides they're relevant
-- **Apply to Specific Files** - Applied when working on matching file patterns
-- **Apply Manually** - Applied when @-mentioned
+- **Always Apply** (`alwaysApply: true`) - Active in every chat session
+- **Apply Intelligently** (`description` field) - Applied when Agent deems relevant
+- **Apply to Specific Files** (`globs` patterns) - Applied when working on matching files
+- **Apply Manually** - Applied only when explicitly mentioned (e.g., `@rule-name`)
 
 See [`.cursor/rules/README.md`](.cursor/rules/README.md) for detailed documentation.
 
-## Commands
+## How Commands Work
 
-Commands are reusable workflows triggered with a `/` prefix. They integrate with Rules to provide standardized processes:
-
-- Individual commands for specific tasks
-- Master commands that orchestrate multiple commands
-- Integration with project Rules for consistent standards
-
-See [`.cursor/commands/README.md`](.cursor/commands/README.md) for detailed documentation.
-
-## Categories
-
-### Core Rules & Commands
-Essential for all projects:
-- **Rules**: `core/`, `security/`
-- **Commands**: `review/`, `security/`
-
-### Agent Development
-For multi-agent systems and LangGraph:
-- **Rules**: `agents/`, `evaluation/`
-- **Commands**: `agents/`, `testing/`
-
-### Production Deployment
-For production-ready applications:
-- **Rules**: `infrastructure/`, `deployment/`
-- **Commands**: `deployment/`, `monitoring/`
-
-### API Development
-For API projects:
-- **Rules**: `api/`
-- **Commands**: Relevant testing and review commands
-
-## Usage Examples
-
-### Using Rules
-
-Rules are automatically applied based on their configuration. You can also manually apply them:
-
-```
-@core-python-standards help me write a function
-@rules-management create a new rule for database patterns
-```
-
-### Using Commands
-
-Commands are triggered with a `/` prefix:
+Commands are triggered with a `/` prefix in the chat input:
 
 ```
 /testing/run-test-suite
 /security/security-audit
-/review/code-review-checklist
-/testing/run-all-testing
+/deployment/pre-deployment-check
 ```
 
-You can also provide additional context:
+Each command follows a standardized workflow and integrates with relevant Rules. See [`.cursor/commands/README.md`](.cursor/commands/README.md) for detailed documentation.
 
-```
-/testing/run-test-suite and fix any failures
-/security/security-audit focusing on OWASP Top 10
-```
+## Categories
 
-## Creating and Updating
+### Core Rules
+Essential rules for all projects:
+- `core-python-standards` - Python coding standards (always applied)
+- `error-handling-and-resilience` - Error handling patterns (always applied)
 
-### Rules
+### Security Rules
+Security and governance:
+- `security-governance-and-observability` - Security standards (always applied)
+- `audit-protocol` - Audit procedures (always applied)
 
-To create or update a rule, the `rules-management` rule is automatically applied when working on `RULE.md` files. You can also tag it manually:
+### Agent Rules
+Agent-specific architecture:
+- `multi-agent-systems` - Multi-agent patterns
+- `langgraph-architecture-and-nodes` - LangGraph workflows
+- `agentic-logic-and-tools` - Agent tools and logic
 
-```
-@rules-management create a new rule for database patterns
-```
+### Infrastructure Rules
+Deployment and operations:
+- `deployment-and-infrastructure` - CI/CD, Docker, K8s
+- `monitoring-and-observability` - Monitoring and logging
+- `performance-optimization` - Performance best practices
+- `multi-tenancy-and-isolation` - Multi-tenancy patterns
 
-See [`.cursor/rules/rules-management/RULE.md`](.cursor/rules/rules-management/RULE.md) for the complete guide.
+### Development Rules
+Development workflow:
+- `tests-and-validation` - Testing standards
+- `code-review-and-collaboration` - Code review process
+- `versioning-and-release-management` - Versioning strategy
 
-### Commands
+### API Rules
+API development:
+- `api-interface-and-streaming` - API design
+- `api-documentation-standards` - API docs
 
-To create or update a command, the `commands-management` rule is automatically applied when working on command files. You can also tag it manually:
+### Data Rules
+Data management:
+- `data-schemas-and-interfaces` - Data schemas
+- `data-migration-and-compatibility` - Migrations
 
-```
-@commands-management create a new command for database migrations
-```
+### Evaluation Rules
+LLM evaluation and testing:
+- `llm-evaluation-and-metrics` - Evaluation metrics
+- `llm-judge-protocol` - LLM judging
+- `final-review-protocol` - Final review (always applied)
 
-See [`.cursor/rules/commands-management/RULE.md`](.cursor/rules/commands-management/RULE.md) for the complete guide.
+### Configuration Rules
+Configuration and setup:
+- `configuration-and-dependency-injection` - DI patterns
+- `prompt-engineering-and-management` - Prompt management
 
 ## Documentation
 
-- **[Rules Documentation](.cursor/rules/README.md)** - Complete guide to Rules
-- **[Commands Documentation](.cursor/commands/README.md)** - Complete guide to Commands
-- **[Rules Management Guide](.cursor/rules/rules-management/RULE.md)** - How to create/update Rules
-- **[Commands Management Guide](.cursor/rules/commands-management/RULE.md)** - How to create/update Commands
-
-## Related Resources
-
-- [Cursor Rules Documentation](https://cursor.com/docs/context/rules)
-- [Cursor Commands Documentation](https://cursor.com/docs/agent/chat/commands)
+- **[Rules Documentation](.cursor/rules/README.md)** - Complete guide to Cursor Rules
+- **[Commands Documentation](.cursor/commands/README.md)** - Complete guide to Cursor Commands
+- **[Cursor Rules Docs](https://cursor.com/docs/context/rules)** - Official Cursor documentation
+- **[Cursor Commands Docs](https://cursor.com/docs/agent/chat/commands)** - Official Cursor documentation
 
 ## Contributing
 
-When adding new rules or commands:
+When creating or updating Rules:
+- Follow the format defined in `.cursor/rules/rules-management/RULE.md`
+- Use appropriate rule types (Always Apply, Apply Intelligently, etc.)
 
-1. Follow the structure and format defined in the management guides
-2. Ensure proper categorization
-3. Include relevant Rules Applied (for commands)
-4. Test thoroughly before committing
-5. Update relevant README files
+When creating or updating Commands:
+- Follow the format defined in `.cursor/rules/commands-management/RULE.md`
+- Integrate with relevant Rules
+- Avoid duplication by reusing existing commands
 
 ## License
 
-This repository contains configuration and documentation files for use with Cursor AI. Use and modify as needed for your projects.
+This repository contains development standards and workflows. Use and adapt as needed for your projects.
