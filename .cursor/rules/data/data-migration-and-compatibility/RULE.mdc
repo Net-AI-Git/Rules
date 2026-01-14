@@ -26,6 +26,8 @@ alwaysApply: false
     * **Manual Approval:** Require manual approval for destructive migrations.
     * **Rollback Plan:** Always have a rollback plan for migrations.
 
+**See:** `@examples_migrations.py` for Alembic migration structure pattern.
+
 ## 2. Backward Compatibility Guarantees
 
 * **API Compatibility:**
@@ -85,6 +87,8 @@ alwaysApply: false
     4. Update application to read from new column.
     5. Remove old column.
 
+**See:** `@examples_zero_downtime.py` for zero-downtime migration pattern with dual-write strategy.
+
 * **Rollback Plan:**
     * **Keep Old Format:** Keep old format until migration fully verified.
     * **Quick Switch:** Be able to quickly switch back to old format if issues arise.
@@ -128,6 +132,8 @@ alwaysApply: false
     * **Reverse Migration:** Run reverse migration to undo changes.
     * **Data Restore:** Restore data from backup if migration corrupted data.
     * **Code Rollback:** Rollback code to previous version if migration is code-dependent.
+
+**See:** `@examples_rollback.py` for migration rollback pattern.
 
 * **Rollback Triggers:**
     * **Error Rate:** Rollback if error rate increases after migration.

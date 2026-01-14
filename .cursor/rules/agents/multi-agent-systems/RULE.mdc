@@ -20,6 +20,8 @@ All agentic systems in this codebase are designed as **Multi-Agent Systems**. Th
   * Attach structured fields per section
   * **MUST NOT:** Execute work or produce final output
 
+**See:** `@examples_orchestration.py` for Orchestrator/Worker/Synthesizer architecture pattern.
+
 ### Worker Agents (Specialists)
 * **Role:** Execute specialized sub-tasks.
 * **Principle:** Specialization - each worker focuses on one domain.
@@ -63,6 +65,8 @@ A SECTION must contain:
 * Workers must never modify the SECTIONS list.
 * Workers must never write into another worker's SECTION.
 
+**See:** `@examples_sections.py` for SECTIONS pattern implementation.
+
 ## 3. FAN-OUT / FAN-IN Patterns
 
 ### FAN-OUT (Task Distribution)
@@ -101,6 +105,8 @@ A SECTION must contain:
 ### State Field Ownership
 * **Rule:** Assign each state field to a single "owner" node to avoid accidental overwrites.
 * **Benefit:** Makes tracing failures easy.
+
+**See:** `@examples_state_management.py` for shared/worker state isolation patterns.
 
 ## 5. Core Control Roles
 

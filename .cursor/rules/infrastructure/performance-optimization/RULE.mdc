@@ -26,6 +26,8 @@ alwaysApply: false
     3. Store in cache for future requests.
     4. Return data to caller.
 
+**See:** `@examples_caching.py` for cache-aside pattern implementation.
+
 * **Write-Through Pattern:**
     * Write to cache and source simultaneously.
     * Ensures cache and source are always in sync.
@@ -91,6 +93,8 @@ alwaysApply: false
     * **Async Batching:** Use `asyncio.gather()` to process batches in parallel.
     * **Worker Pools:** Use worker pools for CPU-intensive batch processing.
 
+**See:** `@examples_batching.py` for batch processing pattern implementation.
+
 * **Error Handling:**
     * **Partial Success:** Handle partial batch failures gracefully.
     * **Retry Logic:** Implement retry logic for failed batch items.
@@ -125,6 +129,8 @@ alwaysApply: false
         * **SQLAlchemy:** Configure pool size, max overflow, pool timeout.
         * **AsyncPG:** Use connection pools for async PostgreSQL connections.
     * **HTTP Connections:** Reuse HTTP connections using connection pools (httpx, aiohttp).
+
+**See:** `@examples_connection_pooling.py` for connection pool configuration pattern.
 
 * **Thread/Process Pools:**
     * **ThreadPoolExecutor:** Use for I/O-bound tasks.

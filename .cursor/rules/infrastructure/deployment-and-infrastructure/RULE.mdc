@@ -66,6 +66,8 @@ CMD ["python", "main.py"]
     * **Resource Limits:** Set CPU and memory limits and requests.
     * **Health Checks:** Configure liveness and readiness probes.
 
+**See:** `@examples_kubernetes.py` for Kubernetes Deployment and Service resource patterns.
+
 * **Service Discovery:**
     * **Service Resources:** Use Kubernetes Services for internal service discovery.
     * **DNS:** Services are accessible via DNS names (e.g., `service-name.namespace.svc.cluster.local`).
@@ -114,6 +116,8 @@ CMD ["python", "main.py"]
     3. Switch traffic from active to inactive environment.
     4. Monitor for issues.
     5. Keep previous environment as backup for quick rollback.
+
+**See:** `@examples_blue_green.py` for blue-green deployment traffic switching pattern.
 
 * **Benefits:**
     * **Zero Downtime:** No downtime during deployments.

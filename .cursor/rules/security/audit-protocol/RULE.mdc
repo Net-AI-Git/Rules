@@ -37,6 +37,8 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
   * Use write-once storage (WORM - Write Once Read Many).
   * Implement cryptographic hashing for log integrity verification.
 
+**See:** `@examples_audit_logging.py` for audit log structure and event logging implementation pattern.
+
 ### Audit Log Storage
 
 * **Centralized Storage:** Store audit logs in a centralized, secure system (e.g., dedicated audit database, SIEM system).
@@ -80,6 +82,8 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
   * **Automated Reports:** Generate compliance reports (access logs, data processing records).
   * **Audit Reports:** Create audit reports for external auditors.
   * **Incident Reports:** Document security incidents for compliance reporting.
+
+**See:** `@examples_compliance.py` for compliance validation pattern implementation.
 
 ## 3. Logging & Tracing Standards
 
@@ -214,6 +218,8 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
   * **Chain of Custody:** Maintain chain of custody for audit logs used in investigations.
   * **Integrity Verification:** Verify log integrity using cryptographic hashes.
   * **Legal Hold:** Preserve audit logs under legal hold orders.
+
+**See:** `@examples_forensics.py` for timeline reconstruction and forensic analysis pattern.
 
 ## 7. Integration with Other Systems
 
