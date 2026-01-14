@@ -1,8 +1,5 @@
 ---
-globs:
-  - "**/prompts/**/*.py"
-  - "**/prompts/**/*.yaml"
-  - "**/prompts/**/*.txt"
+globs: **/prompts/**/*.py, **/prompts/**/*.yaml, **/prompts/**/*.txt
 alwaysApply: false
 ---
 

@@ -1,6 +1,5 @@
 ---
-globs:
-  - "**/.cursor/commands/**/*.md"
+globs: **/.cursor/commands/**/*.md
 alwaysApply: false
 ---
 

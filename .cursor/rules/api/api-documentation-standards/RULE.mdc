@@ -1,8 +1,5 @@
 ---
-globs:
-  - "**/api/**/*.py"
-  - "**/routes/**/*.py"
-  - "**/endpoints/**/*.py"
+globs: **/api/**/*.py, **/routes/**/*.py, **/endpoints/**/*.py
 alwaysApply: false
 ---
 

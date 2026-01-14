@@ -1,7 +1,5 @@
 ---
-globs:
-  - "**/migrations/**/*.py"
-  - "**/alembic/**/*.py"
+globs: **/migrations/**/*.py, **/alembic/**/*.py
 alwaysApply: false
 ---
 

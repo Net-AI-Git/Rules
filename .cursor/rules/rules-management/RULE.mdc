@@ -1,12 +1,12 @@
 ---
-globs:
-  - "**/.cursor/rules/**/RULE.md"
+globs: **/.cursor/rules/**/RULE.mdc
 alwaysApply: false
 ---
-
 ## Mandate
 
 When creating or updating Cursor Rules, you **MUST** follow this guide strictly. This document defines the exact format, structure, and process for all rules in this repository.
+
+**Important:** All rules in the `.cursor/rules` directory **MUST** use the `.mdc` file extension (not `.md`). Every rule file must be named `RULE.mdc`.
 
 ## What are Cursor Rules?
 
@@ -34,23 +34,23 @@ Rules in this repository are organized by category:
 
 ### Rule Folder Structure
 
-Each rule is a **folder** containing a `RULE.md` file:
+Each rule is a **folder** containing a `RULE.mdc` file:
 
 ```
 .cursor/rules/
   category-name/
     rule-name/
-      RULE.md
+      RULE.mdc
 ```
 
 **Important:** 
 - Each rule must be in its own folder
 - The folder name should be kebab-case (e.g., `core-python-standards`)
-- The file inside must be named exactly `RULE.md` (capital letters)
+- The file inside must be named exactly `RULE.mdc` (capital letters, `.mdc` extension)
 
 ## Rule File Format
 
-Every `RULE.md` file **MUST** follow this structure:
+Every `RULE.mdc` file **MUST** follow this structure:
 
 ### 1. Frontmatter Metadata
 
@@ -177,9 +177,7 @@ Applied when working on files matching specified patterns.
 **Frontmatter Structure:**
 ```yaml
 ---
-globs:
-  - "**/api/**/*.py"
-  - "**/routes/**/*.py"
+globs: **/api/**/*.py, **/routes/**/*.py
 alwaysApply: false
 ---
 ```
@@ -189,22 +187,20 @@ alwaysApply: false
 1. **Start with `---` on the first line** (no content before it)
 2. **Add `globs:` field** on the second line
    - Use colon after `globs`: `globs:`
-   - The value is a YAML array (list)
-3. **Add array items** starting from the third line
-   - Each pattern on a new line
-   - Start with `  - ` (2 spaces, dash, space)
-   - Each pattern **MUST** be in double quotes: `"pattern"`
+   - The value is a string with patterns separated by commas
    - Patterns use glob syntax (e.g., `**/api/**/*.py`)
-4. **Add `alwaysApply: false`** after the last glob pattern
+   - Multiple patterns are separated by commas and spaces: `pattern1, pattern2, pattern3`
+3. **Add `alwaysApply: false`** on the third line
    - Use lowercase `false`
    - No quotes around `false`
-5. **End with `---` on a new line** (exactly 3 dashes)
-6. **Add one blank line** after the closing `---` before content starts
+4. **End with `---` on a new line** (exactly 3 dashes)
+5. **Add one blank line** after the closing `---` before content starts
 
 **Required Fields:**
-- ✅ `globs:` (required - must be a YAML array)
+- ✅ `globs:` (required - must be a string with comma-separated patterns)
   - At least one pattern required
-  - Each pattern in double quotes
+  - Multiple patterns separated by commas and spaces
+  - No quotes around the entire value
 - ✅ `alwaysApply: false` (required)
 - ❌ `description` (MUST NOT be present)
 
@@ -217,22 +213,20 @@ alwaysApply: false
 - `*.ext` matches files with extension
 - Patterns are case-sensitive
 - Use forward slashes `/` even on Windows
+- Multiple patterns separated by commas: `pattern1, pattern2, pattern3`
 
 **Common Mistakes to Avoid:**
-- ❌ `globs: "pattern"` (must be array, not string)
-- ❌ `- pattern` without quotes (must use double quotes)
-- ❌ `- 'pattern'` with single quotes (must use double quotes)
+- ❌ `globs:` with array format (must be string, not array)
+- ❌ `globs: "pattern"` (no quotes around the value)
+- ❌ Missing commas between patterns
 - ❌ Missing `alwaysApply: false`
 - ❌ Adding `description` field
-- ❌ Wrong indentation (must be 2 spaces for array items)
 - ❌ Using backslashes `\` instead of forward slashes `/`
 
 **Complete Example:**
 ```markdown
 ---
-globs:
-  - "**/tests/**/*.py"
-  - "**/test_*.py"
+globs: **/tests/**/*.py, **/test_*.py
 alwaysApply: false
 ---
 
@@ -315,8 +309,33 @@ Choose the appropriate category folder:
 Create the folder path:
 ```
 .cursor/rules/[category]/[rule-name]/
-  RULE.md
+  RULE.mdc
+  [optional example files]
 ```
+
+**Optional: Example Files**
+
+For complex rules with extensive code examples, you can create separate example files in the same folder:
+
+```
+.cursor/rules/[category]/[rule-name]/
+  RULE.mdc
+  examples_basic.py
+  examples_advanced.py
+  examples_integration.py
+```
+
+**When to use example files:**
+- ✅ Rule is approaching 400+ lines
+- ✅ Rule contains multiple code examples (3+)
+- ✅ Code examples are long (20+ lines each)
+- ✅ Examples demonstrate different patterns or use cases
+- ✅ You want to keep the rule focused on guidance rather than implementation details
+
+**How to reference example files:**
+- Use `@filename` syntax to reference files in the same folder
+- Example: `See: @examples_server.py for complete server implementation`
+- The Agent can read and understand code from these files when needed
 
 ### Step 4: Write Frontmatter
 
@@ -355,24 +374,22 @@ alwaysApply: false
 **For Apply to Specific Files:**
 
 1. Start with `---` (3 dashes, no spaces)
-2. Add `globs:` (colon, no value on same line)
-3. Add each pattern on a new line with `  - "pattern"` (2 spaces, dash, space, pattern in double quotes)
-4. Add `alwaysApply: false` (lowercase `false`, no quotes, one space after colon)
-5. End with `---` (3 dashes, no spaces)
-6. Add one blank line before content
+2. Add `globs:` followed by patterns separated by commas (e.g., `globs: pattern1, pattern2, pattern3`)
+3. Add `alwaysApply: false` (lowercase `false`, no quotes, one space after colon)
+4. End with `---` (3 dashes, no spaces)
+5. Add one blank line before content
 
 ```yaml
 ---
-globs:
-  - "**/pattern/**/*.ext"
-  - "**/another-pattern/**/*.ext"
+globs: **/pattern/**/*.ext, **/another-pattern/**/*.ext
 alwaysApply: false
 ---
 ```
 
 **Important:** 
-- `globs` must be a YAML array (list), not a string
-- Each pattern must be in double quotes
+- `globs` must be a string with comma-separated patterns, not an array
+- Multiple patterns separated by commas and spaces
+- No quotes around the entire value
 - Use forward slashes `/` even on Windows
 - Patterns use glob syntax with `**/` for recursive matching
 
@@ -402,7 +419,7 @@ alwaysApply: false
 
 Ensure:
 - ✅ Folder name is kebab-case
-- ✅ File is named exactly `RULE.md`
+- ✅ File is named exactly `RULE.mdc` (with `.mdc` extension)
 - ✅ Frontmatter is correct for the rule type
 - ✅ Content follows markdown best practices
 - ✅ Rule is under 500 lines (split if larger)
@@ -413,7 +430,7 @@ Ensure:
 
 Find the rule in the appropriate category folder:
 ```
-.cursor/rules/[category]/[rule-name]/RULE.md
+.cursor/rules/[category]/[rule-name]/RULE.mdc
 ```
 
 ### Step 2: Understand Current Structure
@@ -457,7 +474,10 @@ After update:
 
 2. **Length Limit**
    - Keep rules under 500 lines
-   - If a rule exceeds 500 lines, split it into multiple rules
+   - If a rule exceeds 400 lines, consider using separate example files
+   - Move code examples to `examples_*.py` (or other appropriate extensions) files
+   - Reference examples using `@filename` syntax: `See: @examples_server.py`
+   - If a rule still exceeds 500 lines after extracting examples, split it into multiple rules
 
 3. **Be Actionable**
    - Provide concrete, actionable guidance
@@ -467,7 +487,10 @@ After update:
 4. **Reference, Don't Copy**
    - Use `@filename` to reference files instead of copying content
    - This keeps rules short and prevents staleness
-   - Example: `See: @core-python-standards.md for coding standards`
+   - Reference other rules: `See: @core-python-standards.mdc for coding standards`
+   - Reference example files in the same folder: `See: @examples_server.py for complete implementation`
+   - The Agent can read referenced files when needed, so you don't need to include full code in the rule
+   - **Best practice:** For rules with multiple code examples, create `examples_*.py` files and reference them
 
 5. **Clear Structure**
    - Use markdown headers (`##`, `###`) for organization
@@ -491,6 +514,8 @@ After update:
 4. **Don't Duplicate Code**
    - Point to canonical examples instead of copying code
    - Use `@filename` references
+   - For simple rules with 1-2 short examples, include them inline
+   - Only create separate example files when rule is complex or has many examples
 
 5. **Don't Include Main Title**
    - Start with `## Section` or content directly
@@ -500,7 +525,7 @@ After update:
 
 ### Example 1: Always Apply Rule
 
-**Location:** `.cursor/rules/core/core-python-standards/RULE.md`
+**Location:** `.cursor/rules/core/core-python-standards/RULE.mdc`
 
 ```markdown
 ---
@@ -518,14 +543,11 @@ You are an expert AI developer. You must strictly adhere to the following method
 
 ### Example 2: Apply to Specific Files
 
-**Location:** `.cursor/rules/api/api-documentation-standards/RULE.md`
+**Location:** `.cursor/rules/api/api-documentation-standards/RULE.mdc`
 
 ```markdown
 ---
-globs:
-  - "**/api/**/*.py"
-  - "**/routes/**/*.py"
-  - "**/endpoints/**/*.py"
+globs: **/api/**/*.py, **/routes/**/*.py, **/endpoints/**/*.py
 alwaysApply: false
 ---
 
@@ -537,7 +559,7 @@ alwaysApply: false
 
 ### Example 3: Apply Intelligently
 
-**Location:** `.cursor/rules/development/code-review-and-collaboration/RULE.md`
+**Location:** `.cursor/rules/development/code-review-and-collaboration/RULE.mdc`
 
 ```markdown
 ---
@@ -554,7 +576,7 @@ alwaysApply: false
 
 ### Example 4: Apply Manually
 
-**Location:** `.cursor/rules/evaluation/llm-judge-protocol/RULE.md`
+**Location:** `.cursor/rules/evaluation/llm-judge-protocol/RULE.mdc`
 
 ```markdown
 ---
@@ -566,24 +588,106 @@ alwaysApply: false
 You are the **Supreme AI Adjudicator**. Your role is to evaluate the performance, safety, and logic of an Agentic System...
 ```
 
+### Example 5: Rule with Separate Example Files
+
+**Location:** `.cursor/rules/api/mcp-protocol-implementation/RULE.mdc`
+
+**Folder Structure:**
+```
+.cursor/rules/api/mcp-protocol-implementation/
+  RULE.mdc
+  examples_server.py
+  examples_client.py
+  examples_integration.py
+```
+
+**RULE.mdc content (excerpt):**
+```markdown
+---
+description: "Standards and patterns for implementing Model Context Protocol (MCP) servers and clients"
+alwaysApply: false
+---
+
+## MCP Server Implementation
+
+### Server Setup
+
+Use the `mcp.server.Server` class to create an MCP server:
+
+```python
+from mcp.server import Server
+
+server = Server("my-server")
+```
+
+**See:** `@examples_server.py` for complete server examples.
+
+### Client Implementation
+
+MCP clients connect to servers using stdio, HTTP, or WebSocket:
+
+**See:** `@examples_client.py` for complete client examples.
+
+### Integration Patterns
+
+For complex integrations, use Views/Profiles/Scopes:
+
+**See:** `@examples_integration.py` for complete Views/Profiles/Scopes implementation.
+
+## Complete Examples
+
+Complete, runnable examples are provided in separate files:
+
+- **`@examples_server.py`**: Server implementation examples
+  - Basic server with tools
+  - Server with resources
+  - Server with prompts
+  - Complete server with error handling
+
+- **`@examples_client.py`**: Client implementation examples
+  - Basic stdio client
+  - HTTP client
+  - Tool result parsing
+  - Complete client workflow
+
+- **`@examples_integration.py`**: Integration patterns
+  - Single server architecture
+  - Dynamic tool discovery
+  - Orchestration pattern
+  - Views/Profiles/Scopes implementation
+```
+
+**Key Points:**
+- Rule stays focused on guidance and standards
+- Code examples are in separate files
+- References use `@filename` syntax
+- Agent can read example files when needed
+- Rule remains under 500 lines even with extensive examples
+
 ## Validation Checklist
 
 Before finalizing any rule creation or update, verify:
 
 - [ ] Folder name is kebab-case
-- [ ] File is named exactly `RULE.md` (capital letters)
+- [ ] File is named exactly `RULE.mdc` (capital letters, `.mdc` extension)
 - [ ] Frontmatter is present and correctly formatted
 - [ ] Frontmatter matches the rule type requirements:
   - [ ] Always Apply: only `alwaysApply: true`
   - [ ] Apply Intelligently: `description` + `alwaysApply: false`
-  - [ ] Apply to Specific Files: `globs` array + `alwaysApply: false`
+  - [ ] Apply to Specific Files: `globs` string + `alwaysApply: false`
   - [ ] Apply Manually: only `alwaysApply: false`
 - [ ] Content starts after frontmatter
 - [ ] No main title (`# Title`) - start with sections or content
-- [ ] Rule is under 500 lines
+- [ ] Rule is under 500 lines (or under 400 lines if using example files)
 - [ ] Markdown formatting is correct
 - [ ] References use `@filename` syntax
 - [ ] Content is clear, actionable, and specific
+- [ ] If using example files:
+  - [ ] Example files are in the same folder as `RULE.mdc`
+  - [ ] Example files use descriptive names (e.g., `examples_*.py`)
+  - [ ] All example files are referenced in `RULE.mdc` using `@filename` syntax
+  - [ ] Example files contain complete, runnable code
+  - [ ] Rule explains what each example file demonstrates
 
 ## Quick Reference: Frontmatter Templates
 
@@ -622,17 +726,16 @@ alwaysApply: false
 **Copy this exact template:**
 ```yaml
 ---
-globs:
-  - "**/pattern1/**/*.ext"
-  - "**/pattern2/**/*.ext"
+globs: **/pattern1/**/*.ext, **/pattern2/**/*.ext
 alwaysApply: false
 ---
 ```
 
 **Key Points:**
-- Two fields: `globs` (array) and `alwaysApply`
-- `globs` is a YAML array (list), not a string
-- Each pattern in double quotes, indented with 2 spaces and `- `
+- Two fields: `globs` (string) and `alwaysApply`
+- `globs` is a string with comma-separated patterns, not an array
+- Multiple patterns separated by commas and spaces
+- No quotes around the entire value
 - `globs` comes first, then `alwaysApply: false`
 - No `description` field
 

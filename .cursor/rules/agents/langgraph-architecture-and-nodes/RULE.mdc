@@ -1,8 +1,5 @@
 ---
-globs:
-  - "**/langgraph/**/*.py"
-  - "**/workflows/**/*.py"
-  - "**/nodes/**/*.py"
+globs: **/langgraph/**/*.py, **/workflows/**/*.py, **/nodes/**/*.py
 alwaysApply: false
 ---
 
