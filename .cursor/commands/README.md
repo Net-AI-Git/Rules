@@ -1,47 +1,41 @@
 # Cursor Commands Documentation
 
-This directory contains custom commands for the Cursor AI agent. Commands are reusable workflows that can be triggered with a `/` prefix in the chat input box.
+This directory contains custom commands for the Cursor AI agent. These commands provide reusable workflows that can be triggered with a `/` prefix in the chat input box.
 
-## What are Cursor Commands?
+## Overview
 
-Commands are plain Markdown files that describe workflows and tasks. They integrate with the project's Rules (`.cursor/rules`) to provide comprehensive, standardized processes for development, testing, security, deployment, and agent development.
+Commands are defined as plain Markdown files that describe workflows and tasks. They integrate with the project's Rules (`.cursor/rules`) to provide comprehensive, standardized processes for development, testing, security, deployment, and agent development.
 
-Commands help:
-- Standardize processes across your team
-- Make common tasks more efficient
-- Ensure consistent application of project standards
-- Automate complex workflows
+Commands are organized into categories with dedicated directories. Each category includes individual commands and a master command that runs all commands in that category in sequence.
 
 ## Directory Structure
 
-Commands are organized by category:
-
 ```
 .cursor/commands/
-├── testing/          # Testing and evaluation commands
+├── testing/
 │   ├── run-test-suite.md
 │   ├── run-evaluation-suite.md
 │   ├── evaluate-with-llm-judge.md
 │   └── run-all-testing.md (Master Command)
-├── security/        # Security audit and compliance commands
+├── security/
 │   ├── security-audit.md
 │   ├── analyze-audit-logs.md
 │   ├── compliance-check.md
 │   └── run-all-security.md (Master Command)
-├── review/          # Code review and compliance check commands
+├── review/
 │   ├── code-review-checklist.md
 │   ├── final-compliance-check.md
 │   └── run-all-review.md (Master Command)
-├── monitoring/      # Monitoring and observability commands
+├── monitoring/
 │   ├── analyze-langsmith-traces.md
 │   ├── comprehensive-system-analysis.md
 │   ├── performance-analysis.md
 │   └── run-all-monitoring.md (Master Command)
-├── deployment/      # Deployment and infrastructure commands
+├── deployment/
 │   ├── pre-deployment-check.md
 │   ├── post-deployment-verification.md
 │   └── run-all-deployment.md (Master Command)
-├── agents/          # Agent development commands
+├── agents/
 │   ├── setup-new-agent-system.md
 │   ├── create-agent-node.md
 │   ├── implement-agent-tool.md
@@ -49,26 +43,9 @@ Commands are organized by category:
 └── README.md
 ```
 
-### Command File Structure
-
-Each command is a **markdown file** (`.md`) in the appropriate category directory:
-
-```
-.cursor/commands/
-  category-name/
-    command-name.md
-```
-
-**Important:**
-- Commands are plain markdown files (no frontmatter)
-- File name = command name (kebab-case)
-- Command path = `/category-name/command-name`
-
 ## Command Categories
 
 ### 1. Testing Commands (`/testing/`)
-
-Testing and evaluation workflows:
 
 #### `/testing/run-test-suite`
 Execute the full test suite and systematically analyze results, identify failures, and provide actionable recommendations.
@@ -90,8 +67,6 @@ Runs all testing commands in sequence: test suite → evaluation suite → LLM J
 
 ### 2. Security Commands (`/security/`)
 
-Security audit and compliance:
-
 #### `/security/compliance-check`
 Comprehensive compliance verification to ensure the system meets regulatory requirements (GDPR, HIPAA, SOC 2).
 
@@ -112,8 +87,6 @@ Runs all security commands in sequence: compliance check → audit log analysis 
 
 ### 3. Review Commands (`/review/`)
 
-Code review and compliance checks:
-
 #### `/review/code-review-checklist`
 Comprehensive code review using a structured checklist to ensure code quality, functionality, testing, documentation, security, and maintainability.
 
@@ -128,8 +101,6 @@ Comprehensive final review before commit to verify solution complies with all ac
 Runs all review commands in sequence: code review checklist → final compliance check.
 
 ### 4. Monitoring Commands (`/monitoring/`)
-
-Monitoring and observability:
 
 #### `/monitoring/analyze-langsmith-traces`
 Comprehensive analysis of LangSmith traces to understand LLM operations, tool usage, agent behavior, and performance.
@@ -151,8 +122,6 @@ Runs all monitoring commands in sequence: LangSmith trace analysis → performan
 
 ### 5. Deployment Commands (`/deployment/`)
 
-Deployment and infrastructure:
-
 #### `/deployment/pre-deployment-check`
 Comprehensive pre-deployment verification to ensure code is ready for production deployment. Calls testing, security, and review commands.
 
@@ -167,8 +136,6 @@ Comprehensive post-deployment verification to ensure successful deployment and s
 Runs all deployment commands in sequence: pre-deployment check → [deploy] → post-deployment verification.
 
 ### 6. Agent Development Commands (`/agents/`)
-
-Agent development workflows:
 
 #### `/agents/setup-new-agent-system`
 Systematic setup of a new multi-agent system from initial planning through implementation structure.
@@ -187,52 +154,6 @@ Implement a new tool for agent use following LangChain tool definition standards
 
 #### `/agents/run-all-agents` (Master Command)
 Runs all agent development commands in sequence: setup new agent system → create agent node → implement agent tool.
-
-## Usage
-
-### Basic Usage
-
-To use a command, type `/` followed by the command path in the Cursor chat input box:
-
-```
-/testing/run-test-suite
-/security/security-audit
-/review/code-review-checklist
-/testing/run-all-testing
-```
-
-### With Additional Context
-
-You can provide additional context after the command name:
-
-```
-/testing/run-test-suite and fix any failures
-/security/security-audit focusing on OWASP Top 10
-/review/code-review-checklist for the new authentication module
-```
-
-### Master Commands
-
-Master commands run all commands in a category in sequence:
-
-```
-/testing/run-all-testing
-/security/run-all-security
-/review/run-all-review
-```
-
-## Command Structure
-
-Each command follows a consistent structure:
-
-1. **Title (H1)**: Command name
-2. **Overview (H2)**: Brief description of what the command does
-3. **Rules Applied (H2)**: List of Rules integrated into the command
-4. **Steps (H2)**: Detailed workflow steps the command follows
-5. **Data Sources (H2)**: Sources of data the command analyzes
-6. **Output (H2)**: Description of the expected output
-
-See individual command files for examples.
 
 ## Master Commands
 
@@ -269,6 +190,34 @@ Commands analyze data from various sources:
 - **Performance Metrics**: System resource usage and performance data
 - **Source Code**: Python files, configuration files, documentation
 
+## Usage
+
+To use a command, type `/` followed by the command path in the Cursor chat input box. For example:
+
+```
+/testing/run-test-suite
+/security/security-audit
+/testing/evaluate-with-llm-judge
+/testing/run-all-testing
+```
+
+You can also provide additional context after the command name:
+
+```
+/testing/run-test-suite and fix any failures
+/security/security-audit focusing on OWASP Top 10
+```
+
+## Command Structure
+
+Each command follows a consistent structure:
+
+1. **Overview**: Brief description of what the command does
+2. **Rules Applied**: List of Rules that are integrated into the command
+3. **Steps**: Detailed workflow steps the command follows
+4. **Data Sources**: Sources of data the command analyzes
+5. **Output**: Description of the expected output
+
 ## Integration with Rules
 
 Commands integrate with the project's Rules (`.cursor/rules`) to:
@@ -278,31 +227,6 @@ Commands integrate with the project's Rules (`.cursor/rules`) to:
 - Provide comprehensive analysis based on project rules
 - Standardize workflows across the team
 
-Rules are automatically applied based on their type:
-- **Always Apply** rules are always active
-- **Apply Intelligently** rules are applied when Agent decides they're relevant
-- **Apply to Specific Files** rules are applied when working on matching files
-- **Apply Manually** rules must be tagged with `@rule-name` if needed
-
-See [`.cursor/rules/README.md`](../rules/README.md) for complete Rules documentation.
-
-## Creating and Updating Commands
-
-The `commands-management` rule is automatically applied when you work on command files (`.md` files in `.cursor/commands/`). It provides complete guidance on:
-
-- Command file format and structure
-- Step-by-step creation process
-- Integration with Rules
-- Best practices and validation
-
-You can also manually apply it:
-
-```
-@commands-management create a new command for database migrations
-```
-
-See [`.cursor/rules/commands-management/RULE.md`](../rules/commands-management/RULE.md) for the complete guide.
-
 ## Best Practices
 
 1. **Use Master Commands for Complete Workflows**: Use master commands (e.g., `/testing/run-all-testing`) when you need to run all commands in a category
@@ -310,25 +234,21 @@ See [`.cursor/rules/commands-management/RULE.md`](../rules/commands-management/R
 3. **Review Output**: Always review command output and recommendations before taking action
 4. **Update Commands**: Keep commands updated as Rules and requirements evolve
 5. **Avoid Duplication**: When creating new commands, check if existing commands can be reused instead of duplicating functionality
-6. **Integrate Rules**: Always list relevant rules in "Rules Applied" section
-7. **Follow Structure**: Maintain the standard 6-section structure for consistency
 
 ## Command Development
 
 When creating new commands:
 
-1. Follow the standard command structure (6 sections)
-2. Integrate relevant Rules in "Rules Applied"
+1. Follow the standard command structure
+2. Integrate relevant Rules
 3. Specify data sources clearly
-4. Provide detailed, actionable steps
+4. Provide detailed steps
 5. Document expected output
 6. Test commands thoroughly
 7. Check for overlaps with existing commands and reuse them when possible
-8. Include error handling (especially for Master Commands)
 
 ## Related Documentation
 
 - [Cursor Commands Documentation](https://cursor.com/docs/agent/chat/commands)
-- [Rules Documentation](../rules/README.md) - Complete guide to Rules
-- [Commands Management Guide](../rules/commands-management/RULE.md) - How to create/update commands
-- [Main README](../../README.md) - Project overview
+- [Cursor Rules Documentation](https://cursor.com/docs/context/rules)
+- Project Rules in `.cursor/rules/`
