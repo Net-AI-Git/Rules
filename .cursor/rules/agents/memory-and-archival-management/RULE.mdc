@@ -26,6 +26,52 @@ All agentic systems **MUST** implement long-term memory and archival strategies 
 
 **See:** `@examples_memory_storage.py` for Vector DB integration and user profile storage patterns.
 
+### Storage Strategy Decision
+
+* **Mandate:** Senior engineers must define clear criteria for choosing between Vector DB and PostgreSQL for different types of memory.
+
+* **Vector DB Use Cases:**
+  * **Semantic Search:** When you need to find memories by meaning/similarity, not exact matches
+  * **Embeddings:** When storing vector embeddings for similarity search
+  * **Unstructured Insights:** Contextual insights, facts, patterns that need semantic retrieval
+  * **RAG Integration:** When memories are used for Retrieval-Augmented Generation
+  * **Examples:** "User mentioned they prefer morning meetings", "User has experience with Python"
+
+* **PostgreSQL Use Cases:**
+  * **Structured User Profiles:** User preferences, settings, configuration (key-value pairs)
+  * **Relational Data:** Data with relationships (user → preferences → settings)
+  * **Exact Queries:** When you need exact matches, filtering, or SQL queries
+  * **Transactional Data:** Data that requires ACID guarantees
+  * **Examples:** User email, subscription tier, feature flags, account settings
+
+* **Decision Criteria:**
+  * **Query Type:** Semantic search → Vector DB, Exact match → PostgreSQL
+  * **Data Structure:** Unstructured text → Vector DB, Structured JSON/relational → PostgreSQL
+  * **Retrieval Pattern:** "Find similar memories" → Vector DB, "Get user profile" → PostgreSQL
+  * **Update Frequency:** Frequently updated structured data → PostgreSQL, Rarely updated insights → Vector DB
+
+**See:** `@examples_storage_strategy.py` for storage decision logic and Vector DB vs PostgreSQL patterns.
+
+### Hybrid Storage Pattern
+
+* **Mandate:** Most production systems should use both Vector DB and PostgreSQL together.
+
+* **Architecture:**
+  * **PostgreSQL:** Store structured user profiles, settings, metadata
+  * **Vector DB:** Store embeddings and semantic memories
+  * **Cross-Reference:** Link Vector DB memories to PostgreSQL user profiles via IDs
+
+* **Retrieval Pattern:**
+  1. Load user profile from PostgreSQL (structured data)
+  2. Query Vector DB for relevant semantic memories
+  3. Combine both into context window
+  4. Use PostgreSQL for filtering/validation, Vector DB for relevance
+
+* **Benefits:**
+  * Best of both worlds: structured queries + semantic search
+  * Efficient storage: right tool for right data type
+  * Scalable: PostgreSQL for transactional, Vector DB for search
+
 ### Memory Types
 
 * **User Profile Memory:**
@@ -129,7 +175,48 @@ All agentic systems **MUST** implement long-term memory and archival strategies 
   * Relevant historical context
   * Actionable patterns
 
-## 4. Memory Compression and Retention
+## 4. Context Compression Integration
+
+### Smart Context Compression
+
+* **Mandate:** Long-term memory retrieval must integrate with context compression to prevent context window overflow.
+
+* **Compression-Aware Retrieval:**
+  * **Token Budget:** Allocate token budget for memories before retrieval
+  * **Priority Loading:** Load high-priority memories first, compress or skip low-priority
+  * **Progressive Loading:** Load memories incrementally as context space becomes available
+
+* **Integration with Context Compression:**
+  * **Before Compression:** Load critical memories into context
+  * **During Compression:** Preserve loaded memories in compression process
+  * **After Compression:** Reload additional memories if space becomes available
+
+* **Compression Triggers:**
+  * When context window exceeds threshold, compress old conversation history
+  * Preserve loaded memories during compression
+  * Use compression to make room for additional memory retrieval
+
+* **See:** `context-compression-and-optimization.md` for comprehensive context compression strategies.
+
+### Memory-Aware Compression
+
+* **Memory Preservation:** During context compression, prioritize preserving:
+  * Recently loaded memories (high relevance)
+  * User profile summaries
+  * Critical contextual insights
+
+* **Compression Strategy:**
+  1. Identify compressible content (old conversation history)
+  2. Preserve loaded memories and user profile
+  3. Compress/summarize old conversation
+  4. Reload additional memories if space available
+
+* **Token Allocation:**
+  * Reserve tokens for memory retrieval (e.g., 20% of context window)
+  * Allocate remaining tokens for conversation history
+  * Dynamically adjust based on memory relevance scores
+
+## 5. Memory Compression and Retention
 
 ### Compression Strategies
 
@@ -158,7 +245,7 @@ All agentic systems **MUST** implement long-term memory and archival strategies 
   * Respect user privacy preferences
   * Support GDPR right to be forgotten
 
-## 5. Privacy and Compliance
+## 6. Privacy and Compliance
 
 ### Data Protection
 
@@ -182,7 +269,7 @@ All agentic systems **MUST** implement long-term memory and archival strategies 
 
 * **See:** `security-governance-and-observability.md` for comprehensive security and privacy requirements.
 
-## 6. Integration Points
+## 7. Integration Points
 
 ### LangGraph Integration
 
@@ -211,7 +298,7 @@ All agentic systems **MUST** implement long-term memory and archival strategies 
 
 * **Data Segregation:** Store memories in tenant-specific namespaces or databases.
 
-## 7. Best Practices
+## 8. Best Practices
 
 ### Memory Quality
 

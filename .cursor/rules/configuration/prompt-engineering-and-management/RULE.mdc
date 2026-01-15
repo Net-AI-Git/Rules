@@ -25,9 +25,130 @@ alwaysApply: false
 
 * **Tracking:** Prompts are experimental. Version them (e.g., `prompts/agent_v1.py`, `prompts/agent_v2.py`) to allow A/B testing and rollback.
 
+* **Version Control:**
+  * **Semantic Versioning:** Use semantic versioning for prompts (e.g., `v1.0.0`, `v1.1.0`, `v2.0.0`)
+  * **Version Tags:** Tag versions with meaningful names (e.g., `production`, `experimental`, `deprecated`)
+  * **Version History:** Maintain changelog for prompt versions documenting changes and rationale
 
+* **A/B Testing:**
+  * **Parallel Versions:** Run multiple prompt versions in parallel for comparison
+  * **Traffic Splitting:** Split traffic between versions (e.g., 50/50, 90/10)
+  * **Metrics Collection:** Collect performance metrics for each version
+  * **Winner Selection:** Select winning version based on metrics (quality, cost, latency)
 
-## 4. Context Management
+* **Rollback Strategy:**
+  * **Quick Rollback:** Maintain ability to quickly rollback to previous version
+  * **Version Registry:** Keep registry of all prompt versions with metadata
+  * **Rollback Triggers:** Define conditions for automatic rollback (e.g., quality drop, errors)
+
+**See:** `@examples_prompt_versioning.py` for version control patterns and A/B testing implementation.
+
+## 4. Prompt Testing
+
+* **Mandate:** Prompts are code and must be tested like code. Senior engineers must implement unit tests for prompts.
+
+* **Unit Testing:**
+  * **Test Cases:** Create test cases with input/output pairs for each prompt
+  * **Validation:** Validate prompt outputs against expected results
+  * **Edge Cases:** Test edge cases and boundary conditions
+  * **Regression Testing:** Run tests on prompt updates to detect regressions
+
+* **Test Framework:**
+  * **Prompt Test Suites:** Organize tests into test suites per prompt
+  * **Assertions:** Use assertions to validate prompt behavior
+  * **Mock LLM:** Use mock LLM responses for fast, deterministic tests
+  * **CI/CD Integration:** Run prompt tests in CI/CD pipeline
+
+* **Quality Checks:**
+  * **Output Validation:** Validate output format, structure, completeness
+  * **Constraint Checking:** Verify prompts respect constraints and guidelines
+  * **Token Counting:** Verify prompts stay within token limits
+  * **Performance Testing:** Test prompt performance (latency, cost)
+
+**See:** `@examples_prompt_testing.py` for unit testing patterns and test framework implementation.
+
+## 5. LangSmith Prompt Hub Integration
+
+* **Mandate:** Use LangSmith Prompt Hub for centralized prompt management in production systems.
+
+* **Prompt Hub Benefits:**
+  * **Centralized Storage:** Single source of truth for all prompts
+  * **Version Management:** Built-in version control and history
+  * **Collaboration:** Team collaboration on prompt development
+  * **Deployment:** Easy deployment and rollback of prompts
+
+* **Integration Patterns:**
+  * **Prompt Registration:** Register prompts in Prompt Hub with metadata
+  * **Prompt Retrieval:** Retrieve prompts from Hub at runtime
+  * **Version Selection:** Select specific prompt versions from Hub
+  * **Update Workflow:** Update prompts through Hub with approval process
+
+* **Metadata Management:**
+  * **Tags:** Tag prompts with categories, use cases, models
+  * **Descriptions:** Document prompt purpose, inputs, outputs
+  * **Performance Metrics:** Track performance metrics per prompt version
+  * **Dependencies:** Document prompt dependencies and relationships
+
+**See:** `@examples_langsmith_integration.py` for LangSmith Prompt Hub integration patterns.
+
+## 6. YAML Management
+
+* **Structured Storage:** Store prompts in YAML files for structured, readable format.
+
+* **YAML Structure:**
+  * **Metadata:** Version, author, description, tags
+  * **Prompt Content:** Actual prompt text with variables
+  * **Variables:** Define variables and their types/descriptions
+  * **Examples:** Include example inputs/outputs
+  * **Tests:** Embed test cases in YAML
+
+* **YAML Schema:**
+  ```yaml
+  version: "1.0.0"
+  name: "agent_system_prompt"
+  description: "System prompt for main agent"
+  variables:
+    - name: "user_context"
+      type: "string"
+      description: "User context information"
+  prompt: |
+    You are an expert AI assistant...
+    <context>{{ user_context }}</context>
+  examples:
+    - input: { user_context: "..." }
+      expected_output: "..."
+  ```
+
+* **YAML Tools:**
+  * **Validation:** Validate YAML schema before use
+  * **Parsing:** Parse YAML to extract prompts and variables
+  * **Templating:** Use YAML with Jinja2 for dynamic prompts
+
+**See:** `@examples_prompt_versioning.py` for YAML management patterns.
+
+## 7. Prompt Registry
+
+* **Centralized Management:** Maintain a prompt registry for all prompts in the system.
+
+* **Registry Structure:**
+  * **Prompt ID:** Unique identifier for each prompt
+  * **Version:** Current and historical versions
+  * **Metadata:** Tags, descriptions, ownership
+  * **Usage:** Track where and how prompts are used
+  * **Performance:** Performance metrics per version
+
+* **Registry Operations:**
+  * **Registration:** Register new prompts with metadata
+  * **Lookup:** Lookup prompts by ID, tags, or use case
+  * **Versioning:** Manage versions and track changes
+  * **Deprecation:** Mark prompts as deprecated with migration path
+
+* **Integration:**
+  * **Runtime Lookup:** Lookup prompts at runtime from registry
+  * **Configuration:** Configure prompt selection via registry
+  * **Monitoring:** Monitor prompt usage and performance via registry
+
+## 8. Context Management
 
 * **Token Counting:** You must estimate token usage before sending a prompt.
 

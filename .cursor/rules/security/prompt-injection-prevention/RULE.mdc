@@ -1,0 +1,249 @@
+---
+description: "Prompt injection prevention and input sanitization for LLM security"
+alwaysApply: false
+---
+
+## Mandate
+
+All agentic systems **MUST** implement prompt injection prevention and input sanitization to protect against malicious user inputs. Prompt injection attacks can cause agents to execute tools maliciously, leak sensitive information, or bypass security controls. All user input must be sanitized and validated before entering agent prompts.
+
+## 1. Input Sanitization
+
+### Sanitization Mandate
+
+* **Mandate:** All user input **MUST** be sanitized before being inserted into prompts.
+
+* **Sanitization Points:**
+  * **Entry Point:** Sanitize at API endpoint (first line of defense)
+  * **Before Prompt:** Sanitize before prompt construction
+  * **Before LLM Call:** Final sanitization check before LLM call
+
+* **Sanitization Layers:**
+  * **Layer 1:** Basic sanitization (escaping, filtering)
+  * **Layer 2:** Pattern detection (injection patterns)
+  * **Layer 3:** Validation (format, length, content)
+
+**See:** `@examples_input_sanitization.py` for sanitization patterns and implementation.
+
+### Sanitization Techniques
+
+* **Escaping:**
+  * Escape special characters that could break prompt structure
+  * Escape XML/HTML tags that could be interpreted as instructions
+  * Escape control characters and newlines that could inject commands
+
+* **Filtering:**
+  * Remove or neutralize injection patterns
+  * Filter out system instruction keywords
+  * Remove prompt delimiters and separators
+
+* **Encoding:**
+  * Encode user input to prevent interpretation as code
+  * Use safe encoding for prompt insertion
+  * Decode only when necessary and safe
+
+* **Validation:**
+  * Validate input format and structure
+  * Check length limits
+  * Verify content type and encoding
+
+## 2. Injection Detection
+
+### Detection Methods
+
+* **Pattern Matching:**
+  * Detect common injection patterns (e.g., "ignore previous instructions")
+  * Identify system instruction keywords
+  * Find prompt delimiter attempts
+
+* **Heuristic Analysis:**
+  * Analyze input for suspicious patterns
+  * Check for instruction-like language
+  * Detect attempts to override system prompts
+
+* **ML-Based Detection:**
+  * Use classification models to detect injection attempts
+  * Train models on known injection patterns
+  * Combine with rule-based detection
+
+**See:** `@examples_injection_detection.py` for detection methods and patterns.
+
+### Detection Patterns
+
+* **Common Injection Patterns:**
+  * "Ignore previous instructions"
+  * "Forget everything above"
+  * "You are now..."
+  * "System: ..."
+  * "### Instructions: ..."
+  * "BEGIN NEW PROMPT"
+
+* **Delimiter Patterns:**
+  * XML/HTML tags (`<instruction>`, `</system>`)
+  * Markdown headers (`# System`, `## Instructions`)
+  * Code blocks (```...```)
+  * Triple quotes (`"""..."""`)
+
+* **Encoding Patterns:**
+  * Base64 encoded instructions
+  * URL encoding
+  * Unicode obfuscation
+
+### Detection Response
+
+* **On Detection:**
+  * **Log:** Log all injection attempts with full context
+  * **Alert:** Alert security team for suspicious patterns
+  * **Block:** Block or sanitize detected injection attempts
+  * **Quarantine:** Quarantine suspicious inputs for review
+
+* **False Positive Handling:**
+  * Review false positives to improve detection
+  * Whitelist legitimate patterns
+  * Adjust detection sensitivity
+
+## 3. Input Validation
+
+### Validation Rules
+
+* **Format Validation:**
+  * Validate input format (text, JSON, etc.)
+  * Check encoding (UTF-8, ASCII)
+  * Verify structure (if structured input expected)
+
+* **Length Validation:**
+  * Enforce maximum length limits
+  * Prevent extremely long inputs that could be attacks
+  * Set reasonable minimums if applicable
+
+* **Content Validation:**
+  * Validate content type and structure
+  * Check for required fields (if applicable)
+  * Verify data types and ranges
+
+**See:** `@examples_validation_patterns.py` for validation patterns and rules.
+
+### Validation Layers
+
+* **Layer 1: Schema Validation:**
+  * Use Pydantic models for structured validation
+  * Validate against JSON Schema
+  * Type checking and format validation
+
+* **Layer 2: Business Logic Validation:**
+  * Validate business rules
+  * Check domain-specific constraints
+  * Verify permissions and authorization
+
+* **Layer 3: Security Validation:**
+  * Check for injection patterns
+  * Validate against security policies
+  * Verify no sensitive data leakage
+
+## 4. Sanitization Techniques
+
+### Escaping Strategies
+
+* **XML/HTML Escaping:**
+  * Escape `<`, `>`, `&` characters
+  * Prevent XML tag injection
+  * Use XML-safe encoding
+
+* **Prompt Delimiter Escaping:**
+  * Escape prompt delimiters (e.g., `###`, `---`)
+  * Escape instruction markers
+  * Prevent prompt structure breaking
+
+* **Control Character Handling:**
+  * Remove or escape control characters
+  * Handle newlines and special whitespace
+  * Normalize line endings
+
+### Filtering Strategies
+
+* **Keyword Filtering:**
+  * Filter system instruction keywords
+  * Remove prompt override attempts
+  * Block known injection patterns
+
+* **Pattern Removal:**
+  * Remove suspicious patterns while preserving legitimate content
+  * Use regex patterns for detection and removal
+  * Maintain input meaning when possible
+
+* **Content Filtering:**
+  * Filter based on content analysis
+  * Remove or neutralize injection attempts
+  * Preserve user intent
+
+## 5. OWASP LLM Top 10 Implementation
+
+### Prompt Injection (OWASP #1)
+
+* **Risk:** User input can manipulate LLM behavior and execute unauthorized actions.
+
+* **Mitigation:**
+  * **Input Sanitization:** Sanitize all user inputs
+  * **Output Validation:** Validate LLM outputs before execution
+  * **Principle of Least Privilege:** Limit tool access to minimum needed
+  * **Human-in-the-Loop:** Require approval for critical actions
+
+* **Implementation:**
+  * Apply all sanitization techniques
+  * Implement detection and blocking
+  * Monitor and log all attempts
+  * Regular security reviews
+
+* **See:** `security-governance-and-observability.md` for comprehensive OWASP implementation.
+
+## 6. Integration Points
+
+### Security Integration
+
+* **Security Framework:** Integrate with security governance framework.
+
+* **Audit Logging:** Log all sanitization and detection events.
+
+* **See:** `security-governance-and-observability.md` and `audit-protocol.md` for security integration.
+
+### API Integration
+
+* **API Endpoints:** Apply sanitization at all API entry points.
+
+* **Middleware:** Use middleware for consistent sanitization across endpoints.
+
+* **See:** `api-interface-and-streaming.md` for API integration patterns.
+
+### Agent Integration
+
+* **Pre-Prompt Sanitization:** Sanitize before prompt construction.
+
+* **Tool Call Validation:** Validate tool calls for injection attempts.
+
+* **See:** `agentic-logic-and-tools.md` for agent integration.
+
+## 7. Best Practices
+
+### Defense in Depth
+
+* **Multiple Layers:** Implement multiple sanitization layers.
+
+* **Fail Secure:** If sanitization fails, reject input rather than proceeding.
+
+* **Continuous Monitoring:** Monitor for new injection patterns and adapt.
+
+### Performance
+
+* **Efficient Sanitization:** Optimize sanitization for performance.
+
+* **Caching:** Cache sanitization results when appropriate.
+
+* **Async Processing:** Perform heavy sanitization asynchronously when possible.
+
+### User Experience
+
+* **Transparent Errors:** Provide clear error messages without revealing security details.
+
+* **Graceful Handling:** Handle sanitization failures gracefully.
+
+* **User Feedback:** Inform users when input is modified for security.
