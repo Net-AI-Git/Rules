@@ -68,220 +68,12 @@ The file **MUST** start with YAML frontmatter between `---` markers:
 
 There are 4 types of rules, each with different frontmatter requirements:
 
-#### Type 1: Always Apply
+- **Type 1: Always Apply** - Applied to every chat session automatically
+- **Type 2: Apply Intelligently** - Applied when Agent decides it's relevant based on description
+- **Type 3: Apply to Specific Files** - Applied when working on files matching specified patterns
+- **Type 4: Apply Manually** - Applied only when @-mentioned in chat
 
-Applied to every chat session automatically.
-
-**Frontmatter Structure:**
-```yaml
----
-alwaysApply: true
----
-```
-
-**Detailed Frontmatter Instructions:**
-
-1. **Start with `---` on the first line** (no content before it)
-2. **Add `alwaysApply: true`** on the second line
-   - Use lowercase `true` (not `True` or `TRUE`)
-   - No quotes around `true`
-   - Exactly one space after the colon: `alwaysApply: true`
-3. **End with `---` on the third line** (exactly 3 dashes)
-4. **Add one blank line** after the closing `---` before content starts
-
-**Required Fields:**
-- ✅ `alwaysApply: true` (required)
-- ❌ `description` (MUST NOT be present)
-- ❌ `globs` (MUST NOT be present)
-
-**Common Mistakes to Avoid:**
-- ❌ `alwaysApply: True` (use lowercase `true`)
-- ❌ `alwaysApply: "true"` (no quotes)
-- ❌ Adding `description` field
-- ❌ Adding `globs` field
-- ❌ Missing blank line after `---`
-
-**Complete Example:**
-```markdown
----
-alwaysApply: true
----
-
-## Core Python Standards
-
-All Python code must follow these standards...
-```
-
-**Use when:** The rule should always be active (e.g., core coding standards, security requirements).
-
-#### Type 2: Apply Intelligently
-
-Applied when Agent decides it's relevant based on the description.
-
-**Frontmatter Structure:**
-```yaml
----
-description: "Clear description of what this rule covers"
-alwaysApply: false
----
-```
-
-**Detailed Frontmatter Instructions:**
-
-1. **Start with `---` on the first line** (no content before it)
-2. **Add `description:` field** on the second line
-   - The value **MUST** be in double quotes: `"description text"`
-   - Description should be clear and concise (1-2 sentences)
-   - Description is used by Agent to decide if rule is relevant
-3. **Add `alwaysApply: false`** on the third line
-   - Use lowercase `false` (not `False` or `FALSE`)
-   - No quotes around `false`
-4. **End with `---` on the fourth line** (exactly 3 dashes)
-5. **Add one blank line** after the closing `---` before content starts
-
-**Required Fields:**
-- ✅ `description: "..."` (required - must be in double quotes)
-- ✅ `alwaysApply: false` (required)
-- ❌ `globs` (MUST NOT be present)
-
-**Field Order:**
-- `description` must come before `alwaysApply`
-- Both fields are required
-
-**Common Mistakes to Avoid:**
-- ❌ `description: text without quotes` (must use double quotes)
-- ❌ `description: 'single quotes'` (must use double quotes)
-- ❌ Missing `description` field
-- ❌ Adding `globs` field
-- ❌ `alwaysApply: False` (use lowercase `false`)
-- ❌ Wrong field order
-
-**Complete Example:**
-```markdown
----
-description: "Standards for CI/CD, Docker, Kubernetes, and infrastructure deployment"
-alwaysApply: false
----
-
-## Deployment Standards
-
-When working on deployment...
-```
-
-**Use when:** The rule is relevant in specific contexts but not always needed (e.g., deployment standards, monitoring practices).
-
-#### Type 3: Apply to Specific Files
-
-Applied when working on files matching specified patterns.
-
-**Frontmatter Structure:**
-```yaml
----
-globs: **/api/**/*.py, **/routes/**/*.py
-alwaysApply: false
----
-```
-
-**Detailed Frontmatter Instructions:**
-
-1. **Start with `---` on the first line** (no content before it)
-2. **Add `globs:` field** on the second line
-   - Use colon after `globs`: `globs:`
-   - The value is a string with patterns separated by commas
-   - Patterns use glob syntax (e.g., `**/api/**/*.py`)
-   - Multiple patterns are separated by commas and spaces: `pattern1, pattern2, pattern3`
-3. **Add `alwaysApply: false`** on the third line
-   - Use lowercase `false`
-   - No quotes around `false`
-4. **End with `---` on a new line** (exactly 3 dashes)
-5. **Add one blank line** after the closing `---` before content starts
-
-**Required Fields:**
-- ✅ `globs:` (required - must be a string with comma-separated patterns)
-  - At least one pattern required
-  - Multiple patterns separated by commas and spaces
-  - No quotes around the entire value
-- ✅ `alwaysApply: false` (required)
-- ❌ `description` (MUST NOT be present)
-
-**Field Order:**
-- `globs` must come before `alwaysApply`
-- Both fields are required
-
-**Glob Pattern Syntax:**
-- `**/` matches any directory at any depth
-- `*.ext` matches files with extension
-- Patterns are case-sensitive
-- Use forward slashes `/` even on Windows
-- Multiple patterns separated by commas: `pattern1, pattern2, pattern3`
-
-**Common Mistakes to Avoid:**
-- ❌ `globs:` with array format (must be string, not array)
-- ❌ `globs: "pattern"` (no quotes around the value)
-- ❌ Missing commas between patterns
-- ❌ Missing `alwaysApply: false`
-- ❌ Adding `description` field
-- ❌ Using backslashes `\` instead of forward slashes `/`
-
-**Complete Example:**
-```markdown
----
-globs: **/tests/**/*.py, **/test_*.py
-alwaysApply: false
----
-
-## Testing Standards
-
-When writing test files...
-```
-
-**Use when:** The rule is only relevant for specific file types or locations (e.g., API endpoints, test files, migrations).
-
-#### Type 4: Apply Manually
-
-Applied only when @-mentioned in chat (e.g., `@rule-name`).
-
-**Frontmatter Structure:**
-```yaml
----
-alwaysApply: false
----
-```
-
-**Detailed Frontmatter Instructions:**
-
-1. **Start with `---` on the first line** (no content before it)
-2. **Add `alwaysApply: false`** on the second line
-   - Use lowercase `false` (not `False` or `FALSE`)
-   - No quotes around `false`
-   - Exactly one space after the colon: `alwaysApply: false`
-3. **End with `---` on the third line** (exactly 3 dashes)
-4. **Add one blank line** after the closing `---` before content starts
-
-**Required Fields:**
-- ✅ `alwaysApply: false` (required)
-- ❌ `description` (MUST NOT be present)
-- ❌ `globs` (MUST NOT be present)
-
-**Common Mistakes to Avoid:**
-- ❌ `alwaysApply: False` (use lowercase `false`)
-- ❌ `alwaysApply: "false"` (no quotes)
-- ❌ Adding `description` field
-- ❌ Adding `globs` field
-- ❌ Missing blank line after `---`
-
-**Complete Example:**
-```markdown
----
-alwaysApply: false
----
-
-## Special Audit Protocol
-
-This rule is applied manually when needed...
-```
-
-**Use when:** The rule is rarely needed and should only be applied on demand (e.g., audit protocols, special review procedures, meta-rules like this one).
+**See:** `@frontmatter-reference` for complete frontmatter specifications, detailed instructions, examples, and quick reference templates for all rule types.
 
 ## Creating a New Rule
 
@@ -313,98 +105,28 @@ Create the folder path:
   [optional example files]
 ```
 
-**Optional: Example Files**
+**CRITICAL: Use Helper Files for Code Examples**
 
-For complex rules with extensive code examples, you can create separate example files in the same folder:
+**MANDATE:** When writing rules with code examples, you **MUST** use separate helper files instead of embedding large code blocks directly in `RULE.mdc`. This keeps rules focused on guidance rather than implementation details.
 
-```
-.cursor/rules/[category]/[rule-name]/
-  RULE.mdc
-  examples_basic.py
-  examples_advanced.py
-  examples_integration.py
-```
+**See:** `@helper-files-guide` for complete guide on:
+- When and how to use helper files
+- Naming conventions and folder structure
+- How to reference helper files using `@filename` syntax
+- Best practices for organizing code examples
+- Validation checklist
 
-**When to use example files:**
-- ✅ Rule is approaching 400+ lines
-- ✅ Rule contains multiple code examples (3+)
-- ✅ Code examples are long (20+ lines each)
-- ✅ Examples demonstrate different patterns or use cases
-- ✅ You want to keep the rule focused on guidance rather than implementation details
-
-**How to reference example files:**
-- Use `@filename` syntax to reference files in the same folder
-- Example: `See: @examples_server.py for complete server implementation`
-- The Agent can read and understand code from these files when needed
+**Quick Summary:**
+- Helper files should be in the same folder as `RULE.mdc`
+- Use `examples_*.py` (or appropriate extension) naming convention
+- Reference helper files using `@filename` syntax: `See: @examples_server.py`
+- Keep `RULE.mdc` under 400 lines by extracting code examples
 
 ### Step 4: Write Frontmatter
 
-Based on the rule type, write the correct frontmatter following these exact specifications:
+Based on the rule type, write the correct frontmatter.
 
-**For Always Apply:**
-
-1. Start with `---` (3 dashes, no spaces)
-2. Add `alwaysApply: true` (lowercase `true`, no quotes, one space after colon)
-3. End with `---` (3 dashes, no spaces)
-4. Add one blank line before content
-
-```yaml
----
-alwaysApply: true
----
-```
-
-**For Apply Intelligently:**
-
-1. Start with `---` (3 dashes, no spaces)
-2. Add `description: "Your description here"` (must be in double quotes, on its own line)
-3. Add `alwaysApply: false` (lowercase `false`, no quotes, one space after colon)
-4. End with `---` (3 dashes, no spaces)
-5. Add one blank line before content
-
-```yaml
----
-description: "Clear, concise description of what this rule covers"
-alwaysApply: false
----
-```
-
-**Important:** The description must be in double quotes and should be 1-2 sentences that clearly explain when this rule is relevant.
-
-**For Apply to Specific Files:**
-
-1. Start with `---` (3 dashes, no spaces)
-2. Add `globs:` followed by patterns separated by commas (e.g., `globs: pattern1, pattern2, pattern3`)
-3. Add `alwaysApply: false` (lowercase `false`, no quotes, one space after colon)
-4. End with `---` (3 dashes, no spaces)
-5. Add one blank line before content
-
-```yaml
----
-globs: **/pattern/**/*.ext, **/another-pattern/**/*.ext
-alwaysApply: false
----
-```
-
-**Important:** 
-- `globs` must be a string with comma-separated patterns, not an array
-- Multiple patterns separated by commas and spaces
-- No quotes around the entire value
-- Use forward slashes `/` even on Windows
-- Patterns use glob syntax with `**/` for recursive matching
-
-**For Apply Manually:**
-
-1. Start with `---` (3 dashes, no spaces)
-2. Add `alwaysApply: false` (lowercase `false`, no quotes, one space after colon)
-3. End with `---` (3 dashes, no spaces)
-4. Add one blank line before content
-
-```yaml
----
-alwaysApply: false
----
-```
+**See:** `@frontmatter-reference` for complete frontmatter specifications, detailed step-by-step instructions, examples, and quick reference templates for all 4 rule types.
 
 ### Step 5: Write Rule Content
 
@@ -472,12 +194,12 @@ After update:
    - Avoid mixing unrelated topics
    - Split large rules into multiple, composable rules
 
-2. **Length Limit**
-   - Keep rules under 500 lines
-   - If a rule exceeds 400 lines, consider using separate example files
+2. **Length Limit and Helper Files**
+   - Keep rules under 400 lines (target: 300 lines or less)
+   - **MANDATE:** Use helper files for code examples - see `@helper-files-guide` for complete guide
    - Move code examples to `examples_*.py` (or other appropriate extensions) files
    - Reference examples using `@filename` syntax: `See: @examples_server.py`
-   - If a rule still exceeds 500 lines after extracting examples, split it into multiple rules
+   - If a rule still exceeds 400 lines after extracting examples, split it into multiple rules
 
 3. **Be Actionable**
    - Provide concrete, actionable guidance
@@ -485,12 +207,13 @@ After update:
    - Include examples when helpful
 
 4. **Reference, Don't Copy**
+   - **MANDATE:** Use helper files for code examples - see `@helper-files-guide` for complete guide
    - Use `@filename` to reference files instead of copying content
    - This keeps rules short and prevents staleness
    - Reference other rules: `See: @core-python-standards.mdc for coding standards`
-   - Reference example files in the same folder: `See: @examples_server.py for complete implementation`
+   - Reference helper files in the same folder: `See: @examples_server.py for complete implementation`
    - The Agent can read referenced files when needed, so you don't need to include full code in the rule
-   - **Best practice:** For rules with multiple code examples, create `examples_*.py` files and reference them
+   - **Best practice:** For rules with multiple code examples, always create `examples_*.py` files and reference them
 
 5. **Clear Structure**
    - Use markdown headers (`##`, `###`) for organization
@@ -512,10 +235,11 @@ After update:
    - Avoid documenting rare edge cases
 
 4. **Don't Duplicate Code**
+   - **MANDATE:** Use helper files for code examples - see `@helper-files-guide`
    - Point to canonical examples instead of copying code
    - Use `@filename` references
-   - For simple rules with 1-2 short examples, include them inline
-   - Only create separate example files when rule is complex or has many examples
+   - Only include very short examples (under 10 lines) inline
+   - Always create separate helper files when rule has multiple examples or examples are 15+ lines
 
 5. **Don't Include Main Title**
    - Start with `## Section` or content directly
@@ -523,72 +247,7 @@ After update:
 
 ## Examples
 
-### Example 1: Always Apply Rule
-
-**Location:** `.cursor/rules/core/core-python-standards/RULE.mdc`
-
-```markdown
----
-alwaysApply: true
----
-
-## Mandate
-You are an expert AI developer. You must strictly adhere to the following methodology and standards for all coding tasks.
-
-## Code Quality
-* **Full Type Hinting:** Use the `typing` module for all parameters and variables.
-* **Function Length:** Functions **MUST NOT** exceed 20 lines of actual code.
-...
-```
-
-### Example 2: Apply to Specific Files
-
-**Location:** `.cursor/rules/api/api-documentation-standards/RULE.mdc`
-
-```markdown
----
-globs: **/api/**/*.py, **/routes/**/*.py, **/endpoints/**/*.py
-alwaysApply: false
----
-
-## 1. OpenAPI/Swagger Specifications
-
-* **Mandate:** All API endpoints must be documented using OpenAPI 3.0 specification.
-...
-```
-
-### Example 3: Apply Intelligently
-
-**Location:** `.cursor/rules/development/code-review-and-collaboration/RULE.mdc`
-
-```markdown
----
-description: "Standards for code review, Git workflow, and collaboration practices"
-alwaysApply: false
----
-
-## 1. PR Review Checklist
-
-* **Code Quality:**
-    * [ ] Code follows style guidelines (ruff, black).
-...
-```
-
-### Example 4: Apply Manually
-
-**Location:** `.cursor/rules/evaluation/llm-judge-protocol/RULE.mdc`
-
-```markdown
----
-alwaysApply: false
----
-
-## Mandate
-
-You are the **Supreme AI Adjudicator**. Your role is to evaluate the performance, safety, and logic of an Agentic System...
-```
-
-### Example 5: Rule with Separate Example Files
+### Example: Rule with Helper Files
 
 **Location:** `.cursor/rules/api/mcp-protocol-implementation/RULE.mdc`
 
@@ -610,59 +269,28 @@ alwaysApply: false
 
 ## MCP Server Implementation
 
-### Server Setup
+**See:** `@examples_server.py` for complete server implementation examples.
 
-Use the `mcp.server.Server` class to create an MCP server:
-
-```python
-from mcp.server import Server
-
-server = Server("my-server")
-```
-
-**See:** `@examples_server.py` for complete server examples.
-
-### Client Implementation
-
-MCP clients connect to servers using stdio, HTTP, or WebSocket:
+## Client Implementation
 
 **See:** `@examples_client.py` for complete client examples.
 
-### Integration Patterns
-
-For complex integrations, use Views/Profiles/Scopes:
-
-**See:** `@examples_integration.py` for complete Views/Profiles/Scopes implementation.
-
 ## Complete Examples
 
-Complete, runnable examples are provided in separate files:
-
 - **`@examples_server.py`**: Server implementation examples
-  - Basic server with tools
-  - Server with resources
-  - Server with prompts
-  - Complete server with error handling
-
 - **`@examples_client.py`**: Client implementation examples
-  - Basic stdio client
-  - HTTP client
-  - Tool result parsing
-  - Complete client workflow
-
 - **`@examples_integration.py`**: Integration patterns
-  - Single server architecture
-  - Dynamic tool discovery
-  - Orchestration pattern
-  - Views/Profiles/Scopes implementation
 ```
 
 **Key Points:**
-- Rule stays focused on guidance and standards
-- Code examples are in separate files
+- Rule stays focused on guidance (~300 lines)
+- Code examples are in separate helper files
 - References use `@filename` syntax
-- Agent can read example files when needed
-- Rule remains under 500 lines even with extensive examples
+- See `@helper-files-guide` for complete guide on using helper files
+
+### Other Rule Type Examples
+
+For examples of all 4 rule types (Always Apply, Apply Intelligently, Apply to Specific Files, Apply Manually), see `@frontmatter-reference` which includes complete examples for each type.
 
 ## Validation Checklist
 
@@ -678,80 +306,30 @@ Before finalizing any rule creation or update, verify:
   - [ ] Apply Manually: only `alwaysApply: false`
 - [ ] Content starts after frontmatter
 - [ ] No main title (`# Title`) - start with sections or content
-- [ ] Rule is under 500 lines (or under 400 lines if using example files)
+- [ ] Rule is under 400 lines (use helper files to achieve this)
 - [ ] Markdown formatting is correct
 - [ ] References use `@filename` syntax
 - [ ] Content is clear, actionable, and specific
-- [ ] If using example files:
-  - [ ] Example files are in the same folder as `RULE.mdc`
-  - [ ] Example files use descriptive names (e.g., `examples_*.py`)
-  - [ ] All example files are referenced in `RULE.mdc` using `@filename` syntax
-  - [ ] Example files contain complete, runnable code
-  - [ ] Rule explains what each example file demonstrates
+- [ ] If using helper files (see `@helper-files-guide`):
+  - [ ] Helper files are in the same folder as `RULE.mdc`
+  - [ ] Helper files use `examples_*.py` naming convention
+  - [ ] All helper files are referenced in `RULE.mdc` using `@filename` syntax
+  - [ ] Helper files contain complete, runnable code
+  - [ ] Rule explains what each helper file demonstrates
 
-## Quick Reference: Frontmatter Templates
+## Quick Reference
 
-### Always Apply
+### Frontmatter Templates
 
-**Copy this exact template:**
-```yaml
----
-alwaysApply: true
----
-```
+**See:** `@frontmatter-reference` for complete frontmatter templates, detailed instructions, and quick reference for all 4 rule types.
 
-**Key Points:**
-- Only one field: `alwaysApply: true`
-- Use lowercase `true`, no quotes
-- No `description`, no `globs`
+### Helper Files Guide
 
-### Apply Intelligently
-
-**Copy this exact template:**
-```yaml
----
-description: "Your rule description here"
-alwaysApply: false
----
-```
-
-**Key Points:**
-- Two fields: `description` and `alwaysApply`
-- `description` must be in double quotes
-- `description` comes first, then `alwaysApply: false`
-- No `globs` field
-
-### Apply to Specific Files
-
-**Copy this exact template:**
-```yaml
----
-globs: **/pattern1/**/*.ext, **/pattern2/**/*.ext
-alwaysApply: false
----
-```
-
-**Key Points:**
-- Two fields: `globs` (string) and `alwaysApply`
-- `globs` is a string with comma-separated patterns, not an array
-- Multiple patterns separated by commas and spaces
-- No quotes around the entire value
-- `globs` comes first, then `alwaysApply: false`
-- No `description` field
-
-### Apply Manually
-
-**Copy this exact template:**
-```yaml
----
-alwaysApply: false
----
-```
-
-**Key Points:**
-- Only one field: `alwaysApply: false`
-- Use lowercase `false`, no quotes
-- No `description`, no `globs`
+**See:** `@helper-files-guide` for complete guide on using helper files for code examples, including:
+- When to use helper files
+- Naming conventions and structure
+- How to reference helper files
+- Best practices and validation checklist
 
 ## When Tagged
 

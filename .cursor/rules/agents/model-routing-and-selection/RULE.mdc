@@ -1,0 +1,251 @@
+---
+description: "Dynamic model routing and selection based on task complexity and cost optimization"
+alwaysApply: false
+---
+
+## Mandate
+
+All agentic systems **MUST** implement dynamic model routing to optimize cost and performance. Senior engineers use smaller, cheaper models (e.g., Haiku/Flash) for simple tasks like classification or entity extraction, and reserve powerful models (Opus/GPT-4) only for complex logic. Model selection must be based on task complexity assessment, not hardcoded.
+
+## 1. Routing Strategy
+
+### Task Complexity Assessment
+
+* **Mandate:** Every task must be assessed for complexity before model selection.
+
+* **Complexity Factors:**
+  * **Task Type:** Classification, extraction, reasoning, synthesis, generation
+  * **Input Complexity:** Length, structure, ambiguity
+  * **Output Requirements:** Format, detail level, creativity needed
+  * **Context Requirements:** Amount of context needed, reasoning depth
+
+* **Complexity Levels:**
+  * **Simple:** Classification, simple extraction, pattern matching
+  * **Medium:** Multi-step reasoning, structured generation, analysis
+  * **Complex:** Deep reasoning, creative generation, complex synthesis
+
+**See:** `@examples_routing.py` for task complexity assessment and model selection logic.
+
+### Model Capability Matching
+
+* **Capability Matrix:** Map model capabilities to task requirements.
+
+* **Model Tiers:**
+  * **Tier 1 (Small/Fast/Cheap):** Haiku, Flash, GPT-3.5-turbo - Simple tasks
+  * **Tier 2 (Medium):** Sonnet, GPT-4-turbo - Medium complexity tasks
+  * **Tier 3 (Large/Powerful):** Opus, GPT-4 - Complex tasks
+
+* **Capability Matching:**
+  * Match task requirements to model capabilities
+  * Consider cost-performance trade-off
+  * Account for latency requirements
+
+**See:** `@examples_model_tiers.py` for model tier definitions and cost-performance optimization.
+
+## 2. Model Tiers
+
+### Tier 1: Small Models (Simple Tasks)
+
+* **Models:** Claude Haiku, GPT-3.5-turbo, Flash models
+
+* **Use Cases:**
+  * Classification (sentiment, category, intent)
+  * Named Entity Recognition (NER)
+  * Simple extraction (dates, numbers, keywords)
+  * Routing decisions
+  * Format validation
+
+* **Characteristics:**
+  * Fast response time
+  * Low cost per token
+  * Good for high-volume, low-complexity tasks
+
+### Tier 2: Medium Models (Standard Tasks)
+
+* **Models:** Claude Sonnet, GPT-4-turbo
+
+* **Use Cases:**
+  * Multi-step reasoning
+  * Structured generation (JSON, XML)
+  * Analysis and summarization
+  * Code generation (simple to medium)
+  * Translation
+
+* **Characteristics:**
+  * Balanced cost and performance
+  * Good for most standard agent tasks
+  * Reliable quality
+
+### Tier 3: Large Models (Complex Tasks)
+
+* **Models:** Claude Opus, GPT-4
+
+* **Use Cases:**
+  * Deep reasoning and problem-solving
+  * Creative generation
+  * Complex synthesis
+  * Advanced code generation
+  * Multi-document analysis
+
+* **Characteristics:**
+  * Highest quality
+  * Higher cost per token
+  * Slower response time
+  * Use only when necessary
+
+## 3. Task Classification
+
+### Classification Rules
+
+* **Simple Tasks:**
+  * Binary classification (yes/no, true/false)
+  * Multi-class classification (categories)
+  * Sentiment analysis
+  * Intent detection
+  * Simple entity extraction
+
+* **Extraction Tasks:**
+  * Named Entity Recognition
+  * Date/time extraction
+  * Number extraction
+  * Keyword extraction
+  * Simple structured data extraction
+
+* **Reasoning Tasks:**
+  * Multi-step problem solving
+  * Logical reasoning
+  * Cause-effect analysis
+  * Decision making
+
+* **Synthesis Tasks:**
+  * Document summarization
+  * Multi-source synthesis
+  * Report generation
+  * Complex content creation
+
+**See:** `@examples_routing.py` for task classification implementation.
+
+## 4. Dynamic Selection Patterns
+
+### Runtime Model Selection
+
+* **Selection Process:**
+  1. Assess task complexity
+  2. Determine required capabilities
+  3. Select appropriate model tier
+  4. Consider cost constraints
+  5. Check model availability
+  6. Select specific model
+
+* **Selection Criteria:**
+  * Task complexity (primary)
+  * Cost budget (secondary)
+  * Latency requirements (tertiary)
+  * Model availability
+
+* **Fallback Strategy:**
+  * If preferred model unavailable, fall back to next tier
+  * If budget exceeded, downgrade to cheaper model
+  * If latency critical, prefer faster model
+
+**See:** `@examples_routing.py` for runtime model selection implementation.
+
+### SECTION-Based Routing
+
+* **Per-SECTION Routing:** In multi-agent systems, route each SECTION to appropriate model.
+
+* **Routing Logic:**
+  * Assess SECTION complexity
+  * Route to model matching complexity
+  * Track cost per SECTION
+  * Optimize overall workflow cost
+
+* **Integration:** Works with Orchestrator/Worker/Synthesizer patterns.
+
+* **See:** `multi-agent-systems.md` for SECTION pattern integration.
+
+## 5. Cost Optimization
+
+### Cost-Aware Routing
+
+* **Budget Consideration:** Consider remaining budget when selecting models.
+
+* **Cost-Performance Trade-off:**
+  * Use cheaper models when quality difference is minimal
+  * Reserve expensive models for critical tasks
+  * Balance cost and quality requirements
+
+* **Dynamic Adjustment:**
+  * Adjust model selection based on budget status
+  * Downgrade when approaching budget limits
+  * Upgrade when budget allows and quality critical
+
+* **See:** `cost-and-budget-management.md` for budget integration.
+
+### Token Efficiency
+
+* **Model Efficiency:** Consider token efficiency, not just cost per token.
+
+* **Context Efficiency:** Some models handle context more efficiently.
+
+* **Output Efficiency:** Consider output quality vs token count.
+
+## 6. Integration Points
+
+### Multi-Agent Systems Integration
+
+* **Worker Model Selection:** Each worker selects model based on SECTION complexity.
+
+* **Orchestrator Model:** Orchestrator can use medium model for planning.
+
+* **Synthesizer Model:** Synthesizer typically needs medium to large model.
+
+* **See:** `multi-agent-systems.md` for integration patterns.
+
+### Configuration Integration
+
+* **Model Configuration:** Configure available models and tiers via configuration.
+
+* **Routing Rules:** Define routing rules in configuration files.
+
+* **Cost Tables:** Maintain model pricing in configuration.
+
+* **See:** `configuration-and-dependency-injection.md` for configuration patterns.
+
+### Monitoring Integration
+
+* **Model Usage Metrics:** Track which models are used for which tasks.
+
+* **Cost Tracking:** Track cost per model tier.
+
+* **Performance Metrics:** Track latency and quality per model.
+
+* **See:** `monitoring-and-observability.md` for monitoring patterns.
+
+## 7. Best Practices
+
+### Model Selection Guidelines
+
+* **Start Small:** Default to smaller models, upgrade only when needed.
+
+* **Test Quality:** Validate that smaller models meet quality requirements.
+
+* **Monitor Performance:** Track quality metrics per model to optimize selection.
+
+* **A/B Testing:** Test different models for same tasks to find optimal routing.
+
+### Cost Optimization
+
+* **Batch Simple Tasks:** Batch simple tasks to use cheaper models efficiently.
+
+* **Cache Results:** Cache model outputs when appropriate to avoid redundant calls.
+
+* **Progressive Enhancement:** Start with simple model, upgrade if quality insufficient.
+
+### Quality Assurance
+
+* **Quality Gates:** Set quality thresholds for model outputs.
+
+* **Fallback to Better Model:** If quality insufficient, retry with better model.
+
+* **Validation:** Validate outputs regardless of model used.

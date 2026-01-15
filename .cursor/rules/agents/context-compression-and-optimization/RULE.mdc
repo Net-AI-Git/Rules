@@ -1,0 +1,251 @@
+---
+globs: **/langgraph/**/*.py, **/workflows/**/*.py, **/agents/**/*.py
+alwaysApply: false
+---
+
+## Mandate
+
+All agentic systems **MUST** implement context compression and optimization strategies to manage context window size effectively. In complex systems, the context window fills quickly, leading to token waste, increased costs, and potential truncation of important information. Agents must intelligently compress, summarize, and trim context while preserving coherence and critical information.
+
+## 1. Compression Triggers
+
+### Token Threshold Detection
+
+* **Mandatory Monitoring:** Continuously monitor token usage in the context window.
+
+* **Threshold Levels:**
+  * **Warning Threshold (80%):** Alert when context reaches 80% of model limit
+  * **Compression Threshold (85%):** Trigger compression when context reaches 85% of limit
+  * **Critical Threshold (95%):** Aggressive compression when context reaches 95% of limit
+
+* **Automatic vs Manual:**
+  * **Automatic:** Compress automatically when thresholds are reached
+  * **Manual:** Allow explicit compression requests (e.g., before expensive operations)
+
+* **Model-Specific Limits:** Different models have different context limits - track per model.
+
+**See:** `@examples_compression.py` for compression trigger implementation and threshold management.
+
+### Context Window Management
+
+* **Real-Time Tracking:** Track token count in real-time as messages are added to context.
+
+* **Token Counting:** Use accurate token counting (e.g., `tiktoken` for OpenAI, model-specific counters).
+
+* **Buffer Management:** Maintain buffer space (e.g., 10% of limit) for new messages and responses.
+
+## 2. Summarization Strategies
+
+### Extractive Summarization
+
+* **Pattern:** Extract key sentences/phrases from conversation history without modification.
+
+* **Use Cases:**
+  * Preserve exact quotes or important statements
+  * Maintain factual accuracy
+  * Fast summarization (no LLM call needed)
+
+* **Implementation:**
+  * Identify important sentences (e.g., user requests, key decisions)
+  * Extract without modification
+  * Preserve original structure
+
+### Abstractive Summarization
+
+* **Pattern:** Generate new summary text that captures meaning without preserving exact wording.
+
+* **Use Cases:**
+  * Condense long conversations
+  * Combine multiple related points
+  * Create coherent narrative summary
+
+* **Implementation:**
+  * Use LLM to generate summary
+  * Preserve key information and decisions
+  * Maintain context coherence
+
+**See:** `@examples_compression.py` for extractive and abstractive summarization implementations.
+
+### Hierarchical Summarization
+
+* **Pattern:** Create multi-level summaries (detailed → summary → high-level overview).
+
+* **Use Cases:**
+  * Very long conversation histories
+  * Multiple conversation threads
+  * Complex multi-step processes
+
+* **Implementation:**
+  * Summarize recent messages in detail
+  * Summarize older messages at higher level
+  * Maintain summary hierarchy
+
+## 3. Trimming Logic
+
+### FIFO (First In First Out)
+
+* **Pattern:** Remove oldest messages when context is full.
+
+* **Use Cases:**
+  * Simple, predictable behavior
+  * When recent context is most important
+  * Low complexity requirements
+
+* **Limitations:**
+  * May remove important early context
+  * Doesn't consider message importance
+
+### Importance-Based Trimming
+
+* **Pattern:** Remove least important messages based on scoring.
+
+* **Importance Factors:**
+  * Message type (user requests > agent responses > tool results)
+  * Recency (recent messages more important)
+  * Relevance to current task
+  * Information density
+
+* **Scoring:** Calculate importance score for each message and remove lowest-scoring messages.
+
+**See:** `@examples_retention.py` for importance scoring and retention criteria patterns.
+
+### Recency Weighting
+
+* **Pattern:** Weight messages by recency - recent messages are more important.
+
+* **Implementation:**
+  * Apply recency multiplier to importance scores
+  * Recent messages (last 10%) get high weight
+  * Older messages get progressively lower weight
+
+* **Balance:** Combine recency with importance to avoid removing critical early context.
+
+## 4. Retention Criteria
+
+### What to Keep
+
+* **Mandatory Retention:**
+  * Current user request and context
+  * Recent agent responses (last 3-5 turns)
+  * Critical decisions and outcomes
+  * User preferences and constraints
+  * Tool results that are still relevant
+
+* **High Priority:**
+  * System messages and instructions
+  * User preferences and settings
+  * Important facts and insights
+  * Error messages and resolutions
+
+**See:** `@examples_retention.py` for retention criteria and importance scoring patterns.
+
+### What to Summarize
+
+* **Candidates for Summarization:**
+  * Old conversation history (>10 turns ago)
+  * Redundant information
+  * Detailed tool outputs (summarize results)
+  * Long-form content (documents, articles)
+
+* **Summarization Approach:**
+  * Preserve key points and decisions
+  * Remove redundant information
+  * Maintain coherence
+
+### What to Discard
+
+* **Safe to Remove:**
+  * Very old messages (>20 turns, already summarized)
+  * Redundant information (duplicates)
+  * Temporary state (no longer relevant)
+  * Low-importance tool outputs
+
+* **Never Remove:**
+  * Current user request
+  * System instructions
+  * Critical errors or warnings
+  * User preferences (unless explicitly updated)
+
+## 5. Context Reconstruction
+
+### Coherence Preservation
+
+* **Maintain Flow:** Ensure compressed context maintains conversation flow and coherence.
+
+* **Reference Preservation:**
+  * Preserve references to earlier messages
+  * Maintain pronoun resolution
+  * Keep context links intact
+
+* **Summary Integration:** Integrate summaries seamlessly into context without breaking flow.
+
+### State Consistency
+
+* **State Alignment:** Ensure compressed context aligns with LangGraph state.
+
+* **Checkpoint Compatibility:** Compressed context must work with checkpoints.
+
+* **Version Tracking:** Track context versions to handle rollbacks if needed.
+
+## 6. Integration Points
+
+### LangGraph Integration
+
+* **State Management:** Context compression operates on `messages` field in GraphState.
+
+* **Node Integration:**
+  * **Compression Node:** Dedicated node for context compression
+  * **Pre-LLM Compression:** Compress before expensive LLM calls
+  * **Post-Tool Compression:** Compress after tool outputs are added
+
+* **Conditional Routing:** Use token count in conditional edges to route to compression node.
+
+### Prompt Engineering Integration
+
+* **Token Counting:** Integrate with prompt token counting utilities.
+
+* **Context Formatting:** Format compressed context for optimal LLM consumption.
+
+* **See:** `prompt-engineering-and-management.md` for prompt management patterns.
+
+### Cost Management Integration
+
+* **Cost Reduction:** Context compression directly reduces token costs.
+
+* **Budget Awareness:** Consider budget when deciding compression aggressiveness.
+
+* **See:** `cost-and-budget-management.md` for budget management patterns.
+
+## 7. Best Practices
+
+### Compression Timing
+
+* **Proactive Compression:** Compress before reaching critical thresholds.
+
+* **Strategic Compression:** Compress before expensive operations (large LLM calls, complex tool chains).
+
+* **Periodic Compression:** Compress periodically during long conversations.
+
+### Quality Preservation
+
+* **Validation:** Validate compressed context maintains necessary information.
+
+* **Testing:** Test compression with real conversations to ensure quality.
+
+* **Monitoring:** Monitor compression effectiveness (token reduction vs information loss).
+
+### Performance Optimization
+
+* **Async Compression:** Perform compression asynchronously when possible.
+
+* **Caching:** Cache compression results for similar contexts.
+
+* **Batch Operations:** Batch compression operations for efficiency.
+
+### User Experience
+
+* **Transparency:** Log compression events for debugging.
+
+* **Graceful Degradation:** If compression fails, fall back to FIFO trimming.
+
+* **Error Handling:** Handle compression errors gracefully without breaking workflow.
