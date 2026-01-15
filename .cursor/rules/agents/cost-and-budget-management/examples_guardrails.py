@@ -298,3 +298,239 @@ def budget_aware_router(
         return "degraded_processing_node"
     else:
         return "normal_processing_node"
+
+
+# ============================================================================
+# Pre-Call Budget Checking
+# ============================================================================
+
+@dataclass
+class EstimatedCallCost:
+    """
+    Estimated cost for an upcoming LLM call.
+    
+    This demonstrates cost estimation:
+    - Model name
+    - Estimated input/output tokens
+    - Estimated total cost
+    """
+    model_name: str
+    estimated_input_tokens: int
+    estimated_output_tokens: int
+    estimated_cost_usd: float
+
+
+def check_budget_before_llm_call(
+    state: BudgetState,
+    cost_tracker: CostTracker,
+    guardrail: BudgetGuardrail,
+    estimated_call_cost: EstimatedCallCost
+) -> tuple[bool, Optional[GuardrailAction], Optional[Dict[str, Any]]]:
+    """
+    Check if budget allows LLM call before making it.
+    
+    This demonstrates pre-call budget checking:
+    - Calculate total cost if call is made
+    - Check against budget limits
+    - Return decision: proceed, degrade, or halt
+    - Provide degradation config if needed
+    
+    Args:
+        state: Current budget state
+        cost_tracker: Cost tracker instance
+        guardrail: Budget guardrail instance
+        estimated_call_cost: Estimated cost for upcoming call
+    
+    Returns:
+        Tuple of (can_proceed, action, degradation_config)
+        - can_proceed: True if call can be made
+        - action: GuardrailAction to take
+        - degradation_config: Config for degradation if needed
+    """
+    # Get current budget status
+    current_status = cost_tracker.check_budget_status(state)
+    current_cost = current_status["budget_used"]
+    budget_limit = state.get("budget_limit_usd", 0)
+    
+    # Calculate projected cost after call
+    projected_cost = current_cost + estimated_call_cost.estimated_cost_usd
+    projected_usage_percent = projected_cost / budget_limit if budget_limit > 0 else 0.0
+    
+    # Create temporary state with projected cost for guardrail check
+    projected_state = state.copy()
+    projected_state["total_cost_usd"] = projected_cost
+    
+    # Check guardrail with projected cost
+    action = guardrail.check_guardrail(projected_state)
+    
+    # Determine if we can proceed
+    can_proceed = action != GuardrailAction.HALT
+    
+    # Get degradation config if needed
+    degradation_config = None
+    if action == GuardrailAction.DEGRADE:
+        degradation_config = guardrail.get_degradation_config(projected_state)
+    
+    return can_proceed, action, degradation_config
+
+
+# ============================================================================
+# Budget-Aware Worker Node Pattern
+# ============================================================================
+
+def budget_aware_worker_node(
+    state: Dict[str, Any],
+    cost_tracker: CostTracker,
+    guardrail: BudgetGuardrail,
+    node_name: str,
+    worker_logic_func,
+    *args,
+    **kwargs
+) -> Dict[str, Any]:
+    """
+    Budget-aware Worker Node pattern.
+    
+    This demonstrates Worker Node with pre-call budget checking:
+    - READ: Read BudgetState from GraphState
+    - CHECK: Verify budget allows operation before LLM call
+    - DO: Execute worker logic only if budget allows
+    - WRITE: Update BudgetState after successful call
+    
+    Args:
+        state: GraphState (must contain BudgetState)
+        cost_tracker: Cost tracker instance
+        guardrail: Budget guardrail instance
+        node_name: Name of the worker node
+        worker_logic_func: Function that contains worker logic with LLM calls
+        *args: Arguments for worker logic
+        **kwargs: Keyword arguments for worker logic
+    
+    Returns:
+        Updated GraphState
+    
+    Raises:
+        ValueError: If budget exceeded
+    """
+    # READ: Extract BudgetState from GraphState
+    budget_state = state.get("budget", {})
+    if not budget_state:
+        # Initialize if missing
+        budget_state = {
+            "total_cost_usd": 0.0,
+            "budget_limit_usd": kwargs.get("budget_limit_usd", 10.0),
+            "budget_exceeded": False
+        }
+        state["budget"] = budget_state
+    
+    # CHECK: Estimate cost for upcoming operation
+    # In real implementation, estimate based on:
+    # - Model being used
+    # - Input context size
+    # - Expected output length
+    estimated_cost = EstimatedCallCost(
+        model_name=kwargs.get("model", "gpt-4"),
+        estimated_input_tokens=kwargs.get("estimated_input_tokens", 1000),
+        estimated_output_tokens=kwargs.get("estimated_output_tokens", 500),
+        estimated_cost_usd=0.0  # Would be calculated from pricing
+    )
+    
+    # Pre-call budget check
+    can_proceed, action, degradation_config = check_budget_before_llm_call(
+        state=budget_state,
+        cost_tracker=cost_tracker,
+        guardrail=guardrail,
+        estimated_call_cost=estimated_cost
+    )
+    
+    # HALT if budget exceeded
+    if not can_proceed:
+        error = guardrail.create_budget_exceeded_error(budget_state)
+        state["errors"] = state.get("errors", []) + [error]
+        state["budget"]["budget_exceeded"] = True
+        return state
+    
+    # Apply degradation if needed
+    if degradation_config:
+        # Update kwargs with degradation config
+        if "model" in degradation_config:
+            kwargs["model"] = degradation_config["model"]
+        if "max_context_tokens" in degradation_config:
+            kwargs["max_context_tokens"] = degradation_config["max_context_tokens"]
+    
+    # DO: Execute worker logic
+    try:
+        result = worker_logic_func(*args, **kwargs)
+        
+        # Extract actual token usage from result
+        # In real implementation, this comes from LLM response
+        actual_input_tokens = result.get("usage", {}).get("prompt_tokens", estimated_cost.estimated_input_tokens)
+        actual_output_tokens = result.get("usage", {}).get("completion_tokens", estimated_cost.estimated_output_tokens)
+        model_name = kwargs.get("model", estimated_cost.model_name)
+        
+        # WRITE: Update BudgetState
+        updated_budget = cost_tracker.update_budget_state(
+            state=budget_state,
+            model_name=model_name,
+            node_name=node_name,
+            input_tokens=actual_input_tokens,
+            output_tokens=actual_output_tokens
+        )
+        
+        # Update state with new budget
+        state["budget"] = updated_budget
+        
+        # Check again after actual call (in case estimation was off)
+        if guardrail.should_halt(updated_budget):
+            error = guardrail.create_budget_exceeded_error(updated_budget)
+            state["errors"] = state.get("errors", []) + [error]
+            state["budget"]["budget_exceeded"] = True
+        
+        return state
+        
+    except Exception as e:
+        # Handle errors - don't update budget on failure
+        state["errors"] = state.get("errors", []) + [{"error": str(e), "node": node_name}]
+        return state
+
+
+# ============================================================================
+# Example: Worker Node Using Budget Check
+# ============================================================================
+
+def example_worker_node_with_budget_check(state: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Example Worker Node that uses budget checking.
+    
+    This demonstrates the pattern:
+    - Read BudgetState
+    - Check budget before LLM call
+    - Execute only if budget allows
+    - Update BudgetState after call
+    """
+    # In real implementation, these would be injected
+    cost_tracker = None  # CostTracker instance
+    guardrail = None  # BudgetGuardrail instance
+    
+    def worker_logic(prompt: str, model: str = "gpt-4"):
+        """Worker logic that makes LLM call."""
+        # In real implementation, make actual LLM call
+        return {
+            "content": "Worker output",
+            "usage": {
+                "prompt_tokens": 1000,
+                "completion_tokens": 500
+            }
+        }
+    
+    # Use budget-aware wrapper
+    return budget_aware_worker_node(
+        state=state,
+        cost_tracker=cost_tracker,
+        guardrail=guardrail,
+        node_name="example_worker",
+        worker_logic_func=worker_logic,
+        prompt=state.get("user_input", ""),
+        model="gpt-4",
+        estimated_input_tokens=1000,
+        estimated_output_tokens=500
+    )

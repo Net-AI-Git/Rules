@@ -1,0 +1,213 @@
+---
+description: "Human-in-the-Loop approval context schema for structured interrupt handling and approval workflows"
+alwaysApply: false
+---
+
+## Mandate
+
+All agentic systems that use Human-in-the-Loop (HITL) interrupts **MUST** implement a structured Approval Context Schema. In production systems, human approval cannot be based solely on a message - it requires structured context including risk assessment, cost estimation, and proposed changes. Without this schema, HITL becomes a "black hole" that cannot be measured or optimized.
+
+## 1. Approval Context Schema
+
+### Mandatory Schema Structure
+
+* **Mandate:** Every interrupt that requires human approval **MUST** include an Approval Context object with the following structure:
+
+* **Required Fields:**
+  * `risk_level`: "low" | "medium" | "high" | "critical" - Risk assessment of the proposed action
+  * `estimated_cost`: float (USD) - Estimated cost of the proposed action
+  * `proposed_diff`: Dict[str, Any] - Structured representation of what the agent proposes to change
+  * `action_description`: str - Human-readable description of the action
+  * `current_state_snapshot`: Dict[str, Any] - Snapshot of relevant state before the action
+  * `approval_required_by`: Optional[datetime] - Deadline for approval (if time-sensitive)
+
+* **Optional Fields:**
+  * `alternatives`: List[Dict[str, Any]] - Alternative actions with their own risk/cost assessments
+  * `impact_analysis`: Dict[str, Any] - Analysis of potential impact
+  * `rollback_plan`: Dict[str, Any] - Plan for rolling back if action fails
+  * `approval_history`: List[Dict[str, Any]] - History of previous approvals/rejections
+
+**See:** `@examples_approval_context.py` for ApprovalContext TypedDict definition and builder patterns.
+
+### Risk Level Calculation
+
+* **Risk Assessment Criteria:**
+  * **Low:** Read-only operations, non-destructive actions, low-cost operations
+  * **Medium:** Write operations with rollback, moderate cost, reversible changes
+  * **High:** Destructive operations, high cost, irreversible changes, data deletion
+  * **Critical:** System-level changes, production deployments, security changes, financial transactions
+
+* **Risk Factors:**
+  * **Action Type:** Read vs Write vs Delete vs System Change
+  * **Cost Magnitude:** Low (<$1) vs Medium ($1-$100) vs High ($100+) vs Critical ($1000+)
+  * **Reversibility:** Fully reversible vs Partially reversible vs Irreversible
+  * **Impact Scope:** Single user vs Multiple users vs System-wide
+  * **Data Sensitivity:** Public vs Internal vs Confidential vs Critical
+
+* **Risk Calculation:**
+  * Combine multiple risk factors
+  * Use highest risk factor as base level
+  * Escalate if multiple high-risk factors present
+
+## 2. Cost Estimation
+
+### Estimated Cost Calculation
+
+* **Mandate:** Every approval request **MUST** include an estimated cost in USD.
+
+* **Cost Components:**
+  * **LLM Costs:** Estimated tokens × model pricing
+  * **Tool Costs:** API costs, compute costs, storage costs
+  * **Time Costs:** Estimated execution time × resource costs
+  * **Opportunity Costs:** Cost of delays or alternative approaches
+
+* **Estimation Methods:**
+  * **Historical Data:** Use past similar actions for estimation
+  * **Model-Based:** Calculate based on input size and expected output
+  * **Tool-Specific:** Use tool documentation for cost estimates
+  * **Conservative Estimates:** Over-estimate rather than under-estimate
+
+* **Cost Accuracy:**
+  * Track actual vs estimated costs
+  * Improve estimation models over time
+  * Alert on significant estimation errors
+
+## 3. Proposed Diff Structure
+
+### Diff Format
+
+* **Mandate:** `proposed_diff` must be a structured representation of changes, not free-form text.
+
+* **Diff Structure:**
+  * **Action Type:** "create" | "update" | "delete" | "execute"
+  * **Target Resource:** Identifier of resource being modified
+  * **Current Value:** Current state (for updates/deletes)
+  * **Proposed Value:** New state (for creates/updates)
+  * **Fields Changed:** List of specific fields being modified
+  * **Dependencies:** Resources that must exist or be modified first
+
+* **Examples:**
+  * **Database Update:** `{"action": "update", "table": "users", "id": 123, "fields": {"status": "active"}}`
+  * **File Creation:** `{"action": "create", "path": "/data/report.json", "content": {...}}`
+  * **API Call:** `{"action": "execute", "endpoint": "/api/deploy", "params": {...}}`
+
+* **Validation:**
+  * Validate diff structure before sending for approval
+  * Ensure all required fields are present
+  * Check for invalid operations
+
+## 4. Integration Points
+
+### LangGraph Interrupts Integration
+
+* **Interrupt Node Pattern:**
+  * Worker Node creates Approval Context
+  * Interrupt Node sends Approval Context to human
+  * Human reviews and approves/rejects
+  * Workflow continues based on approval decision
+
+* **State Management:**
+  * Store Approval Context in GraphState
+  * Track approval status
+  * Preserve state during approval wait
+
+* **See:** `langgraph-architecture-and-nodes.md` for interrupt patterns.
+
+### Cost Management Integration
+
+* **Budget Integration:**
+  * Use `estimated_cost` from Approval Context for budget planning
+  * Check if approval cost fits within remaining budget
+  * Update budget after approval and execution
+
+* **See:** `cost-and-budget-management.md` for budget integration.
+
+### Audit Protocol Integration
+
+* **Audit Logging:**
+  * Log all approval requests with full Approval Context
+  * Log approval decisions (approve/reject) with reasoning
+  * Track approval times and outcomes
+
+* **See:** `audit-protocol.md` for audit logging requirements.
+
+## 5. Approval Workflow
+
+### Approval Process
+
+* **Request Creation:**
+  1. Worker Node identifies need for approval
+  2. Build Approval Context with all required fields
+  3. Calculate risk level and estimated cost
+  4. Create proposed_diff structure
+  5. Send to Interrupt Node
+
+* **Human Review:**
+  1. Human receives Approval Context
+  2. Reviews risk_level, estimated_cost, proposed_diff
+  3. Makes decision: approve, reject, or request changes
+  4. Optionally provides reasoning
+
+* **Workflow Continuation:**
+  1. If approved: Execute proposed action
+  2. If rejected: Skip action or use alternative
+  3. If changes requested: Update Approval Context and resubmit
+
+### Approval Timeouts
+
+* **Timeout Handling:**
+  * Set `approval_required_by` for time-sensitive actions
+  * Handle timeout: auto-reject, auto-approve (low risk), or escalate
+  * Notify human if timeout approaching
+
+* **Escalation:**
+  * Escalate critical approvals that are pending
+  * Route to backup approvers if primary unavailable
+  * Log escalation events
+
+## 6. Best Practices
+
+### Approval Context Quality
+
+* **Completeness:** Ensure all required fields are populated
+* **Accuracy:** Verify risk_level and estimated_cost are accurate
+* **Clarity:** Make action_description clear and actionable
+* **Structure:** Ensure proposed_diff is well-structured and parseable
+
+### Approval Efficiency
+
+* **Batch Approvals:** Group related approvals when possible
+* **Pre-approval:** Pre-approve low-risk, low-cost actions
+* **Auto-approval:** Auto-approve actions below risk/cost thresholds
+* **Approval Templates:** Use templates for common approval types
+
+### Measurement and Optimization
+
+* **Metrics:**
+  * Approval request rate
+  * Approval time (time to decision)
+  * Approval vs rejection rate
+  * Cost estimation accuracy
+  * Risk level distribution
+
+* **Optimization:**
+  * Identify patterns in approvals
+  * Adjust risk thresholds based on data
+  * Improve cost estimation models
+  * Reduce unnecessary approvals
+
+## 7. Security and Compliance
+
+### Approval Security
+
+* **Access Control:** Only authorized users can approve actions
+* **Audit Trail:** All approvals must be logged and auditable
+* **Non-repudiation:** Approval decisions must be cryptographically signed
+
+### Compliance
+
+* **Regulatory Requirements:** Ensure approvals meet regulatory requirements
+* **Data Protection:** Protect sensitive data in Approval Context
+* **Retention:** Retain approval records per compliance requirements
+
+* **See:** `security-governance-and-observability.md` for security requirements.

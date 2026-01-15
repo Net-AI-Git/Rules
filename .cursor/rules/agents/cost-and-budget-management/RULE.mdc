@@ -83,6 +83,34 @@ All agentic systems, especially those using loops (e.g., LangGraph workflows), *
 
 **See:** `@examples_guardrails.py` for threshold checking and graceful degradation patterns.
 
+### Pre-Call Budget Checking in Worker Nodes
+
+* **Mandate:** Every Worker Node **MUST** check `accumulated_cost_usd` (or `total_cost_usd` in BudgetState) before making any LLM call.
+
+* **Pre-Call Validation:**
+  * **Check Before LLM Call:** Verify that current accumulated cost plus estimated call cost does not exceed budget threshold
+  * **Check Before Tool Execution:** For expensive tools, verify budget allows execution
+  * **Fail Fast:** If budget would be exceeded, halt immediately rather than making the call and then halting
+
+* **Implementation Pattern:**
+  * **Read Phase:** Read current `BudgetState` from GraphState
+  * **Check Phase:** Call `check_budget_before_llm_call()` to verify budget allows operation
+  * **Do Phase:** Only proceed with LLM call if budget check passes
+  * **Write Phase:** Update BudgetState after successful call
+
+* **Budget Check Logic:**
+  * Calculate estimated cost for upcoming LLM call (based on model, estimated tokens)
+  * Add estimated cost to current `total_cost_usd`
+  * Compare against `budget_limit_usd` and thresholds
+  * Return decision: proceed, degrade, or halt
+
+* **Worker Node Pattern:**
+  * Every Worker Node must implement budget-aware pattern
+  * Use `budget_aware_worker_node()` wrapper or inline budget checking
+  * Handle budget exceeded errors gracefully (don't crash, return error state)
+
+**See:** `@examples_guardrails.py` for `check_budget_before_llm_call()` implementation and `budget_aware_worker_node()` pattern.
+
 ### Error Handling
 
 * **Budget Exceeded Error:** Return a clear error message indicating:
