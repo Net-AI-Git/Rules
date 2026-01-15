@@ -5,8 +5,11 @@ Comprehensive post-deployment verification to ensure successful deployment and s
 
 ## Rules Applied
 - `deployment-and-infrastructure` - Deployment verification, health checks, rollback procedures
-- `monitoring-and-observability` - Health check endpoints, metrics, alerting
-- `error-handling-and-resilience` - Error monitoring and recovery
+- `monitoring-and-observability` - Health check endpoints, metrics, alerting, tracing
+- `error-handling-and-resilience` - Error monitoring and recovery, error classification
+- `performance-optimization` - Post-deployment performance analysis, SLI/SLO validation
+- `security-governance-and-observability` - Security verification, security monitoring
+- `audit-protocol` - Audit trail verification, compliance checks
 
 ## Steps
 
@@ -23,7 +26,7 @@ Comprehensive post-deployment verification to ensure successful deployment and s
      - Verify `/health/startup` endpoint for long startup times
      - Check service initialization is complete
 
-2. **Smoke Tests**
+2. **Automated Smoke Tests**
    - **Basic Functionality**:
      - Test core functionality endpoints
      - Verify basic operations work correctly
@@ -36,6 +39,8 @@ Comprehensive post-deployment verification to ensure successful deployment and s
      - Test agent execution with sample inputs
      - Verify agent responses are correct
      - Check tool execution works properly
+   - **Automated Test Execution**: Run automated smoke test suite
+   - **Test Results Analysis**: Analyze smoke test results for failures
 
 3. **Performance Verification**
    - **Latency Checks**:
@@ -50,6 +55,10 @@ Comprehensive post-deployment verification to ensure successful deployment and s
      - Monitor CPU and memory usage
      - Verify resource usage is within limits
      - Check for resource leaks
+   - **Performance Baseline Comparison**:
+     - Compare post-deployment performance with pre-deployment baseline
+     - Identify performance regressions
+     - Analyze performance improvements or degradations
 
 4. **Error Rate Monitoring**
    - **Error Rate Analysis**:
@@ -89,8 +98,15 @@ Comprehensive post-deployment verification to ensure successful deployment and s
      - Check trace collection and correlation
      - Validate trace completeness
 
-7. **Rollback Readiness**
-   - **Rollback Plan Verification**:
+7. **Security Verification**
+   - **Security Monitoring**: Verify security monitoring is active
+   - **Security Checks**: Check for security incidents post-deployment
+   - **Audit Trail Verification**: Verify audit trails are being generated correctly
+   - **Compliance Status**: Check compliance status post-deployment
+
+8. **Rollback Decision Support**
+   - **Rollback Criteria**: Evaluate rollback criteria based on verification results
+   - **Rollback Readiness**:
      - Verify rollback procedure is documented
      - Check rollback tools are accessible
      - Validate rollback can be executed quickly
@@ -98,14 +114,17 @@ Comprehensive post-deployment verification to ensure successful deployment and s
      - Verify previous version is available for rollback
      - Check rollback artifacts are accessible
      - Validate rollback can be performed if needed
+   - **Rollback Recommendation**: Provide rollback recommendation based on findings
 
-8. **Generate Post-Deployment Report**
+9. **Generate Post-Deployment Report**
    - Create comprehensive post-deployment verification report
    - Include results from all verification steps
-   - Provide overall deployment status
-   - Highlight any issues or concerns
+   - Provide overall deployment status (Success/Needs Attention/Rollback Recommended)
+   - **Performance Baseline Comparison**: Performance comparison with baseline, regression analysis
+   - **Security Verification**: Security monitoring status, security incidents, audit trail verification
+   - Highlight any issues or concerns with severity classification
    - Include recommendations for monitoring
-   - Provide rollback recommendation if needed
+   - **Rollback Decision Support**: Rollback criteria evaluation, rollback recommendation with justification
 
 ## Data Sources
 - Health check endpoint responses
@@ -118,12 +137,14 @@ Comprehensive post-deployment verification to ensure successful deployment and s
 ## Output
 A comprehensive post-deployment verification report including:
 - **Health Check Status**: Liveness, readiness, startup probe results
-- **Smoke Test Results**: Basic functionality, API endpoints, agent operations
-- **Performance Verification**: Latency, throughput, resource usage
-- **Error Rate Analysis**: Error rates, error types, error recovery
+- **Automated Smoke Test Results**: Basic functionality, API endpoints, agent operations, test execution results
+- **Performance Verification**: Latency, throughput, resource usage, SLI/SLO compliance
+- **Performance Baseline Comparison**: Comparison with pre-deployment baseline, regression analysis, performance trends
+- **Error Rate Analysis**: Error rates, error types, error recovery, error classification
 - **Integration Status**: External services, database connectivity
-- **Monitoring Status**: Metrics, logging, tracing
-- **Rollback Readiness**: Rollback plan, previous version availability
-- **Overall Deployment Status**: Success/Needs Attention/Rollback Recommended
-- **Issues and Concerns**: Identified issues with severity levels
-- **Monitoring Recommendations**: Ongoing monitoring suggestions
+- **Monitoring Status**: Metrics, logging, tracing, observability
+- **Security Verification**: Security monitoring status, security incidents, audit trail verification, compliance status
+- **Rollback Decision Support**: Rollback criteria evaluation, rollback readiness, previous version availability, rollback recommendation
+- **Overall Deployment Status**: Success/Needs Attention/Rollback Recommended with justification
+- **Issues and Concerns**: Identified issues with severity levels and impact assessment
+- **Monitoring Recommendations**: Ongoing monitoring suggestions with alerting recommendations

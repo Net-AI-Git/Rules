@@ -7,6 +7,9 @@ Comprehensive analysis of LangSmith traces to understand LLM operations, tool us
 - `monitoring-and-observability` - LangSmith integration, tracing, performance metrics
 - `agentic-logic-and-tools` - Tool usage patterns, agent internals, performance
 - `error-handling-and-resilience` - Error patterns and retry strategies
+- `performance-optimization` - Performance analysis, bottleneck identification
+- `cost-and-budget-management` - Cost analysis, token usage optimization
+- `model-routing-and-selection` - Model selection analysis, routing patterns
 
 ## Steps
 
@@ -31,14 +34,18 @@ Comprehensive analysis of LangSmith traces to understand LLM operations, tool us
      - Calculate P50, P95, P99 latency percentiles
      - Identify slow LLM calls
      - Analyze latency patterns
-   - **Costs**:
+   - **Cost Analysis**:
      - Calculate costs based on token usage and model pricing
-     - Identify expensive operations
-     - Analyze cost trends
+     - **Cost Optimization Recommendations**: Identify expensive operations and suggest alternatives
+     - Analyze cost trends over time
+     - Calculate cost per operation type
+     - Identify cost optimization opportunities
    - **Model Information**:
      - Extract model name and version used
      - Check model configuration
-     - Analyze model selection patterns
+     - **Model Selection Analysis**: Analyze model selection patterns and routing decisions
+     - Identify optimal model selection strategies
+     - Analyze model performance by model type
 
 3. **Analyze Tool Calls**
    - **Tool Selection**:
@@ -83,8 +90,10 @@ Comprehensive analysis of LangSmith traces to understand LLM operations, tool us
      - Find redundant LLM calls
    - **Resource Waste**:
      - Identify excessive token usage
+     - **Token Usage Optimization**: Identify opportunities to reduce token consumption
      - Detect unnecessary retries
      - Find inefficient caching patterns
+     - Analyze token waste patterns
 
 6. **Identify Errors and Retries**
    - **Error Analysis**:
@@ -130,11 +139,14 @@ Comprehensive analysis of LangSmith traces to understand LLM operations, tool us
 
 ## Output
 A comprehensive LangSmith trace analysis report including:
-- **LLM Call Analysis**: Token usage, latency, costs, model information
+- **LLM Call Analysis**: Token usage, latency, costs, model information, model selection patterns
 - **Tool Call Analysis**: Selection, execution, parameters, usage patterns
 - **Agent Step Analysis**: Flow, decisions, state transitions
 - **Bottleneck Identification**: Slow operations, inefficient patterns, resource waste
 - **Error Analysis**: Error types, retry patterns, recovery strategies
 - **Performance Metrics**: Overall performance, resource usage, efficiency metrics
-- **Optimization Recommendations**: Prioritized suggestions for improving performance
-- **Cost Analysis**: Token costs, operation costs, cost optimization opportunities
+- **Cost Analysis**: Token costs, operation costs, cost trends, cost per operation type
+- **Cost Optimization Recommendations**: Specific suggestions for reducing costs with impact assessment
+- **Model Selection Analysis**: Model routing patterns, optimal model selection strategies
+- **Token Usage Optimization**: Opportunities to reduce token consumption
+- **Optimization Recommendations**: Prioritized suggestions for improving performance and reducing costs

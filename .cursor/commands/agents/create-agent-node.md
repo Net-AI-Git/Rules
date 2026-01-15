@@ -6,7 +6,12 @@ Create a new LangGraph node following the four-part structure (READ → DO → W
 ## Rules Applied
 - `langgraph-architecture-and-nodes` - Node implementation rules, four-part structure, state field ownership
 - `core-python-standards` - Code quality standards, function length, type hints, logging
-- `error-handling-and-resilience` - Error handling patterns, retry strategies
+- `error-handling-and-resilience` - Error handling patterns, retry strategies, error classification
+- `multi-agent-systems` - Multi-agent patterns, node role in multi-agent system
+- `tests-and-validation` - Test creation, test structure, test coverage
+- `monitoring-and-observability` - Node instrumentation, metrics collection
+- `performance-optimization` - Node performance, efficiency considerations
+- `reflection-and-self-critique` - Self-critique patterns, reflection mechanisms
 
 ## Steps
 
@@ -118,10 +123,21 @@ Create a new LangGraph node following the four-part structure (READ → DO → W
      - Include type hints for all parameters
      - Document complex logic with comments
 
-10. **Generate Node Creation Report**
+10. **Node Validation Checklist**
+    - **Node Structure Validation**: Verify READ → DO → WRITE → CONTROL structure
+    - **State Field Ownership**: Verify state field ownership is correct
+    - **Error Handling Validation**: Verify error handling is comprehensive
+    - **Performance Considerations**: Check performance implications
+    - **Node Testing Requirements**: Verify test coverage meets requirements
+    - **Multi-Agent Compliance**: Verify node follows multi-agent patterns if applicable
+
+11. **Generate Node Creation Report**
     - Create node creation summary
     - Document node structure and implementation
     - Include test coverage information
+    - **Node Validation Results**: Validation checklist results
+    - **Performance Analysis**: Performance considerations and recommendations
+    - **Node Testing Status**: Test coverage and test quality assessment
     - Provide integration status
 
 ## Data Sources
@@ -134,9 +150,14 @@ Create a new LangGraph node following the four-part structure (READ → DO → W
 A complete agent node implementation including:
 - **Node Implementation**: Complete node with READ → DO → WRITE → CONTROL structure
 - **State Integration**: Proper state field ownership and updates
-- **Error Handling**: Comprehensive error handling with retry logic
-- **Tests**: Complete test suite with good coverage
+- **Error Handling**: Comprehensive error handling with retry logic and error classification
+- **Multi-Agent Compliance**: Node follows multi-agent patterns and role requirements
+- **Node Instrumentation**: Monitoring and observability instrumentation
+- **Performance Considerations**: Performance analysis and optimization recommendations
+- **Self-Critique Patterns**: Reflection and self-critique mechanisms if applicable
+- **Tests**: Complete test suite with good coverage meeting test requirements
+- **Node Validation**: Validation checklist results and compliance status
 - **Workflow Integration**: Node added to workflow with proper edges
 - **Documentation**: Complete node and code documentation
 - **Visualization Update**: Updated workflow graph visualization
-- **Creation Report**: Summary of node creation with next steps
+- **Creation Report**: Summary of node creation with validation results and next steps

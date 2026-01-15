@@ -6,7 +6,9 @@ Execute the full test suite and systematically analyze results, identify failure
 ## Rules Applied
 - `tests-and-validation` - Testing framework standards and validation requirements
 - `core-python-standards` - Code quality standards and best practices
-- `error-handling-and-resilience` - Error handling patterns for test failures
+- `error-handling-and-resilience` - Error handling patterns for test failures, error classification
+- `monitoring-and-observability` - Test execution metrics and logging
+- `performance-optimization` - Test performance analysis
 
 ## Steps
 
@@ -24,6 +26,9 @@ Execute the full test suite and systematically analyze results, identify failure
 
 3. **Identify Failure Patterns**
    - Group failures by type (assertion errors, import errors, timeout errors, etc.)
+   - **Error Classification**: Classify each failure as transient (retryable) or permanent (requires fix)
+     - Transient: network timeouts, temporary service unavailability, rate limits
+     - Permanent: assertion failures, logic errors, missing dependencies
    - Identify common failure patterns across multiple tests
    - Check if failures are related to recent code changes
    - Determine if failures are flaky or deterministic
@@ -32,7 +37,16 @@ Execute the full test suite and systematically analyze results, identify failure
    - Total number of tests executed
    - Pass rate percentage
    - Execution time (total and per-test average)
-   - Test coverage metrics (if available)
+   - **Test Coverage Analysis**:
+     - Calculate line coverage, branch coverage, and function coverage
+     - Identify uncovered code paths and functions
+     - Highlight critical paths without test coverage
+     - Compare coverage with previous runs (if available)
+   - **Performance Metrics Collection**:
+     - Record execution time per test
+     - Identify slow tests (exceeding threshold)
+     - Track performance trends over time
+     - Calculate test execution efficiency metrics
    - Breakdown by test file and test category
 
 5. **Provide Recommendations**
@@ -55,9 +69,11 @@ Execute the full test suite and systematically analyze results, identify failure
 
 ## Output
 A comprehensive test report including:
-- Summary statistics (total tests, pass rate, execution time)
-- Detailed failure analysis with stack traces
-- Grouped failures by type and pattern
-- Specific recommendations for each failure
-- Overall assessment and next steps
-- Visual indicators (✅/❌/⚠️) for quick status identification
+- **Summary Statistics**: Total tests, pass rate, execution time
+- **Test Coverage Analysis**: Coverage metrics, uncovered code paths, coverage trends
+- **Performance Metrics**: Execution time per test, slow test identification, performance trends
+- **Error Classification**: Transient vs permanent failures with classification rationale
+- **Detailed Failure Analysis**: Stack traces, grouped by type and pattern
+- **Specific Recommendations**: Actionable fixes for each failure with error context
+- **Overall Assessment**: Status summary and next steps
+- **Visual Indicators**: ✅/❌/⚠️ for quick status identification

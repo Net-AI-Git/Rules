@@ -7,6 +7,9 @@ Comprehensive compliance verification to ensure the system meets regulatory requ
 - `audit-protocol` - Compliance requirements, regulatory compliance (GDPR, HIPAA, SOC 2)
 - `security-governance-and-observability` - Security governance, access controls, data protection
 - `data-schemas-and-interfaces` - Data handling and PII protection
+- `multi-tenancy-and-isolation` - Multi-tenant compliance checks, data isolation verification
+- `monitoring-and-observability` - Compliance monitoring, audit trail verification
+- `error-handling-and-resilience` - Compliance error handling, error classification
 
 ## Steps
 
@@ -84,12 +87,26 @@ Comprehensive compliance verification to ensure the system meets regulatory requ
    - Validate audit log retention meets regulatory requirements
    - Review audit log access controls
 
-8. **Generate Compliance Report**
-   - Create comprehensive compliance report
-   - Document compliance status for each regulation
-   - Identify compliance gaps and issues
-   - Provide prioritized recommendations for remediation
-   - Include evidence and references for each check
+8. **Multi-Tenancy Compliance Checks** (if applicable)
+   - **Data Isolation**: Verify tenant data is properly isolated
+   - **Access Controls**: Check tenant-specific access controls are enforced
+   - **Audit Logging**: Verify tenant-specific audit logging
+   - **Compliance Monitoring**: Check multi-tenant compliance monitoring
+
+9. **Automated Compliance Validation**
+   - **Automated Checks**: Run automated compliance validation scripts
+   - **Configuration Validation**: Verify compliance-related configurations
+   - **Policy Enforcement**: Check automated policy enforcement mechanisms
+   - **Compliance Gap Analysis**: Identify gaps between current state and requirements
+
+10. **Generate Compliance Report**
+    - Create comprehensive compliance report
+    - Document compliance status for each regulation
+    - **Compliance Gap Analysis**: Detailed analysis of compliance gaps with severity classification
+    - **Remediation Tracking**: Track remediation status for identified gaps
+    - Provide prioritized recommendations for remediation
+    - Include evidence and references for each check
+    - **Compliance Scoring**: Calculate compliance score per regulation and overall
 
 ## Data Sources
 - Audit logs (JSON format) from local files
@@ -103,9 +120,13 @@ A comprehensive compliance report including:
 - **GDPR Compliance Status**: Data subject rights, consent management, data processing records, breach notification
 - **HIPAA Compliance Status** (if applicable): PHI access logging, access controls, audit trail requirements
 - **SOC 2 Compliance Status**: Access controls, system changes, incident response
+- **Multi-Tenancy Compliance** (if applicable): Data isolation, tenant access controls, audit logging
 - **Data Retention Verification**: Policy compliance and enforcement status
 - **Access Control Verification**: Configuration and enforcement status
 - **Data Protection Status**: PII handling, encryption, data classification
 - **Audit Trail Completeness**: Logging coverage and structure compliance
-- **Compliance Gaps**: Identified issues with severity levels
-- **Remediation Recommendations**: Prioritized actions to achieve compliance
+- **Compliance Gap Analysis**: Detailed analysis of gaps with severity levels and impact assessment
+- **Remediation Tracking**: Status of remediation efforts for identified gaps
+- **Compliance Scoring**: Per-regulation scores and overall compliance score
+- **Automated Validation Results**: Results from automated compliance checks
+- **Remediation Recommendations**: Prioritized actions to achieve compliance with timelines

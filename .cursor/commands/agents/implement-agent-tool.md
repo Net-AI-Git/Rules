@@ -7,6 +7,11 @@ Implement a new tool for agent use following LangChain tool definition standards
 - `agentic-logic-and-tools` - LangChain fundamentals, tool definitions, tool documentation
 - `data-schemas-and-interfaces` - Pydantic schema standards, field descriptions, structured outputs
 - `core-python-standards` - Code quality standards, type hints, function length
+- `error-handling-and-resilience` - Tool error handling, error classification, retry strategies
+- `security-governance-and-observability` - Tool security, access control, input validation
+- `tests-and-validation` - Tool testing, test structure, test coverage
+- `monitoring-and-observability` - Tool instrumentation, metrics collection
+- `prompt-injection-prevention` - Tool input validation, prompt injection prevention
 
 ## Steps
 
@@ -39,14 +44,23 @@ Implement a new tool for agent use following LangChain tool definition standards
      - Implement tool function with proper logic
      - Keep functions under 20 lines (split if needed)
      - Use full type hints for all parameters
+   - **Tool Security Validation**:
+     - **Input Validation**: Validate all inputs to prevent prompt injection
+     - **Access Control**: Verify tool access control is properly configured
+     - **Security Checks**: Check for security vulnerabilities in tool logic
    - **Error Handling**:
      - Implement proper error handling
-     - Classify errors (transient vs permanent)
+     - **Error Classification**: Classify errors (transient vs permanent)
+     - **Retry Strategies**: Implement retry logic for transient errors
      - Return appropriate error responses
    - **Logging**:
      - Use logger (not print) for all logging
      - Log tool execution with structured format
      - Include tool name, parameters, and results in logs
+   - **Tool Performance Considerations**:
+     - Consider performance implications of tool execution
+     - Optimize tool logic for efficiency
+     - Consider caching if applicable
 
 4. **Add Tool Decorator**
    - **Tool Definition**:
@@ -75,10 +89,15 @@ Implement a new tool for agent use following LangChain tool definition standards
      - Add tool to tool registry
      - Configure tool availability by environment (Dev vs Prod)
      - Set up tool whitelisting if required
-   - **Access Control**:
+   - **Tool Access Control Setup**:
      - Configure tool access control
      - Set up tool sandboxing if needed
+     - **Security Configuration**: Configure security settings for tool
      - Document tool access requirements
+   - **Tool Instrumentation**:
+     - Set up monitoring and observability for tool
+     - Configure metrics collection
+     - Set up logging and tracing
 
 7. **Create Tests**
    - **Test Structure**:
@@ -113,9 +132,18 @@ Implement a new tool for agent use following LangChain tool definition standards
      - Document version history
      - Support multiple versions if needed
 
-10. **Generate Tool Implementation Report**
+10. **Tool Security Validation**
+    - **Security Review**: Review tool for security vulnerabilities
+    - **Input Validation Check**: Verify input validation prevents prompt injection
+    - **Access Control Verification**: Verify access control is properly configured
+    - **Security Testing**: Run security tests for tool
+
+11. **Generate Tool Implementation Report**
     - Create tool implementation summary
     - Document tool structure and functionality
+    - **Tool Security Status**: Security validation results
+    - **Tool Performance Analysis**: Performance considerations and recommendations
+    - **Tool Access Control**: Access control configuration status
     - Include test coverage information
     - Provide integration status
 
@@ -128,10 +156,14 @@ Implement a new tool for agent use following LangChain tool definition standards
 ## Output
 A complete tool implementation including:
 - **Pydantic Schema**: Complete schema with field descriptions and constraints
-- **Tool Function**: Implementation with proper error handling and logging
+- **Tool Function**: Implementation with proper error handling, logging, and performance optimization
+- **Tool Security**: Security validation, input validation, access control, prompt injection prevention
 - **Tool Decorator**: Properly configured LangChain tool
 - **LLM Integration**: Structured outputs and tool call handling
-- **Tool Registry**: Tool added to registry with access control
-- **Tests**: Complete test suite with good coverage
+- **Tool Registry**: Tool added to registry with access control and instrumentation
+- **Tool Instrumentation**: Monitoring, metrics collection, logging, tracing
+- **Tests**: Complete test suite with good coverage including security tests
 - **Documentation**: Complete tool and code documentation
-- **Implementation Report**: Summary of tool implementation with next steps
+- **Tool Security Status**: Security validation results and compliance
+- **Tool Performance Analysis**: Performance considerations and recommendations
+- **Implementation Report**: Summary of tool implementation with security and performance analysis

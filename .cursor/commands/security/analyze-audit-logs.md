@@ -7,6 +7,9 @@ Comprehensive analysis of audit logs to identify security incidents, compliance 
 - `audit-protocol` - Audit trail requirements, log structure, compliance checks
 - `monitoring-and-observability` - Log aggregation, correlation IDs, distributed tracing
 - `security-governance-and-observability` - Security event monitoring and incident detection
+- `error-handling-and-resilience` - Error pattern analysis, error classification
+- `performance-optimization` - Performance anomaly detection, resource usage analysis
+- `human-in-the-loop-approval` - Human intervention tracking, approval workflow analysis
 
 ## Steps
 
@@ -47,7 +50,8 @@ Comprehensive analysis of audit logs to identify security incidents, compliance 
      - Review LangGraph state transitions
      - Analyze node executions and state modifications
      - Identify error states and recovery actions
-     - Check human-in-the-loop intervention points
+     - **Human Intervention Tracking**: Check human-in-the-loop intervention points and approval workflows
+     - Analyze human intervention patterns and effectiveness
    - **API Requests**:
      - Analyze incoming API request patterns
      - Review authentication and authorization events
@@ -68,10 +72,17 @@ Comprehensive analysis of audit logs to identify security incidents, compliance 
      - Count and analyze failed authorization checks
      - Identify repeated denial patterns
      - Check for potential brute force attempts
-   - **Error Patterns**:
+   - **Error Pattern Analysis**:
      - Identify recurring error types
+     - **Error Classification**: Classify errors as transient vs permanent
      - Analyze error recovery patterns
      - Detect cascading failures
+     - Track error frequency and trends
+   - **Performance Anomaly Detection**:
+     - Identify unusual resource consumption patterns
+     - Detect latency spikes and performance degradation
+     - Flag excessive tool usage or resource waste
+     - Analyze performance trends over time
    - **Resource Usage Anomalies**:
      - Identify unusual resource consumption
      - Detect potential DoS attempts
@@ -102,9 +113,10 @@ Comprehensive analysis of audit logs to identify security incidents, compliance 
      - Analyze incident scope and impact
      - Identify affected resources and users
    - **Forensic Analysis**:
-     - Reconstruct incident timelines
-     - Track user activities across sessions
-     - Identify root causes
+     - **Timeline Reconstruction**: Reconstruct detailed incident timelines with event sequencing
+     - **Activity Tracking**: Track user activities across sessions with correlation IDs
+     - **Root Cause Analysis**: Identify root causes with evidence chain
+     - **Incident Correlation**: Correlate related incidents across time periods
 
 7. **Generate Audit Report**
    - Create comprehensive audit log analysis report
@@ -124,7 +136,11 @@ A comprehensive audit log analysis report including:
 - **Log Statistics**: Total events, event types breakdown, time range coverage
 - **Event Analysis**: Detailed analysis by category (tool calls, state changes, API requests, data access)
 - **Anomaly Detection**: Identified anomalies with severity levels and context
+  - Error patterns with classification (transient vs permanent)
+  - Performance anomalies with resource usage analysis
+  - Human intervention patterns and approval workflow analysis
 - **Compliance Status**: GDPR, HIPAA, SOC 2 compliance verification results
-- **Security Incidents**: Detected incidents with timeline reconstruction and impact analysis
-- **Patterns and Trends**: Operational patterns, usage trends, and behavioral analysis
+- **Security Incidents**: Detected incidents with detailed timeline reconstruction, impact analysis, and root cause identification
+- **Forensic Analysis**: Timeline reconstruction, activity tracking, incident correlation
+- **Patterns and Trends**: Operational patterns, usage trends, behavioral analysis, performance trends
 - **Recommendations**: Actionable suggestions for improving audit logging and security

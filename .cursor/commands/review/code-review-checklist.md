@@ -7,6 +7,11 @@ Comprehensive code review using a structured checklist to ensure code quality, f
 - `code-review-and-collaboration` - Code review standards, PR review checklist, Git workflow
 - `core-python-standards` - Code quality standards, function length, type hints, logging
 - `final-review-protocol` - Final review compliance checklist
+- `error-handling-and-resilience` - Error handling review, error classification, retry strategies
+- `tests-and-validation` - Test coverage review, test quality standards
+- `security-governance-and-observability` - Security review, vulnerability checks, access control
+- `performance-optimization` - Performance review, efficiency checks
+- `data-schemas-and-interfaces` - Data handling review, schema validation
 
 ## Steps
 
@@ -106,7 +111,9 @@ Comprehensive code review using a structured checklist to ensure code quality, f
 
 8. **Generate Review Report**
    - Create comprehensive code review report
-   - Include checklist items with status (✅/❌/⚠️)
+   - **Comprehensive Checklist**: Include all checklist items with status (✅/❌/⚠️) covering all standards
+   - **Automated Checks**: Include results from automated code quality checks where applicable
+   - **Review Approval Workflow**: Document approval status and workflow requirements
    - Provide specific feedback for each item
    - Prioritize issues by severity
    - Include recommendations for improvements
@@ -120,13 +127,16 @@ Comprehensive code review using a structured checklist to ensure code quality, f
 
 ## Output
 A comprehensive code review report including:
-- **Checklist Summary**: Overall status with visual indicators (✅/❌/⚠️)
-- **Code Quality Assessment**: Function length, type hints, style compliance
-- **Functionality Review**: Correctness, edge cases, error handling
-- **Testing Status**: Coverage, test quality, execution results
-- **Documentation Status**: Code docs, project docs, API docs
-- **Security Assessment**: Vulnerabilities, sensitive data handling, access control
-- **Dependencies Review**: Justification, security, licenses
-- **Architecture Review**: Design patterns, integration, compatibility
+- **Checklist Summary**: Overall status with visual indicators (✅/❌/⚠️) covering all standards
+- **Code Quality Assessment**: Function length, type hints, style compliance, code duplication
+- **Functionality Review**: Correctness, edge cases, error handling with classification
+- **Testing Status**: Coverage, test quality, execution results, test structure
+- **Documentation Status**: Code docs, project docs, API docs, docstring structure
+- **Security Assessment**: Vulnerabilities, sensitive data handling, access control, input validation
+- **Performance Review**: Algorithm efficiency, async/await usage, performance considerations
+- **Data Handling Review**: Schema validation, data structure usage, Pydantic models
+- **Dependencies Review**: Justification, security, licenses, version compatibility
+- **Architecture Review**: Design patterns, integration, compatibility, separation of concerns
+- **Automated Check Results**: Results from automated code quality tools
 - **Prioritized Recommendations**: Actionable feedback with severity levels
-- **Approval Status**: Overall recommendation (Approve/Request Changes/Needs Discussion)
+- **Approval Status**: Overall recommendation (Approve/Request Changes/Needs Discussion) with workflow requirements

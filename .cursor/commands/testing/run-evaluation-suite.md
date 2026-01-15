@@ -7,11 +7,18 @@ Execute the complete LLM evaluation suite using specialized evaluation framework
 - `llm-evaluation-and-metrics` - LLM evaluation standards and mandatory metrics
 - `llm-judge-protocol` - LLM Judge evaluation protocol and rubric
 - `monitoring-and-observability` - LangSmith integration and tracing
+- `data-schemas-and-interfaces` - Evaluation data structures and Pydantic schemas
+- `error-handling-and-resilience` - Evaluation error handling and retry strategies
+- `performance-optimization` - Evaluation performance metrics and optimization
 
 ## Steps
 
 1. **Prepare Evaluation Environment**
-   - Verify evaluation frameworks are installed (Ragas, DeepEval, LangSmith)
+   - **Evaluation Framework Validation**:
+     - Verify evaluation frameworks are installed (Ragas, DeepEval, LangSmith)
+     - Validate framework versions are compatible
+     - Check framework configuration is correct
+     - Verify framework dependencies are available
    - Check for golden dataset (`datasets/golden_qa.json` or similar)
    - Validate evaluation configuration and parameters
    - Ensure LangSmith tracing is enabled if applicable
@@ -26,8 +33,14 @@ Execute the complete LLM evaluation suite using specialized evaluation framework
 3. **Collect Evaluation Data**
    - Gather evaluation results from all frameworks
    - Collect LangSmith traces for LLM operations
+   - **Cost Tracking**:
+     - Extract token usage (input and output tokens per evaluation)
+     - Calculate costs based on model pricing
+     - Track cost per evaluation metric
+     - Identify expensive evaluation operations
    - Extract performance metrics (latency, token usage, costs)
    - Capture evaluation execution logs
+   - **Error Handling**: Classify evaluation errors as transient (retryable) or permanent (requires fix)
 
 4. **Compare Against Golden Dataset**
    - Compare actual outputs with expected ideal answers (Ground Truth)
@@ -46,7 +59,12 @@ Execute the complete LLM evaluation suite using specialized evaluation framework
    - Include per-metric breakdowns and scores
    - Highlight areas requiring improvement
    - Provide specific examples of failures or low scores
-   - Compare current results with previous evaluations (if available)
+   - **Comparison with Previous Evaluations**:
+     - Compare current metrics with previous evaluation runs
+     - Identify metric trends (improving, degrading, stable)
+     - Highlight significant changes in scores
+     - Track evaluation cost trends over time
+     - Provide trend analysis and recommendations
 
 7. **Provide Improvement Recommendations**
    - Suggest prompt engineering improvements
@@ -63,10 +81,12 @@ Execute the complete LLM evaluation suite using specialized evaluation framework
 
 ## Output
 A comprehensive evaluation report including:
-- Metric scores (Faithfulness, Answer Relevance, Context Precision, Tool Usage Accuracy)
-- Comparison with golden dataset results
-- Performance metrics (latency, token usage, costs)
-- Specific test case analysis with examples
-- Areas requiring improvement with priority levels
-- Actionable recommendations for each metric
-- Trend analysis if historical data available
+- **Metric Scores**: Faithfulness, Answer Relevance, Context Precision, Tool Usage Accuracy
+- **Comparison with Golden Dataset**: Accuracy metrics, deviation scores, mismatch patterns
+- **Performance Metrics**: Latency, token usage, costs with cost tracking breakdown
+- **Cost Analysis**: Cost per evaluation, cost trends, expensive operations identification
+- **Evaluation Framework Validation**: Framework status, configuration validation, dependency checks
+- **Specific Test Case Analysis**: Examples of failures or low scores with context
+- **Trend Analysis**: Comparison with previous evaluations, metric trends, cost trends
+- **Areas Requiring Improvement**: Prioritized by impact and severity
+- **Actionable Recommendations**: Specific suggestions for each metric with implementation guidance

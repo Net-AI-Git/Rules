@@ -4,9 +4,19 @@
 Execute all monitoring commands in sequence: LangSmith trace analysis, performance analysis, and comprehensive system analysis. This master command runs the complete monitoring workflow to analyze system performance, identify bottlenecks, and provide holistic insights.
 
 ## Rules Applied
-- `monitoring-and-observability` - Metrics, tracing, log aggregation
-- `performance-optimization` - Performance optimization strategies
-- `agentic-logic-and-tools` - Tool usage patterns
+- `monitoring-and-observability` - Metrics, tracing, log aggregation, LangSmith integration
+- `performance-optimization` - Performance optimization strategies, bottleneck identification
+- `agentic-logic-and-tools` - Tool usage patterns, agent internals
+- `error-handling-and-resilience` - Error patterns, retry strategies, error impact analysis
+- `cost-and-budget-management` - Cost analysis, token usage optimization
+- `model-routing-and-selection` - Model selection analysis
+- `deployment-and-infrastructure` - Infrastructure performance
+- `rate-limiting-and-queue-management` - Queue performance
+- `audit-protocol` - Audit trail analysis
+- `llm-evaluation-and-metrics` - Evaluation results
+- `tests-and-validation` - Test results
+- `security-governance-and-observability` - Security analysis
+- `human-in-the-loop-approval` - Human intervention analysis
 
 ## Steps
 
@@ -37,11 +47,15 @@ Execute all monitoring commands in sequence: LangSmith trace analysis, performan
    - **Output**: Comprehensive system analysis report with cross-system correlations
 
 4. **Generate Comprehensive Monitoring Report**
+   - **System Health Dashboard**: Create dashboard with key metrics and health indicators
+   - **Trend Analysis**: Analyze trends across all monitoring dimensions
+   - **Alerting Recommendations**: Provide recommendations for setting up alerts based on findings
    - Aggregate results from all three commands
-   - Create summary with overall system health status
-   - Highlight performance bottlenecks and anomalies
-   - Provide prioritized optimization recommendations
+   - Create summary with overall system health status (Healthy/Degraded/Critical)
+   - Highlight performance bottlenecks and anomalies with severity classification
+   - Provide prioritized optimization recommendations with impact assessment
    - Include links to detailed reports from each command
+   - **Monitoring Insights**: Key insights and patterns identified across all monitoring data
 
 ## Data Sources
 - Results from `/monitoring/analyze-langsmith-traces` command
@@ -53,13 +67,17 @@ Execute all monitoring commands in sequence: LangSmith trace analysis, performan
 
 ## Output
 A comprehensive monitoring report including:
-- **Overall System Health**: Healthy/Degraded/Critical
-- **LangSmith Analysis Summary**: LLM calls, tool usage, agent steps, bottlenecks
-- **Performance Analysis Summary**: Latency, throughput, resource usage, optimization opportunities
-- **Comprehensive Analysis Summary**: Cross-system correlations, patterns, anomalies
-- **Critical Issues**: Performance bottlenecks and system issues
-- **Prioritized Recommendations**: Optimization suggestions with impact assessment
-- **Next Steps**: Actionable performance improvements
+- **Overall System Health**: Healthy/Degraded/Critical with health score
+- **System Health Dashboard**: Key metrics, health indicators, component health status
+- **LangSmith Analysis Summary**: LLM calls, tool usage, agent steps, bottlenecks, cost analysis, model selection
+- **Performance Analysis Summary**: Latency, throughput, resource usage, SLI/SLO compliance, capacity planning, optimization opportunities
+- **Comprehensive Analysis Summary**: Cross-system correlations, patterns, anomalies, system health scoring, predictive analysis
+- **Trend Analysis**: Performance trends, cost trends, error trends, health trends
+- **Critical Issues**: Performance bottlenecks and system issues with severity classification
+- **Alerting Recommendations**: Suggested alerts based on findings with thresholds
+- **Prioritized Recommendations**: Optimization suggestions with impact assessment and implementation guidance
+- **Monitoring Insights**: Key insights and patterns identified across all monitoring data
+- **Next Steps**: Actionable performance improvements with priority levels
 
 ## Execution Flow
 ```

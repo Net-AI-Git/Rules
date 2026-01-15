@@ -7,6 +7,9 @@ Comprehensive performance analysis to identify bottlenecks, optimize resource us
 - `performance-optimization` - Performance optimization strategies, caching, query optimization, resource pooling
 - `monitoring-and-observability` - Performance metrics, SLI/SLO definitions, profiling
 - `core-python-standards` - Concurrency patterns (asyncio, ProcessPoolExecutor)
+- `error-handling-and-resilience` - Error impact on performance, error recovery performance
+- `deployment-and-infrastructure` - Infrastructure performance, resource limits
+- `rate-limiting-and-queue-management` - Queue performance, rate limiting impact
 
 ## Steps
 
@@ -106,13 +109,34 @@ Comprehensive performance analysis to identify bottlenecks, optimize resource us
      - Identify unnecessary sequential operations
      - Find parallelization opportunities
 
-8. **Generate Performance Report**
-   - Create comprehensive performance analysis report
-   - Include latency, throughput, and resource usage analysis
-   - Provide cache and query optimization insights
-   - Highlight bottlenecks and optimization opportunities
-   - Include prioritized recommendations
-   - Provide specific optimization steps
+8. **SLI/SLO Compliance Checks**
+   - **Service Level Indicators**: Verify SLI metrics meet defined thresholds
+   - **Service Level Objectives**: Check SLO compliance for all defined objectives
+   - **SLO Violations**: Identify and analyze SLO violations
+   - **SLO Trends**: Track SLO compliance trends over time
+
+9. **Capacity Planning Recommendations**
+   - **Resource Capacity**: Analyze current resource usage vs capacity
+   - **Scaling Recommendations**: Provide scaling recommendations based on trends
+   - **Capacity Projections**: Project future capacity needs
+   - **Cost-Benefit Analysis**: Analyze cost vs performance trade-offs
+
+10. **Performance Regression Detection**
+    - **Baseline Comparison**: Compare current performance with historical baselines
+    - **Regression Identification**: Identify performance regressions
+    - **Regression Analysis**: Analyze causes of performance regressions
+    - **Regression Trends**: Track regression patterns over time
+
+11. **Generate Performance Report**
+    - Create comprehensive performance analysis report
+    - Include latency, throughput, and resource usage analysis
+    - Provide cache and query optimization insights
+    - Highlight bottlenecks and optimization opportunities
+    - Include SLI/SLO compliance status
+    - Provide capacity planning recommendations
+    - Include performance regression analysis
+    - Include prioritized recommendations
+    - Provide specific optimization steps
 
 ## Data Sources
 - Performance metrics from monitoring systems
@@ -130,6 +154,12 @@ A comprehensive performance analysis report including:
 - **Cache Performance**: Hit rates, patterns, configuration analysis
 - **Query Optimization**: Database queries, index usage, query patterns
 - **Connection Pooling**: Pool usage, configuration, optimization
+- **Error Impact Analysis**: Error impact on performance, error recovery performance
+- **Infrastructure Performance**: Infrastructure resource usage, resource limits
+- **Queue Performance**: Queue metrics, rate limiting impact on performance
+- **SLI/SLO Compliance**: SLI metrics, SLO compliance status, SLO violations, SLO trends
+- **Capacity Planning**: Resource capacity analysis, scaling recommendations, capacity projections, cost-benefit analysis
+- **Performance Regression**: Baseline comparison, regression identification, regression analysis, regression trends
 - **Bottleneck Identification**: Critical paths, resource contention, sequential dependencies
-- **Optimization Recommendations**: Prioritized suggestions with specific steps
+- **Optimization Recommendations**: Prioritized suggestions with specific steps and impact assessment
 - **Performance Baseline**: Current performance metrics for comparison

@@ -10,6 +10,10 @@ Complete cross-system analysis combining all available data sources (LangSmith t
 - `llm-evaluation-and-metrics` - Evaluation results
 - `tests-and-validation` - Test results
 - `security-governance-and-observability` - Security analysis
+- `performance-optimization` - System-wide performance analysis
+- `cost-and-budget-management` - Cost analysis across systems
+- `error-handling-and-resilience` - System-wide error patterns
+- `human-in-the-loop-approval` - Human intervention analysis
 
 ## Steps
 
@@ -99,11 +103,25 @@ Complete cross-system analysis combining all available data sources (LangSmith t
      - Identify error impact on performance
      - Find error prevention opportunities
 
-6. **Generate Comprehensive Report**
+6. **System Health Scoring**
+   - **Health Metrics**: Calculate system health score based on all metrics
+   - **Component Health**: Assess health of individual system components
+   - **Health Trends**: Track system health trends over time
+   - **Health Predictions**: Predict future health based on trends
+
+7. **Predictive Analysis**
+   - **Trend Projections**: Project future trends based on historical data
+   - **Anomaly Prediction**: Predict potential future anomalies
+   - **Capacity Projections**: Project future capacity needs
+   - **Risk Assessment**: Assess risks based on current patterns
+
+8. **Generate Comprehensive Report**
    - Create holistic system analysis report
    - Include analysis from all data sources
    - Provide cross-system correlations
    - Highlight patterns and anomalies
+   - Include system health scoring
+   - Provide predictive analysis and projections
    - Include prioritized recommendations
    - Provide actionable insights
 
@@ -117,11 +135,17 @@ Complete cross-system analysis combining all available data sources (LangSmith t
 
 ## Output
 A comprehensive system analysis report including:
-- **Data Source Summary**: Overview of all collected data
-- **Cross-System Correlations**: Relationships between different systems
-- **Pattern Identification**: Operational, performance, error, and usage patterns
-- **Anomaly Detection**: Performance, security, quality, and operational anomalies
-- **Cross-System Analysis**: Performance vs quality, security vs usability, errors vs performance
+- **Data Source Summary**: Overview of all collected data from all systems
+- **Cross-System Correlations**: Relationships between different systems with correlation analysis
+- **Pattern Identification**: Operational, performance, error, usage, and cost patterns
+- **Anomaly Detection**: Performance, security, quality, operational, and cost anomalies
+- **Cross-System Analysis**: Performance vs quality, security vs usability, errors vs performance, cost vs efficiency
+- **System-Wide Performance**: Overall performance metrics across all systems
+- **System-Wide Cost Analysis**: Cost breakdown and trends across all systems
+- **System-Wide Error Patterns**: Error patterns and trends across all systems
+- **Human Intervention Analysis**: Human intervention patterns and effectiveness
+- **System Health Scoring**: Overall system health score, component health, health trends
+- **Predictive Analysis**: Trend projections, anomaly predictions, capacity projections, risk assessment
 - **Holistic Insights**: System-wide observations and trends
-- **Prioritized Recommendations**: Actionable improvements across all systems
-- **System Health Assessment**: Overall system health and status
+- **Prioritized Recommendations**: Actionable improvements across all systems with impact assessment
+- **System Health Assessment**: Overall system health and status with health predictions

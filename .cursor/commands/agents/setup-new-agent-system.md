@@ -8,6 +8,13 @@ Systematic setup of a new multi-agent system from initial planning through imple
 - `langgraph-architecture-and-nodes` - LangGraph workflow design, state definition, node implementation
 - `agentic-logic-and-tools` - LangChain fundamentals, tool definitions, agent internals
 - `core-python-standards` - Code quality standards, project structure
+- `configuration-and-dependency-injection` - Configuration setup, pydantic-settings, dependency injection
+- `data-schemas-and-interfaces` - Schema definitions, Pydantic models, structured interfaces
+- `prompt-engineering-and-management` - Prompt setup, prompt templates, prompt versioning
+- `error-handling-and-resilience` - Error handling setup, retry strategies, error classification
+- `human-in-the-loop-approval` - Human-in-the-loop setup, approval workflows
+- `cost-and-budget-management` - Budget setup, cost tracking configuration
+- `rate-limiting-and-queue-management` - Rate limiting setup, queue management configuration
 
 ## Steps
 
@@ -111,11 +118,32 @@ Systematic setup of a new multi-agent system from initial planning through imple
    - **Tool Registry Configuration**:
      - Set up tool registry with environment-based tool selection
      - Configure Dev vs Prod tool sets
+   - **Budget Setup**:
+     - Configure cost tracking and budget management
+     - Set up budget limits and alerts
+     - Configure cost monitoring
+   - **Rate Limiting Setup**:
+     - Configure rate limiting for agent operations
+     - Set up queue management if needed
+     - Configure resource quotas
+   - **Human-in-the-Loop Setup**:
+     - Configure approval workflows for critical actions
+     - Set up human intervention points
+     - Configure approval tracking
 
-10. **Generate Setup Report**
+10. **Comprehensive Setup Checklist**
+    - **Architecture Validation**: Verify architecture follows multi-agent patterns
+    - **Setup Verification**: Verify all components are properly configured
+    - **Validation Steps**: Run validation checks for each component
+    - **Checklist Completion**: Ensure all setup steps are completed
+
+11. **Generate Setup Report**
     - Create comprehensive setup report
     - Document project structure
     - Include workflow visualization
+    - **Setup Checklist**: Complete checklist with status for all components
+    - **Architecture Validation**: Architecture compliance status
+    - **Setup Verification**: Verification results for all components
     - Provide next steps for development
 
 ## Data Sources
@@ -132,5 +160,8 @@ A comprehensive agent system setup including:
 - **Tool Definitions**: Tool registry with complete documentation
 - **Visualization**: Graph visualization of the workflow
 - **Basic Tests**: Initial test suite for workflow and nodes
-- **Configuration**: Environment setup and tool registry configuration
-- **Setup Report**: Documentation of setup with next steps
+- **Configuration**: Environment setup, tool registry, budget, rate limiting, human-in-the-loop configuration
+- **Setup Checklist**: Complete checklist with status for all components
+- **Architecture Validation**: Architecture compliance status and validation results
+- **Setup Verification**: Verification results for all components
+- **Setup Report**: Documentation of setup with next steps and verification status

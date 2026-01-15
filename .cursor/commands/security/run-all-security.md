@@ -4,9 +4,16 @@
 Execute all security commands in sequence: compliance check, audit log analysis, and comprehensive security audit. This master command runs the complete security workflow to ensure system security, compliance, and audit trail integrity.
 
 ## Rules Applied
-- `security-governance-and-observability` - Security governance requirements
-- `audit-protocol` - Audit trail requirements and compliance
-- `data-schemas-and-interfaces` - Data handling and PII protection
+- `security-governance-and-observability` - Security governance, OWASP Top 10, NIST AI RMF, blast radius containment
+- `audit-protocol` - Audit trail requirements, compliance checks, regulatory compliance
+- `data-schemas-and-interfaces` - Data handling, PII protection, data security validation
+- `multi-tenancy-and-isolation` - Multi-tenant compliance checks, isolation security
+- `monitoring-and-observability` - Compliance monitoring, audit trail verification, log aggregation
+- `error-handling-and-resilience` - Compliance error handling, error pattern analysis, error classification
+- `performance-optimization` - Performance anomaly detection
+- `human-in-the-loop-approval` - Human intervention tracking, approval workflow analysis
+- `prompt-injection-prevention` - Prompt injection vulnerability checks
+- `configuration-and-dependency-injection` - Secrets management, configuration security
 
 ## Steps
 
@@ -39,10 +46,24 @@ Execute all security commands in sequence: compliance check, audit log analysis,
    - **Output**: Comprehensive security audit report
 
 4. **Generate Comprehensive Security Report**
-   - Aggregate results from all three commands
-   - Create summary with overall security status
-   - Highlight critical vulnerabilities and compliance gaps
-   - Provide prioritized remediation recommendations
+   - **Comprehensive Security Status Aggregation**:
+     - Aggregate results from all three commands (compliance check, audit log analysis, security audit)
+     - Combine security findings, compliance status, and audit insights
+     - Create unified security posture assessment
+   - **Risk Prioritization**:
+     - Categorize all findings by risk level (Critical, High, Medium, Low)
+     - Prioritize based on impact and exploitability
+     - Calculate overall risk score
+     - Identify top security risks requiring immediate attention
+   - **Security Metrics Dashboard**:
+     - Compliance score per regulation (GDPR, HIPAA, SOC 2)
+     - Security vulnerability count by severity
+     - Audit log coverage and completeness metrics
+     - Security incident count and trends
+     - Overall security posture score
+   - Create summary with overall security status (Pass/Fail/Needs Attention)
+   - Highlight critical vulnerabilities and compliance gaps with severity classification
+   - Provide prioritized remediation recommendations with timelines
    - Include links to detailed reports from each command
 
 ## Data Sources
@@ -52,13 +73,15 @@ Execute all security commands in sequence: compliance check, audit log analysis,
 
 ## Output
 A comprehensive security report including:
-- **Overall Security Status**: Pass/Fail/Needs Attention
-- **Compliance Summary**: GDPR, HIPAA, SOC 2 compliance status
-- **Audit Log Summary**: Anomalies, incidents, patterns
-- **Security Audit Summary**: Vulnerabilities, OWASP Top 10 compliance, infrastructure security
-- **Critical Issues**: Blocking security issues that must be addressed
-- **Prioritized Recommendations**: Remediation steps with severity levels
-- **Next Steps**: Actionable security improvements
+- **Overall Security Status**: Pass/Fail/Needs Attention with risk score
+- **Security Metrics Dashboard**: Compliance scores, vulnerability counts, audit coverage, incident trends, overall security posture
+- **Compliance Summary**: GDPR, HIPAA, SOC 2 compliance status with gap analysis and remediation tracking
+- **Audit Log Summary**: Anomalies, incidents, patterns, forensic analysis, human intervention tracking
+- **Security Audit Summary**: Vulnerabilities, OWASP Top 10 compliance, infrastructure security, security testing recommendations
+- **Risk Prioritization**: All findings categorized by risk level with impact assessment
+- **Critical Issues**: Blocking security issues that must be addressed immediately
+- **Prioritized Recommendations**: Remediation steps with severity levels, timelines, and implementation guidance
+- **Next Steps**: Actionable security improvements with priority levels
 
 ## Execution Flow
 ```

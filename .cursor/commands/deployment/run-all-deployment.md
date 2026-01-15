@@ -4,10 +4,18 @@
 Execute all deployment commands in sequence: pre-deployment check and post-deployment verification. This master command runs the complete deployment workflow to ensure successful and verified deployment.
 
 ## Rules Applied
-- `deployment-and-infrastructure` - Deployment standards and procedures
-- `final-review-protocol` - Final review compliance
-- `security-governance-and-observability` - Security governance
-- `monitoring-and-observability` - Health checks and monitoring
+- `deployment-and-infrastructure` - Deployment standards, CI/CD, Docker, Kubernetes, rollback procedures
+- `final-review-protocol` - Final review compliance checklist
+- `security-governance-and-observability` - Security governance, security verification
+- `monitoring-and-observability` - Health checks, monitoring, metrics, alerting, tracing
+- `tests-and-validation` - Testing requirements
+- `llm-evaluation-and-metrics` - Evaluation requirements
+- `performance-optimization` - Performance readiness, SLI/SLO validation, performance analysis
+- `configuration-and-dependency-injection` - Configuration validation, secrets management
+- `versioning-and-release-management` - Version validation, release management
+- `rate-limiting-and-queue-management` - Rate limiting checks, queue configuration
+- `error-handling-and-resilience` - Error monitoring, error recovery, error classification
+- `audit-protocol` - Audit trail verification, compliance checks
 
 ## Steps
 
@@ -31,10 +39,14 @@ Execute all deployment commands in sequence: pre-deployment check and post-deplo
    - **Output**: Post-deployment verification report with system status
 
 3. **Generate Comprehensive Deployment Report**
+   - **Deployment Workflow Orchestration**: Coordinate execution of pre and post deployment checks
+   - **Deployment Approval Workflow**: Document approval status and workflow requirements
+   - **Deployment Metrics Tracking**: Track deployment metrics and success rates
    - Aggregate results from both commands
-   - Create summary with overall deployment status
-   - Highlight pre-deployment issues and post-deployment status
-   - Provide recommendations for improvements
+   - Create summary with overall deployment status (Success/Failed/Needs Attention)
+   - Highlight pre-deployment issues and post-deployment status with severity classification
+   - **Deployment Insights**: Key insights from deployment process
+   - Provide recommendations for improvements with priority levels
    - Include links to detailed reports from each command
 
 ## Data Sources
@@ -46,12 +58,16 @@ Execute all deployment commands in sequence: pre-deployment check and post-deplo
 
 ## Output
 A comprehensive deployment report including:
-- **Overall Deployment Status**: Success/Failed/Needs Attention
-- **Pre-Deployment Summary**: Test results, evaluation results, security audit, compliance, infrastructure validation
-- **Post-Deployment Summary**: Health checks, smoke tests, performance verification, error monitoring
-- **Critical Issues**: Blocking issues that require immediate attention or rollback
-- **Recommendations**: Improvements for future deployments
-- **Next Steps**: Actionable items for deployment optimization
+- **Overall Deployment Status**: Success/Failed/Needs Attention with justification
+- **Deployment Workflow Status**: Execution status of pre and post deployment checks
+- **Pre-Deployment Summary**: Test results, evaluation results, security audit, compliance, infrastructure validation, rollback readiness, risk assessment
+- **Post-Deployment Summary**: Health checks, automated smoke tests, performance verification (with baseline comparison), error monitoring, security verification, rollback decision support
+- **Deployment Metrics**: Deployment success metrics, deployment duration, rollback rate
+- **Critical Issues**: Blocking issues that require immediate attention or rollback with severity classification
+- **Deployment Approval Status**: Approval workflow status and recommendations
+- **Deployment Insights**: Key insights and patterns from deployment process
+- **Recommendations**: Improvements for future deployments with priority levels and implementation guidance
+- **Next Steps**: Actionable items for deployment optimization with priority levels
 
 ## Execution Flow
 ```
