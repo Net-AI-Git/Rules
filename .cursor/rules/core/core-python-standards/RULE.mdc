@@ -44,7 +44,29 @@ You are an expert AI developer. You must strictly adhere to the following method
     * Use `asyncio.gather()` to run independent tool calls in parallel.
 * **CPU Bound (Data Processing/Embeddings):**
     * **MUST** use `concurrent.futures.ProcessPoolExecutor` to utilize all CPU cores.
-    * Offload heavy computations (e.g., parsing large PDFs) to separate processes so the Agent loop doesn't freeze.
+    * **Mandatory Identification:** Before writing code, identify if the task is CPU-bound. If yes, **MUST** use `ProcessPoolExecutor` - never use sequential loops (`for` loops) for CPU-bound batch operations.
+    * **Common CPU-Bound Tasks (MUST use ProcessPoolExecutor):**
+        * **Data Generation:** Synthetic data generation, test data creation, random data generation
+        * **Data Processing:** Parsing large files (PDFs, CSVs, JSON), data transformations, calculations
+        * **Embeddings:** Generating embeddings for multiple items, vector computations
+        * **Heavy Computations:** Mathematical operations, image processing, encryption/decryption
+        * **Batch Operations:** Any loop that processes multiple items with CPU-intensive work
+    * **Implementation Pattern:**
+        * Extract the CPU-bound function to module level (not nested) for `ProcessPoolExecutor` compatibility
+        * Use `ProcessPoolExecutor.submit()` or `ProcessPoolExecutor.map()` for parallel execution
+        * Never use sequential `for` loops when processing multiple CPU-bound items
+    * **Production Requirements:**
+        * **MUST** use `ProcessPoolExecutor` in production for all CPU-bound batch operations
+        * Configure pool size based on CPU cores: `ProcessPoolExecutor(max_workers=os.cpu_count())`
+        * Monitor process pool usage and adjust `max_workers` based on system load
+        * Handle process failures gracefully with error handling and retries
+        * **Agent Parallel Execution:** When creating/initializing multiple agents or processing agent workloads in parallel, use `ProcessPoolExecutor` for CPU-bound agent initialization tasks (e.g., loading models, generating embeddings, data preprocessing)
+    * **Examples:**
+        * **Synthetic Data Generation:** Generating 1000 synthetic data items **MUST** use `ProcessPoolExecutor`, not a `for` loop
+        * **Agent Initialization:** Initializing 10 agents with CPU-bound setup (model loading, embedding generation) **MUST** use `ProcessPoolExecutor`
+        * **Batch Processing:** Processing 500 items through CPU-intensive transformations **MUST** use `ProcessPoolExecutor`
+    * **See:** `@examples_process_pool.py` for complete ProcessPoolExecutor implementation patterns including synthetic data generation and parallel agent initialization for production systems.
+    * Offload heavy computations to separate processes so the Agent loop doesn't freeze.
 
 ### 3. Logging System
 * **No `print()`:** Use the pre-configured logger exclusively.

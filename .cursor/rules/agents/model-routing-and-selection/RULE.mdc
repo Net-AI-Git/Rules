@@ -249,3 +249,129 @@ All agentic systems **MUST** implement dynamic model routing to optimize cost an
 * **Fallback to Better Model:** If quality insufficient, retry with better model.
 
 * **Validation:** Validate outputs regardless of model used.
+
+## 8. Multi-Provider Failover
+
+### Mandate
+
+All agentic systems **MUST** implement multi-provider failover strategies to ensure High Availability (HA). When a primary LLM provider (e.g., OpenAI) fails, the system must automatically failover to secondary providers (e.g., Anthropic, Cohere) without user-visible disruption. This is critical for production systems where API failures, rate limits, or outages can occur.
+
+### Provider Health Monitoring
+
+* **Health Checks:**
+  * **Periodic Health Checks:** Monitor provider health at regular intervals (e.g., every 30 seconds)
+  * **Request-Based Health Checks:** Check provider health before each request if recent failures detected
+  * **Health Metrics:** Track success rate, latency, error rate per provider
+  * **Health Status:** Maintain health status (healthy, degraded, unhealthy) for each provider
+
+* **Health Indicators:**
+  * **API Availability:** Provider API is responding
+  * **Rate Limit Status:** Provider has available rate limit capacity
+  * **Latency Thresholds:** Provider latency within acceptable range
+  * **Error Rate:** Provider error rate below threshold
+
+**See:** `@examples_multi_provider_failover.py` for provider health monitoring implementation.
+
+### Automatic Failover Triggers
+
+* **Failure Conditions:**
+  * **API Failures:** HTTP 5xx errors, connection timeouts, service unavailable
+  * **Rate Limits:** HTTP 429 (Too Many Requests) errors
+  * **Authentication Failures:** HTTP 401/403 errors (may indicate key rotation needed)
+  * **Timeout Errors:** Request timeouts exceeding threshold
+  * **Consecutive Failures:** Multiple consecutive failures trigger failover
+
+* **Failover Decision:**
+  * **Immediate Failover:** Failover immediately on critical errors (5xx, timeouts)
+  * **Gradual Failover:** Failover after threshold of failures (e.g., 3 failures in 60 seconds)
+  * **Circuit Breaker Integration:** Use circuit breaker pattern to prevent cascading failures
+  * **Provider Priority:** Failover to providers in priority order (Primary → Secondary → Tertiary)
+
+**See:** `error-handling-and-resilience.md` for retry strategies and circuit breaker patterns.
+
+### Provider Priority Configuration
+
+* **Priority Chain:**
+  * **Primary Provider:** Preferred provider for normal operations
+  * **Secondary Provider:** First fallback when primary fails
+  * **Tertiary Provider:** Final fallback when secondary fails
+  * **Provider Selection:** Select provider based on priority, health status, and cost
+
+* **Configuration:**
+  * **Provider List:** Configure list of providers with priorities
+  * **Provider-Specific Models:** Map models to providers (e.g., GPT-4 → OpenAI, Claude → Anthropic)
+  * **Cost Considerations:** Consider provider costs when selecting fallback
+  * **Latency Requirements:** Prefer faster providers when latency critical
+
+**See:** `@examples_multi_provider_failover.py` for provider priority configuration and routing.
+
+### Load Balancing Strategies
+
+* **Load Distribution:**
+  * **Round-Robin:** Distribute requests evenly across healthy providers
+  * **Weighted Round-Robin:** Distribute based on provider capacity and cost
+  * **Least Connections:** Route to provider with fewest active connections
+  * **Health-Based:** Route only to healthy providers
+
+* **Traffic Splitting:**
+  * **Primary/Backup:** Route all traffic to primary, use backup only on failure
+  * **Active-Active:** Split traffic across multiple providers for redundancy
+  * **Percentage-Based:** Split traffic by percentage (e.g., 80% primary, 20% secondary)
+
+* **Implementation:**
+  * **Provider Pool:** Maintain pool of available providers
+  * **Selection Algorithm:** Select provider based on load balancing strategy
+  * **Health-Aware Routing:** Exclude unhealthy providers from routing
+  * **Automatic Recovery:** Re-include providers when health recovers
+
+### Cost Tracking Per Provider
+
+* **Cost Monitoring:**
+  * **Per-Provider Costs:** Track costs separately for each provider
+  * **Cost Per Request:** Calculate cost per request for each provider
+  * **Cost Comparison:** Compare costs across providers for same tasks
+  * **Budget Allocation:** Allocate budget per provider if needed
+
+* **Cost Optimization:**
+  * **Provider Selection:** Consider cost when selecting provider for failover
+  * **Cost-Aware Routing:** Prefer cheaper providers when quality acceptable
+  * **Cost Reporting:** Report costs per provider for analysis
+  * **Budget Alerts:** Alert when provider costs exceed budget
+
+* **See:** `cost-and-budget-management.md` for budget integration.
+
+### Fallback Chain Implementation
+
+* **Fallback Sequence:**
+  1. Attempt request with primary provider
+  2. On failure, retry with secondary provider (with exponential backoff)
+  3. On secondary failure, retry with tertiary provider
+  4. If all providers fail, return error or use cached response if available
+
+* **Retry Strategy:**
+  * **Per-Provider Retries:** Retry with same provider before failing over
+  * **Failover Retries:** Retry with next provider in chain
+  * **Max Attempts:** Limit total retry attempts across all providers
+  * **Exponential Backoff:** Use exponential backoff between retries
+
+* **Error Handling:**
+  * **Provider-Specific Errors:** Handle provider-specific error codes appropriately
+  * **Transient vs Permanent:** Distinguish transient errors (retry) from permanent (failover)
+  * **Error Propagation:** Propagate errors only after all providers exhausted
+  * **Graceful Degradation:** Return partial results or cached data when possible
+
+**See:** `@examples_multi_provider_failover.py` for fallback chain implementation and error handling.
+
+### Integration with Error Handling
+
+* **Error Classification:**
+  * **Transient Errors:** Retry with same provider (network timeouts, rate limits)
+  * **Permanent Errors:** Failover to next provider (authentication failures, invalid requests)
+  * **Provider Failures:** Failover immediately (service unavailable, connection errors)
+
+* **Circuit Breaker Integration:**
+  * **Per-Provider Circuit Breakers:** Maintain circuit breaker per provider
+  * **Circuit Breaker States:** Track circuit breaker state (closed, open, half-open) per provider
+  * **Automatic Recovery:** Automatically recover providers when circuit breaker closes
+
+* **See:** `error-handling-and-resilience.md` for comprehensive error handling patterns.

@@ -493,3 +493,338 @@ class RollbackManager:
             return True
         
         return False
+
+
+# ============================================================================
+# Runtime A/B Testing in Agentic Loops
+# ============================================================================
+
+@dataclass
+class RuntimeMetrics:
+    """
+    Runtime metrics for prompt version.
+    
+    This demonstrates in-loop metrics:
+    - Quality score
+    - Latency
+    - Cost
+    - Success status
+    """
+    version: str
+    quality_score: float = 0.0
+    latency: float = 0.0
+    cost: float = 0.0
+    success: bool = True
+    timestamp: datetime = field(default_factory=datetime.now)
+
+
+@dataclass
+class ABTestContext:
+    """
+    A/B test context for LangGraph state.
+    
+    This demonstrates state integration:
+    - Assigned version
+    - Test metadata
+    - Metrics collection
+    """
+    prompt_id: str
+    assigned_version: str
+    test_id: Optional[str] = None
+    metrics: List[RuntimeMetrics] = field(default_factory=list)
+
+
+class RuntimeABTestManager:
+    """
+    Manager for runtime A/B testing in agentic loops.
+    
+    This demonstrates runtime A/B testing patterns:
+    - Dynamic version selection
+    - Context-aware routing
+    - In-loop metrics collection
+    - Real-time performance monitoring
+    """
+    
+    def __init__(
+        self,
+        version_manager: PromptVersionManager,
+        ab_test_manager: ABTestManager
+    ):
+        """
+        Initialize runtime A/B test manager.
+        
+        Args:
+            version_manager: Prompt version manager
+            ab_test_manager: A/B test manager
+        """
+        self.version_manager = version_manager
+        self.ab_test_manager = ab_test_manager
+        self.runtime_metrics: Dict[str, List[RuntimeMetrics]] = {}
+        self.active_tests: Dict[str, ABTestConfig] = {}
+    
+    def select_prompt_version(
+        self,
+        prompt_id: str,
+        context: Optional[Dict[str, Any]] = None,
+        state: Optional[Dict[str, Any]] = None
+    ) -> str:
+        """
+        Select prompt version at runtime.
+        
+        Args:
+            prompt_id: Prompt identifier
+            context: Runtime context (user, task, etc.)
+            state: LangGraph state
+            
+        Returns:
+            Selected prompt version
+        """
+        # Check for active A/B test
+        if prompt_id in self.ab_test_manager.active_tests:
+            return self._select_version_for_ab_test(
+                prompt_id,
+                context,
+                state
+            )
+        
+        # Context-aware routing
+        if context:
+            return self._context_aware_routing(prompt_id, context)
+        
+        # Default to production
+        version = self.version_manager.get_version(
+            prompt_id,
+            tag=VersionTag.PRODUCTION
+        )
+        return version.version if version else "latest"
+    
+    def _select_version_for_ab_test(
+        self,
+        prompt_id: str,
+        context: Optional[Dict[str, Any]],
+        state: Optional[Dict[str, Any]]
+    ) -> str:
+        """
+        Select version for active A/B test.
+        
+        Args:
+            prompt_id: Prompt identifier
+            context: Runtime context
+            state: LangGraph state
+            
+        Returns:
+            Selected version
+        """
+        # Get user ID from context or state
+        user_id = None
+        if context:
+            user_id = context.get("user_id")
+        if not user_id and state:
+            user_id = state.get("user_id")
+        if not user_id:
+            user_id = "anonymous"
+        
+        # Use AB test manager for assignment
+        return self.ab_test_manager.assign_version(prompt_id, user_id)
+    
+    def _context_aware_routing(
+        self,
+        prompt_id: str,
+        context: Dict[str, Any]
+    ) -> str:
+        """
+        Route based on context.
+        
+        Args:
+            prompt_id: Prompt identifier
+            context: Runtime context
+            
+        Returns:
+            Selected version
+        """
+        # Example: Route based on task complexity
+        task_complexity = context.get("task_complexity", "medium")
+        
+        if task_complexity == "simple":
+            # Use simpler/faster version
+            version = self.version_manager.get_version(
+                prompt_id,
+                tag=VersionTag.PRODUCTION
+            )
+            return version.version if version else "latest"
+        
+        # Default routing
+        version = self.version_manager.get_version(
+            prompt_id,
+            tag=VersionTag.PRODUCTION
+        )
+        return version.version if version else "latest"
+    
+    def record_runtime_metrics(
+        self,
+        prompt_id: str,
+        version: str,
+        metrics: RuntimeMetrics
+    ):
+        """
+        Record runtime metrics.
+        
+        Args:
+            prompt_id: Prompt identifier
+            version: Prompt version
+            metrics: Runtime metrics
+        """
+        key = f"{prompt_id}:{version}"
+        if key not in self.runtime_metrics:
+            self.runtime_metrics[key] = []
+        
+        self.runtime_metrics[key].append(metrics)
+        
+        # Also record in AB test manager if active
+        if prompt_id in self.ab_test_manager.active_tests:
+            self.ab_test_manager.record_result(
+                prompt_id,
+                version,
+                metrics.success,
+                metrics.quality_score
+            )
+    
+    def get_runtime_performance(
+        self,
+        prompt_id: str,
+        version: Optional[str] = None
+    ) -> Dict[str, float]:
+        """
+        Get runtime performance metrics.
+        
+        Args:
+            prompt_id: Prompt identifier
+            version: Optional version filter
+            
+        Returns:
+            Performance metrics dictionary
+        """
+        if version:
+            key = f"{prompt_id}:{version}"
+            metrics_list = self.runtime_metrics.get(key, [])
+        else:
+            # Aggregate all versions
+            metrics_list = []
+            for key, metrics in self.runtime_metrics.items():
+                if key.startswith(f"{prompt_id}:"):
+                    metrics_list.extend(metrics)
+        
+        if not metrics_list:
+            return {
+                "avg_quality": 0.0,
+                "avg_latency": 0.0,
+                "avg_cost": 0.0,
+                "success_rate": 0.0,
+                "total_requests": 0
+            }
+        
+        total = len(metrics_list)
+        successful = sum(1 for m in metrics_list if m.success)
+        
+        return {
+            "avg_quality": sum(m.quality_score for m in metrics_list) / total,
+            "avg_latency": sum(m.latency for m in metrics_list) / total,
+            "avg_cost": sum(m.cost for m in metrics_list) / total,
+            "success_rate": successful / total,
+            "total_requests": total
+        }
+    
+    def adjust_traffic_split(
+        self,
+        prompt_id: str,
+        performance_threshold: float = 0.05
+    ) -> bool:
+        """
+        Adjust traffic split based on performance.
+        
+        Args:
+            prompt_id: Prompt identifier
+            performance_threshold: Minimum performance difference for adjustment
+            
+        Returns:
+            True if split was adjusted
+        """
+        if prompt_id not in self.ab_test_manager.active_tests:
+            return False
+        
+        test_config = self.ab_test_manager.active_tests[prompt_id]
+        results = self.ab_test_manager.test_results.get(prompt_id, {})
+        
+        if "version_a" not in results or "version_b" not in results:
+            return False
+        
+        score_a = results["version_a"].get("quality_score", 0.0)
+        score_b = results["version_b"].get("quality_score", 0.0)
+        
+        # Calculate performance difference
+        diff = abs(score_a - score_b)
+        if diff < performance_threshold:
+            return False  # Not significant enough
+        
+        # Adjust split: favor better performing version
+        if score_a > score_b:
+            # Increase traffic to version A
+            new_split = min(0.9, test_config.traffic_split + 0.1)
+        else:
+            # Increase traffic to version B
+            new_split = max(0.1, test_config.traffic_split - 0.1)
+        
+        test_config.traffic_split = new_split
+        return True
+    
+    def create_ab_test_context(
+        self,
+        prompt_id: str,
+        version: str,
+        test_id: Optional[str] = None
+    ) -> ABTestContext:
+        """
+        Create A/B test context for LangGraph state.
+        
+        Args:
+            prompt_id: Prompt identifier
+            version: Assigned version
+            test_id: Optional test identifier
+            
+        Returns:
+            ABTestContext
+        """
+        return ABTestContext(
+            prompt_id=prompt_id,
+            assigned_version=version,
+            test_id=test_id
+        )
+    
+    def update_state_with_metrics(
+        self,
+        state: Dict[str, Any],
+        context: ABTestContext,
+        metrics: RuntimeMetrics
+    ):
+        """
+        Update LangGraph state with metrics.
+        
+        Args:
+            state: LangGraph state
+            context: A/B test context
+            metrics: Runtime metrics
+        """
+        # Add metrics to context
+        context.metrics.append(metrics)
+        
+        # Store in state
+        if "ab_test_contexts" not in state:
+            state["ab_test_contexts"] = {}
+        
+        state["ab_test_contexts"][context.prompt_id] = {
+            "assigned_version": context.assigned_version,
+            "test_id": context.test_id,
+            "metrics_count": len(context.metrics),
+            "latest_quality": metrics.quality_score,
+            "latest_latency": metrics.latency
+        }

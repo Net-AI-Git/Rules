@@ -194,3 +194,157 @@ alwaysApply: false
     3. Implement optimizations.
     4. Measure improvement.
     5. Repeat as needed.
+
+## 9. Semantic Caching
+
+### Mandate
+
+All agentic systems **MUST** implement semantic caching using Vector DB to avoid redundant LLM calls for semantically similar queries. Traditional caching uses exact key matching, but semantic caching identifies similar queries by meaning, dramatically reducing costs and latency. This is critical for production systems where similar questions are asked repeatedly with different wording.
+
+### Semantic Similarity Detection
+
+* **Vector-Based Similarity:**
+  * **Embedding Generation:** Generate embeddings for queries using embedding models
+  * **Similarity Calculation:** Calculate cosine similarity between query embeddings
+  * **Similarity Threshold:** Define similarity threshold for cache hits (e.g., 0.85)
+  * **Semantic Matching:** Match queries based on semantic meaning, not exact text
+
+* **Similarity Metrics:**
+  * **Cosine Similarity:** Use cosine similarity for embedding comparison
+  * **Euclidean Distance:** Alternative distance metric for embeddings
+  * **Threshold Configuration:** Configure similarity threshold per use case
+  * **Dynamic Thresholds:** Adjust thresholds based on query type or context
+
+**See:** `@examples_caching.py` for semantic similarity detection implementation.
+
+### Vector DB Integration
+
+* **Vector Database Selection:**
+  * **Pinecone:** Use Pinecone for managed vector database
+  * **Weaviate:** Use Weaviate for self-hosted vector database
+  * **Qdrant:** Use Qdrant for open-source vector database
+  * **Chroma:** Use Chroma for lightweight vector database
+
+* **Cache Storage:**
+  * **Query Embeddings:** Store query embeddings in vector DB
+  * **Response Storage:** Store LLM responses with embeddings
+  * **Metadata Storage:** Store metadata (timestamp, cost, quality) with responses
+  * **Index Management:** Maintain vector index for fast similarity search
+
+* **Cache Lookup:**
+  * **Embedding Generation:** Generate embedding for incoming query
+  * **Similarity Search:** Search for similar queries in vector DB
+  * **Threshold Filtering:** Filter results by similarity threshold
+  * **Top-K Retrieval:** Retrieve top-K most similar cached responses
+
+**See:** `memory-and-archival-management.md` for Vector DB integration patterns.
+
+### Similarity Threshold Configuration
+
+* **Threshold Selection:**
+  * **High Threshold (0.9+):** Very similar queries only (high precision, lower recall)
+  * **Medium Threshold (0.8-0.9):** Moderately similar queries (balanced)
+  * **Low Threshold (0.7-0.8):** Loosely similar queries (higher recall, lower precision)
+  * **Context-Aware:** Adjust threshold based on query context or domain
+
+* **Threshold Tuning:**
+  * **Performance Metrics:** Monitor cache hit rate vs quality
+  * **Cost Savings:** Track cost savings from cache hits
+  * **Quality Validation:** Validate cached response quality
+  * **A/B Testing:** Test different thresholds to find optimal value
+
+* **Dynamic Thresholds:**
+  * **Query Type:** Different thresholds for different query types
+  * **Domain:** Different thresholds for different domains
+  * **User Context:** Adjust thresholds based on user context
+  * **Time-Based:** Adjust thresholds based on time (e.g., lower for recent queries)
+
+**See:** `@examples_caching.py` for similarity threshold configuration.
+
+### Cache Invalidation Strategies
+
+* **Time-Based Invalidation:**
+  * **TTL (Time-To-Live):** Set TTL for cached responses (e.g., 24 hours)
+  * **Expiration:** Expire cached responses after time period
+  * **Refresh Policy:** Refresh cache entries periodically
+  * **Age-Based:** Invalidate based on cache entry age
+
+* **Event-Based Invalidation:**
+  * **Data Updates:** Invalidate when source data is updated
+  * **Model Updates:** Invalidate when LLM model is updated
+  * **Prompt Updates:** Invalidate when prompts are updated
+  * **Context Changes:** Invalidate when context significantly changes
+
+* **Similarity-Based Invalidation:**
+  * **Similarity Decay:** Reduce similarity score over time
+  * **Quality-Based:** Invalidate low-quality cached responses
+  * **Confidence-Based:** Invalidate low-confidence cached responses
+  * **Feedback-Based:** Invalidate based on user feedback
+
+* **Manual Invalidation:**
+  * **Cache Clear:** Manual cache clearing for testing
+  * **Selective Invalidation:** Invalidate specific cache entries
+  * **Pattern-Based:** Invalidate entries matching patterns
+  * **Bulk Operations:** Bulk invalidation operations
+
+**See:** `@examples_caching.py` for cache invalidation implementation.
+
+### Cost Savings Calculation
+
+* **Cost Tracking:**
+  * **Cache Hit Cost:** Track cost saved per cache hit (LLM call avoided)
+  * **Cache Miss Cost:** Track cost of cache miss (LLM call made)
+  * **Total Savings:** Calculate total cost savings from caching
+  * **ROI Calculation:** Calculate return on investment for caching
+
+* **Metrics:**
+  * **Cache Hit Rate:** Percentage of queries served from cache
+  * **Cost Per Query:** Average cost per query (with caching)
+  * **Savings Per Query:** Average savings per query
+  * **Total Savings:** Total cost savings over time period
+
+* **Reporting:**
+  * **Daily Reports:** Generate daily cost savings reports
+  * **Weekly Reports:** Generate weekly cost savings reports
+  * **Monthly Reports:** Generate monthly cost savings reports
+  * **Dashboard:** Display cost savings in monitoring dashboard
+
+**See:** `@examples_caching.py` for cost savings calculation.
+
+### Integration with Memory Management
+
+* **Memory Integration:**
+  * **Shared Vector DB:** Use same Vector DB for memory and caching
+  * **Unified Embeddings:** Use same embedding model for consistency
+  * **Cross-Reference:** Cross-reference cached responses with user memories
+  * **Memory-Aware Caching:** Consider user memory when caching
+
+* **Storage Strategy:**
+  * **Separate Namespaces:** Use separate namespaces for cache vs memory
+  * **Metadata Distinction:** Distinguish cache entries from memory entries
+  * **Lifecycle Management:** Different lifecycle for cache vs memory
+  * **Retrieval Strategy:** Different retrieval strategies for cache vs memory
+
+**See:** `memory-and-archival-management.md` for memory management integration.
+
+### Best Practices
+
+* **Embedding Model Selection:**
+  * **Model Quality:** Use high-quality embedding models for accurate similarity
+  * **Model Consistency:** Use same embedding model for cache and queries
+  * **Model Updates:** Handle embedding model updates carefully
+  * **Model Cost:** Consider embedding model cost vs LLM cost savings
+
+* **Cache Size Management:**
+  * **Size Limits:** Set limits on cache size to prevent unbounded growth
+  * **Eviction Policy:** Implement eviction policy (LRU, LFU, similarity-based)
+  * **Storage Optimization:** Optimize storage for vector embeddings
+  * **Index Optimization:** Optimize vector index for fast search
+
+* **Quality Assurance:**
+  * **Quality Validation:** Validate cached response quality
+  * **A/B Testing:** Test cached vs non-cached responses
+  * **User Feedback:** Collect user feedback on cached responses
+  * **Quality Monitoring:** Monitor quality metrics for cached responses
+
+**See:** `@examples_caching.py` for semantic caching implementation.
