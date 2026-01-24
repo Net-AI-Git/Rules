@@ -31,6 +31,17 @@ alwaysApply: false
     * **Trace Context:** Propagate trace context across service boundaries (HTTP headers, gRPC metadata).
     * **Span Attributes:** Add relevant attributes (user ID, request ID, operation type).
 
+* **Mandatory Timestamp Requirements:**
+    * **All Spans MUST Include Timestamps:** Every span MUST have explicit `start_time` and `end_time` timestamps.
+    * **Duration Calculation:** Spans MUST calculate and include `duration_ms` attribute for latency measurement.
+    * **Timestamp Format:** Use ISO 8601 format with UTC timezone for consistency.
+    * **Span Attributes:** Spans MUST include: `operation.name`, `operation.type`, `correlation_id`, `duration_ms`.
+
+* **Span Creation Pattern:**
+    * Use context managers to ensure spans are properly closed: `with tracer.start_as_current_span("operation_name") as span:`
+    * Automatically capture start/end times and calculate duration.
+    * Add span attributes including correlation_id from trace context.
+
 * **Trace Sampling:** Implement sampling to reduce overhead in high-traffic scenarios.
     * **Strategy:** Sample a percentage of traces (e.g., 10%) or use adaptive sampling based on error rates.
 
@@ -40,20 +51,37 @@ alwaysApply: false
     * **HTTP Clients:** Instrument httpx, aiohttp for outbound requests.
     * **LangChain:** Use LangSmith for LLM operation tracing.
 
+* **See:** Section 9 (Performance Timing & Latency Measurement) for detailed timing requirements and latency measurement patterns.
+
 ## 3. Log Aggregation Strategies
 
 * **Centralized Logging:** Send all logs to a centralized system (e.g., ELK Stack, Loki, CloudWatch).
     * **Structured Format:** Use JSON format for logs to enable parsing and querying.
     * **Log Levels:** Use appropriate levels (DEBUG, INFO, WARNING, ERROR, CRITICAL).
 
+* **Mandatory Timestamp Requirements:**
+    * **All Log Entries MUST Include Timestamps:** Every log entry MUST include a `timestamp` field (ISO 8601 format with UTC timezone).
+    * **Operation Timing:** Operations that span time MUST log both `start_timestamp` and `end_timestamp`.
+    * **Duration Logging:** Operations MUST log `duration_ms` to enable latency analysis.
+    * **Timestamp Format:** Use `datetime.now(timezone.utc).isoformat()` for consistency.
+
+* **Mandatory Log Fields:**
+    * Every log entry MUST include: `timestamp`, `correlation_id`, `operation_name` (or `stage`).
+    * Operations MUST include: `start_timestamp`, `end_timestamp`, `duration_ms` (when applicable).
+    * Include `stage_latency_ms` and `total_latency_ms` for multi-stage operations.
+
 * **Correlation IDs:** Include correlation/request IDs in all log entries to trace requests across services.
+    * **Mandatory:** Every request/operation MUST have a correlation ID (UUID format).
     * **Propagation:** Pass correlation IDs through HTTP headers, message queues, and async operations.
+    * **Inclusion:** Correlation ID MUST be included in all logs, spans, and metrics.
+    * **Source:** Use `trace_id` from OpenTelemetry context when available, otherwise generate UUID.
 
 * **Log Retention:** Define retention policies based on log level and importance.
     * **Production:** Retain ERROR and above for extended periods (e.g., 90 days).
     * **Development:** Shorter retention for DEBUG logs.
 
 * **See:** `core-python-standards.md` for structured logging implementation details.
+* **See:** Section 9 (Performance Timing & Latency Measurement) for detailed timing requirements and latency measurement patterns.
 
 ## 4. Alerting Rules & Thresholds
 
@@ -135,3 +163,61 @@ alwaysApply: false
     * **Link Evaluations:** Link evaluation runs to specific traces for analysis.
 
 * **See:** `security-governance-and-observability.md` for auditing requirements that complement LangSmith tracing.
+
+## 9. Performance Timing & Latency Measurement
+
+* **Mandate:** All operations MUST include timestamps and latency measurements to enable bottleneck identification and performance analysis. This requirement applies to every function, node, tool call, API request, database query, and agent step.
+
+* **Timestamp Requirements:**
+    * **All Operations MUST Include Timestamps:** Every operation MUST log start and end timestamps (ISO 8601 format with UTC timezone).
+    * **Format:** Use `datetime.now(timezone.utc).isoformat()` for consistency (e.g., `2024-01-15T10:30:45.123Z`).
+    * **Inclusion:** Timestamps MUST be included in logs, spans, and metrics.
+    * **Operations:** Every function, node, tool call, API request, database query MUST log both `start_timestamp` and `end_timestamp`.
+
+* **OpenTelemetry Span Requirements:**
+    * **Mandatory Span Creation:** Every significant operation MUST create an OpenTelemetry span with explicit start/end times.
+    * **Span Attributes:** Spans MUST include: `start_time`, `end_time`, `duration_ms`, `operation.name`, `operation.type`, `correlation_id`.
+    * **Context Managers:** Use context managers or decorators to ensure spans are always properly closed: `with tracer.start_as_current_span("operation_name") as span:`
+    * **Automatic Timing:** Spans MUST automatically capture start/end times and calculate duration.
+
+* **Structured Logging Requirements:**
+    * **Mandatory Log Fields:** Every log entry MUST include: `timestamp`, `correlation_id`, `operation_name` (or `stage`).
+    * **Operation Logging:** Operations MUST log: `start_timestamp`, `end_timestamp`, `duration_ms`.
+    * **Format:** Use JSON structured logging for all entries to enable parsing and querying.
+    * **Stage Tracking:** Multi-stage operations MUST log `stage_latency_ms` and `total_latency_ms` for bottleneck identification.
+
+* **Correlation ID Requirements:**
+    * **Mandatory:** Every request/operation MUST have a correlation ID (UUID format).
+    * **Propagation:** Correlation ID MUST be propagated across all service boundaries (HTTP headers, gRPC metadata, message queues, async operations).
+    * **Inclusion:** Correlation ID MUST be included in all logs, spans, HTTP headers, and message queues.
+    * **Source:** Use `trace_id` from OpenTelemetry context when available, otherwise generate UUID.
+
+* **Latency Measurement:**
+    * **Mandatory Latency Tracking:** Calculate and log latency between every stage/operation.
+    * **Metrics:** Track `stage_latency_ms`, `total_latency_ms`, `stage_name` for each operation.
+    * **Bottleneck Identification:** Compare stage latencies to identify performance bottlenecks.
+    * **Export:** Log latency metrics to both logs and metrics systems (Prometheus/StatsD) for aggregation.
+    * **Histograms:** Export latency histograms to Prometheus/StatsD for percentile analysis (P50, P95, P99).
+
+* **Implementation Pattern:**
+    * **Context Manager Pattern:** Use context managers for automatic timing: `with PerformanceTimer("operation_name"):`
+    * **Automatic Logging:** Context managers MUST automatically log start/end timestamps and calculate duration.
+    * **Automatic Spans:** Context managers MUST automatically create OpenTelemetry spans.
+    * **Error Handling:** Ensure timestamps and latency are logged even when operations fail.
+
+* **Integration with Existing Tools:**
+    * **OpenTelemetry:** Use OpenTelemetry spans for distributed tracing (see Section 2 for details).
+    * **Datadog:** If Datadog is available, use Datadog APM for automatic instrumentation and timing.
+    * **Prometheus/StatsD:** Export latency histograms for aggregation and percentile calculation.
+    * **Structured Logging:** Use existing structured logging patterns from `core-python-standards.md`.
+
+* **Examples:**
+    * **Function Timing:** Every function MUST log start/end timestamps and duration.
+    * **Node Timing:** Every LangGraph node MUST create a span and log timing information.
+    * **Tool Call Timing:** Every tool call MUST be wrapped in a span with timing.
+    * **API Request Timing:** Every API request MUST include timing in logs and spans.
+    * **Database Query Timing:** Every database query MUST include timing information.
+
+* **See:** `core-python-standards.md` for structured logging implementation details.
+* **See:** Section 2 (Distributed Tracing) for OpenTelemetry span creation patterns.
+* **See:** Section 3 (Log Aggregation Strategies) for structured logging requirements.

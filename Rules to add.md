@@ -54,3 +54,12 @@ isPathAllowed(requestedPath)
 לינק עבור הסכמות של סוגי בקשות ודברים נוספים עבור MCP, מאותו הפרויקט אבל REPO אחר - 
 https://github.com/modelcontextprotocol/modelcontextprotocol
 
+
+
+
+
+
+
+
+
+

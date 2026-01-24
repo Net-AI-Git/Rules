@@ -8,7 +8,7 @@ All agentic systems in this codebase are designed as **Multi-Agent Systems**. Th
 
 ## 1. Core Architecture Components
 
-### Orchestrator (Planner)
+### Orchestrator
 * **Role:** Decompose user requests into sub-tasks and decide how many workers are needed.
 * **When to Use:**
   * Task structure is not known in advance
@@ -19,6 +19,7 @@ All agentic systems in this codebase are designed as **Multi-Agent Systems**. Th
   * Create SECTIONS list
   * Attach structured fields per section
   * **MUST NOT:** Execute work or produce final output
+* **Note:** Orchestrator receives strategic plans from Planner and decomposes them into SECTIONS.
 
 **See:** `@examples_orchestration.py` for Orchestrator/Worker/Synthesizer architecture pattern.
 
@@ -42,6 +43,47 @@ All agentic systems in this codebase are designed as **Multi-Agent Systems**. Th
   * Merge into FINAL_OUTPUT
   * Resolve conflicts
   * **MUST NOT:** Create new tasks or call workers again
+
+## 1.5 Complementary Architecture Components
+
+### Planner (Strategic Planning)
+* **Role:** Strategic goal setting, risk assessment, and action planning before task decomposition.
+* **Position:** Executes before Orchestrator in workflow.
+* **Responsibilities:**
+  * Define main goals and sub-goals
+  * Analyze environment state
+  * Evaluate actions by risk, cost, and benefit
+  * Create structured action plan
+  * Receive feedback from Memory Node
+* **MUST NOT:** Decompose tasks (Orchestrator) or execute work (Executor).
+* **See:** `@planner-strategic-planning` for comprehensive strategic planning patterns.
+
+### Memory Node (Feedback & Learning)
+* **Role:** LangGraph NODE that provides historical context and learning feedback.
+* **Position:** Can be called at conversation start, on-demand, and at conversation end.
+* **Responsibilities:**
+  * Store experiences (actions, context, results)
+  * Enable learning from patterns
+  * Provide relevant historical context
+  * Feed insights back to Planner (feedback loop)
+* **MUST NOT:** Handle physical storage (uses memory-and-archival-management).
+* **See:** `@memory-feedback-node` for Memory Node implementation patterns and `@memory-and-archival-management` for storage patterns.
+
+### Executor (Action Translation)
+* **Role:** Translates strategic plans into concrete executable actions.
+* **Position:** Between Planner/Orchestrator and Workers in workflow.
+* **Responsibilities:**
+  * Translate plans to concrete actions
+  * Execute decisions (API calls, tool invocations, file operations)
+  * Respond to real-time changes
+  * Monitor results and provide feedback
+* **MUST NOT:** Plan strategically (Planner) or specialize in domain (Workers).
+* **See:** `@executor-action-translation` for action translation patterns.
+
+### API Contract (Component Interfaces)
+* **Role:** Defines clear interfaces between Planner, Memory, and Executor components.
+* **Purpose:** Enables modularity, maintainability, testing, and implementation swapping.
+* **See:** `@agent-component-interfaces` for interface definitions and contract patterns.
 
 ## 2. SECTIONS Pattern
 
@@ -110,10 +152,17 @@ A SECTION must contain:
 
 ## 5. Core Control Roles
 
+### PLANNER
+* **Responsibility:** Strategic goal setting and action planning.
+* **Decisions:** Goals, sub-goals, risk assessment, action plan structure.
+* **MUST NOT:** Decompose tasks or execute work.
+* **See:** `@planner-strategic-planning` for comprehensive planning patterns.
+
 ### ORCHESTRATOR
 * **Responsibility:** Understand request and decompose into SECTIONS.
 * **Decisions:** How many SECTIONS, what each SECTION contains.
 * **MUST NOT:** Execute work or produce final output.
+* **Note:** Orchestrator receives plans from Planner and decomposes them into SECTIONS.
 
 ### ASSIGN WORKERS Node
 * **Responsibility:** Execution dispatch only.

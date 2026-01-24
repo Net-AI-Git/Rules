@@ -1,0 +1,262 @@
+---
+description: "API contracts and interfaces between agent components (Planner, Memory, Executor) for modularity and maintainability"
+alwaysApply: false
+---
+
+## Mandate
+
+All agentic systems **MUST** define clear API contracts between core components (Planner, Memory Node, Executor) using ABCs (Abstract Base Classes) and type hints. These contracts enable modularity, maintainability, testing, and implementation swapping without breaking the system.
+
+## 1. Interface Definition Principles
+
+### Contract-Based Design
+
+* **Mandate:** Every component (Planner, Memory Node, Executor) must implement a well-defined interface.
+* **Purpose:** 
+  * Enable swapping implementations (A/B testing, provider changes)
+  * Support parallel team development
+  * Facilitate testing with mocks
+  * Reduce technical debt over time
+  * Prevent breaking changes when internal logic changes
+
+* **Interface Requirements:**
+  * Use Python `abc.ABC` for abstract base classes
+  * Define all methods with type hints
+  * Specify input/output contracts clearly
+  * Document expected behavior, not implementation
+
+**See:** `@examples_interfaces.py` for ABC interface definitions for Planner, Memory, and Executor.
+
+### Input/Output Contracts
+
+* **Mandate:** Every interface method must have clear input/output contracts.
+
+* **Contract Structure:**
+  * **Input:** Typed parameters with clear descriptions
+  * **Output:** Typed return values with clear structure
+  * **Exceptions:** Documented exception types and conditions
+  * **Side Effects:** Documented state changes or external calls
+
+* **Contract Validation:**
+  * Use Pydantic models for complex input/output structures
+  * Validate inputs at interface boundary
+  * Return structured outputs (not raw strings or dicts)
+
+**See:** `@examples_contracts.py` for input/output contract definitions and validation patterns.
+
+## 2. Component Interfaces
+
+### Planner Interface
+
+* **Purpose:** Define contract for strategic planning component.
+
+* **Required Methods:**
+  * `plan(user_request: UserRequest, context: PlanningContext) -> StrategicPlan`
+  * `evaluate_actions(actions: List[Action], context: PlanningContext) -> List[ActionEvaluation]`
+  * `set_goals(user_request: UserRequest) -> Goals`
+
+* **Interface Contract:**
+  * Input: User request and current context
+  * Output: Strategic plan with goals, sub-goals, risk assessment
+  * **MUST NOT:** Decompose tasks (Orchestrator responsibility) or execute actions (Executor responsibility)
+
+**See:** `@planner-strategic-planning` for Planner implementation patterns.
+
+### Memory Node Interface
+
+* **Purpose:** Define contract for memory feedback and learning node.
+
+* **Required Methods:**
+  * `retrieve_memories(context: MemoryContext) -> List[Memory]`
+  * `store_experience(experience: Experience, context: MemoryContext) -> MemoryID`
+  * `provide_feedback(plan: StrategicPlan, context: MemoryContext) -> Feedback`
+
+* **Interface Contract:**
+  * Input: Context for memory operations
+  * Output: Memories, feedback, or memory IDs
+  * **MUST NOT:** Handle physical storage (uses memory-and-archival-management)
+
+**See:** `@memory-feedback-node` for Memory Node implementation patterns and `@memory-and-archival-management` for storage patterns.
+
+### Executor Interface
+
+* **Purpose:** Define contract for action translation and execution.
+
+* **Required Methods:**
+  * `translate_plan(plan: StrategicPlan, context: ExecutionContext) -> List[ConcreteAction]`
+  * `execute_action(action: ConcreteAction, context: ExecutionContext) -> ActionResult`
+  * `monitor_execution(actions: List[ConcreteAction]) -> ExecutionStatus`
+
+* **Interface Contract:**
+  * Input: Strategic plan and execution context
+  * Output: Concrete actions and execution results
+  * **MUST NOT:** Plan strategically (Planner) or specialize in domain (Workers)
+
+**See:** `@executor-action-translation` for Executor implementation patterns.
+
+## 3. Interface Implementation Patterns
+
+### ABC-Based Implementation
+
+* **Pattern:** Use `abc.ABC` and `@abstractmethod` decorator.
+
+* **Benefits:**
+  * Enforces interface contract at runtime
+  * Prevents incomplete implementations
+  * Enables type checking and IDE support
+  * Supports multiple implementations
+
+* **Implementation Requirements:**
+  * Inherit from ABC interface
+  * Implement all abstract methods
+  * Maintain interface contract (input/output types)
+  * Can extend with additional methods (but must implement all required)
+
+**See:** `@examples_interfaces.py` for complete ABC implementation patterns.
+
+### Protocol-Based Implementation (Alternative)
+
+* **Pattern:** Use `typing.Protocol` for structural subtyping.
+
+* **Use When:**
+  * Interface is simple (few methods)
+  * Want duck typing support
+  * Don't need runtime enforcement
+  * Prefer structural over nominal typing
+
+* **Trade-offs:**
+  * More flexible than ABC
+  * Less strict enforcement
+  * Better for gradual typing adoption
+
+## 4. Modularity and Swapping
+
+### Implementation Swapping
+
+* **Purpose:** Enable swapping implementations without breaking the system.
+
+* **Pattern:**
+  * Define interface contract
+  * Implement multiple concrete classes
+  * Use dependency injection to select implementation
+  * Swap via configuration or factory pattern
+
+* **Use Cases:**
+  * A/B testing different planning strategies
+  * Switching memory implementations (local vs cloud)
+  * Changing execution providers (API changes)
+  * Testing with mocks
+
+**See:** `@examples_modularity.py` for implementation swapping patterns and dependency injection.
+
+### Version Compatibility
+
+* **Mandate:** Interface changes must maintain backward compatibility.
+
+* **Compatibility Rules:**
+  * **Additive Changes:** Adding new optional methods is safe
+  * **Breaking Changes:** Changing method signatures requires versioning
+  * **Deprecation:** Mark old methods as deprecated before removal
+  * **Migration:** Provide migration path for breaking changes
+
+* **Versioning Strategy:**
+  * Use semantic versioning for interfaces
+  * Document breaking changes clearly
+  * Provide migration guides
+  * Support multiple versions during transition
+
+## 5. Integration with Other Systems
+
+### Data Schemas Integration
+
+* **Relationship:** API Contracts define interfaces, Data Schemas define data structures.
+
+* **Usage:**
+  * Use Pydantic models from `@data-schemas-and-interfaces` for input/output types
+  * Interfaces reference schemas, don't duplicate them
+  * Schemas provide validation, interfaces provide contracts
+
+* **See:** `@data-schemas-and-interfaces` for Pydantic schema standards.
+
+### Multi-Agent Systems Integration
+
+* **Integration Points:**
+  * Planner interface integrates with Orchestrator
+  * Executor interface integrates with Workers
+  * Memory Node interface integrates with storage systems
+
+* **See:** `@multi-agent-systems` for multi-agent architecture patterns.
+
+## 6. Testing and Validation
+
+### Interface Testing
+
+* **Mandate:** Test interfaces independently of implementations.
+
+* **Testing Patterns:**
+  * Create mock implementations for testing
+  * Test interface contracts (input/output validation)
+  * Test error handling and edge cases
+  * Test multiple implementations against same interface
+
+* **Mock Patterns:**
+  * Use `unittest.mock` for simple mocks
+  * Create test implementations that implement interface
+  * Verify interface contract compliance
+
+### Contract Validation
+
+* **Runtime Validation:**
+  * Validate inputs at interface boundary
+  * Validate outputs before returning
+  * Use Pydantic for complex validation
+  * Log validation failures for debugging
+
+* **Type Checking:**
+  * Use `mypy` or `pyright` for static type checking
+  * Enable strict mode for interface files
+  * Check interface compliance in CI/CD
+
+## 7. Best Practices
+
+### Interface Design
+
+* **Keep Interfaces Focused:**
+  * One interface per component responsibility
+  * Avoid god interfaces (too many methods)
+  * Prefer composition over large interfaces
+
+* **Clear Naming:**
+  * Use descriptive method names
+  * Follow Python naming conventions
+  * Document purpose in docstrings
+
+* **Documentation:**
+  * Document all interface methods
+  * Include usage examples
+  * Document expected behavior, not implementation
+
+### Implementation Guidelines
+
+* **Respect Contracts:**
+  * Don't violate input/output contracts
+  * Don't add side effects not documented
+  * Don't change behavior without updating contract
+
+* **Error Handling:**
+  * Document all exceptions
+  * Use typed exceptions
+  * Provide clear error messages
+
+* **Performance:**
+  * Document performance expectations
+  * Don't block on I/O in interface methods (use async)
+  * Consider caching for expensive operations
+
+## 8. Examples and Patterns
+
+**See:** `@examples_interfaces.py` for complete ABC interface definitions for Planner, Memory, and Executor components.
+
+**See:** `@examples_contracts.py` for input/output contract definitions and validation patterns.
+
+**See:** `@examples_modularity.py` for implementation swapping patterns, dependency injection, and A/B testing examples.

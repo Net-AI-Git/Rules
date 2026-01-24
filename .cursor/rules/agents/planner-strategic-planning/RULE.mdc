@@ -1,0 +1,275 @@
+---
+description: "Strategic planning component for goal setting, risk assessment, and action planning before task decomposition"
+alwaysApply: false
+---
+
+## Mandate
+
+All agentic systems **MUST** implement a **Planner** component that performs strategic planning before task decomposition. The Planner is responsible for goal setting, risk assessment, and creating structured action plans. It executes before the Orchestrator in the workflow and receives feedback from the Memory Node to improve future decisions.
+
+## 1. Planner Role and Position
+
+### Strategic Planning Component
+
+* **Role:** Strategic goal setting, risk assessment, and action planning before task decomposition.
+* **Position in Workflow:** Executes **before** Orchestrator in the workflow.
+* **Purpose:** 
+  * Understand high-level objectives
+  * Define goals and sub-goals
+  * Assess risks, costs, and benefits
+  * Create structured action plans
+  * Learn from past experiences (via Memory Node feedback)
+
+* **Workflow Position:**
+```
+User Request → [PLANNER] → [Memory Node] → [ORCHESTRATOR] → [EXECUTOR] → [WORKERS]
+```
+
+**See:** `@examples_planner_node.py` for Planner node implementation following READ→DO→WRITE→CONTROL pattern.
+
+## 2. Core Responsibilities
+
+### Goal Setting
+
+* **Mandate:** Planner must define clear goals and sub-goals from user requests.
+
+* **Goal Definition:**
+  * **Main Goals:** High-level objectives from user request
+  * **Sub-Goals:** Breakdown of main goals into actionable sub-objectives
+  * **Goal Hierarchy:** Structured relationship between goals and sub-goals
+  * **Goal Constraints:** Limitations, deadlines, resource constraints
+
+* **Goal Structure:**
+  * Each goal must have clear success criteria
+  * Goals must be measurable and achievable
+  * Sub-goals must support main goals
+  * Goals must account for dependencies
+
+**See:** `@examples_goal_setting.py` for goal and sub-goal definition patterns.
+
+### Environment State Analysis
+
+* **Mandate:** Planner must analyze the current environment state before planning.
+
+* **State Analysis:**
+  * **Current Context:** Understand current system state
+  * **Available Resources:** Identify available tools, APIs, data
+  * **Constraints:** Recognize limitations and boundaries
+  * **Historical Context:** Load relevant memories from Memory Node
+
+* **Context Sources:**
+  * User request and current conversation
+  * Memory Node (historical experiences)
+  * System state and available resources
+  * External context (time, environment)
+
+### Risk, Cost, and Benefit Evaluation
+
+* **Mandate:** Planner must evaluate potential actions by risk, cost, and benefit.
+
+* **Evaluation Dimensions:**
+  * **Risk Assessment:** Identify potential failures, side effects, security concerns
+  * **Cost Analysis:** Estimate resource usage, token costs, time requirements
+  * **Benefit Evaluation:** Assess value, impact, and success probability
+  * **Trade-off Analysis:** Balance risks, costs, and benefits
+
+* **Evaluation Criteria:**
+  * **Risk Levels:** Low, Medium, High (with justification)
+  * **Cost Estimates:** Token usage, API calls, time
+  * **Benefit Scores:** Expected value, impact, priority
+  * **Recommendations:** Preferred actions based on evaluation
+
+**See:** `@examples_risk_assessment.py` for risk/cost/benefit evaluation patterns.
+
+### Action Plan Creation
+
+* **Mandate:** Planner must create a structured action plan from goals and evaluations.
+
+* **Plan Structure:**
+  * **Strategic Plan:** High-level action plan with goals and sub-goals
+  * **Action Sequence:** Ordered list of actions to achieve goals
+  * **Dependencies:** Action dependencies and prerequisites
+  * **Risk Mitigation:** Strategies to handle identified risks
+  * **Success Criteria:** How to measure plan success
+
+* **Plan Output:**
+  * Structured plan object (not task decomposition)
+  * Goals, sub-goals, and action sequence
+  * Risk assessments and mitigation strategies
+  * Resource requirements and constraints
+
+## 3. Integration Points
+
+### Memory Node Integration
+
+* **Purpose:** Planner receives feedback from Memory Node to improve decisions.
+
+* **Feedback Loop:**
+  * **Input:** Historical experiences, patterns, past decisions
+  * **Usage:** Learn from past successes and failures
+  * **Output:** Improved planning based on historical context
+  * **Adaptation:** Adjust strategies based on feedback
+
+* **Memory Integration:**
+  * Load relevant memories at planning start
+  * Use past experiences to inform risk assessment
+  * Learn from patterns to improve goal setting
+  * Store planning decisions for future learning
+
+* **See:** `@memory-feedback-node` for Memory Node integration patterns and `@memory-and-archival-management` for storage patterns.
+
+### Orchestrator Integration
+
+* **Purpose:** Planner feeds structured plans to Orchestrator for task decomposition.
+
+* **Integration Pattern:**
+  * Planner creates strategic plan with goals and actions
+  * Orchestrator receives plan and decomposes into SECTIONS
+  * Orchestrator uses plan structure to guide decomposition
+  * Clear separation: Planner plans, Orchestrator decomposes
+
+* **Plan Handoff:**
+  * Strategic plan passed to Orchestrator
+  * Orchestrator uses plan to create SECTIONS
+  * Plan structure guides task decomposition
+  * No overlap in responsibilities
+
+* **See:** `@multi-agent-systems` for Orchestrator integration patterns.
+
+## 4. What Planner MUST NOT Do
+
+### Task Decomposition
+
+* **MUST NOT:** Decompose user requests into SECTIONS (Orchestrator responsibility).
+* **Reason:** Planner focuses on strategic planning, Orchestrator handles task decomposition.
+* **Boundary:** Planner creates plans, Orchestrator creates SECTIONS.
+
+### Work Execution
+
+* **MUST NOT:** Execute work or produce final output (Executor/Workers responsibility).
+* **Reason:** Planner is strategic, not operational.
+* **Boundary:** Planner plans, Executor/Workers execute.
+
+### Memory Storage
+
+* **MUST NOT:** Handle physical memory storage (memory-and-archival-management responsibility).
+* **Reason:** Planner uses Memory Node, doesn't implement storage.
+* **Boundary:** Planner receives feedback, Memory Node handles storage.
+
+## 5. Planner Node Implementation
+
+### LangGraph Node Structure
+
+* **Mandate:** Planner must be implemented as a LangGraph node following READ→DO→WRITE→CONTROL pattern.
+
+* **Node Structure:**
+  * **READ:** Read user request, context, and relevant memories
+  * **DO:** Perform strategic planning (goal setting, risk assessment, plan creation)
+  * **WRITE:** Write strategic plan to state
+  * **CONTROL:** Route to next node (Memory Node or Orchestrator)
+
+* **State Management:**
+  * Read: `user_request`, `context`, `memories`
+  * Write: `strategic_plan`, `goals`, `risk_assessment`
+  * Own: `strategic_plan` field (single owner)
+
+**See:** `@langgraph-architecture-and-nodes` for node implementation patterns and `@examples_planner_node.py` for complete Planner node implementation.
+
+### Planning Process
+
+* **Step 1: Goal Setting**
+  * Parse user request
+  * Define main goals
+  * Break down into sub-goals
+  * Set success criteria
+
+* **Step 2: State Analysis**
+  * Analyze current environment
+  * Identify available resources
+  * Load relevant memories
+  * Assess constraints
+
+* **Step 3: Risk/Cost/Benefit Evaluation**
+  * Evaluate potential actions
+  * Assess risks and costs
+  * Calculate benefits
+  * Make trade-off decisions
+
+* **Step 4: Plan Creation**
+  * Create structured action plan
+  * Define action sequence
+  * Identify dependencies
+  * Set risk mitigation strategies
+
+## 6. Integration with Other Systems
+
+### API Contract Integration
+
+* **Interface:** Planner must implement the Planner interface from `@agent-component-interfaces`.
+
+* **Required Methods:**
+  * `plan(user_request: UserRequest, context: PlanningContext) -> StrategicPlan`
+  * `evaluate_actions(actions: List[Action], context: PlanningContext) -> List[ActionEvaluation]`
+  * `set_goals(user_request: UserRequest) -> Goals`
+
+* **See:** `@agent-component-interfaces` for interface definitions and contract patterns.
+
+### Error Handling
+
+* **Planning Failures:**
+  * Handle invalid user requests gracefully
+  * Manage missing context or resources
+  * Handle memory retrieval failures
+  * Provide fallback planning strategies
+
+* **Error Recovery:**
+  * Log planning errors
+  * Provide partial plans when possible
+  * Route to human review if needed
+  * Learn from planning failures
+
+* **See:** `@error-handling-and-resilience` for comprehensive error handling patterns.
+
+## 7. Best Practices
+
+### Planning Quality
+
+* **Clear Goals:**
+  * Define measurable, achievable goals
+  * Ensure goals align with user intent
+  * Set realistic success criteria
+  * Account for dependencies
+
+* **Risk Management:**
+  * Identify risks early
+  * Quantify risks when possible
+  * Provide mitigation strategies
+  * Document risk decisions
+
+* **Plan Structure:**
+  * Create well-structured plans
+  * Define clear action sequences
+  * Document dependencies
+  * Include success criteria
+
+### Performance Optimization
+
+* **Efficient Planning:**
+  * Cache planning results when appropriate
+  * Reuse successful plan patterns
+  * Optimize memory retrieval
+  * Minimize planning latency
+
+* **Resource Management:**
+  * Consider resource constraints in planning
+  * Optimize for cost and time
+  * Balance quality and efficiency
+  * Monitor planning performance
+
+## 8. Examples and Patterns
+
+**See:** `@examples_planner_node.py` for complete Planner node implementation following READ→DO→WRITE→CONTROL pattern.
+
+**See:** `@examples_goal_setting.py` for goal and sub-goal definition patterns, goal hierarchy, and success criteria.
+
+**See:** `@examples_risk_assessment.py` for risk/cost/benefit evaluation patterns, trade-off analysis, and risk mitigation strategies.

@@ -1,7 +1,7 @@
 # Run All Testing
 
 ## Overview
-Execute all testing commands in sequence: test suite, evaluation suite, and LLM Judge evaluation. This master command runs the complete testing workflow to ensure code quality, functionality, and agent performance.
+Execute all testing commands in sequence: write targeted tests for new code, test suite, evaluation suite, and LLM Judge evaluation. This master command runs the complete testing workflow to ensure code quality, functionality, and agent performance.
 
 ## Rules Applied
 - `tests-and-validation` - Testing framework standards and validation requirements
@@ -17,7 +17,17 @@ Execute all testing commands in sequence: test suite, evaluation suite, and LLM 
 
 ## Steps
 
-1. **Run Test Suite**
+1. **Write Targeted Tests**
+   - Execute `/testing/write-targeted-tests` command
+   - Wait for completion and review results
+   - **Comprehensive Error Handling**:
+     - **No New Code**: If no new/modified code detected, skip this step and proceed
+     - **Test Generation Failures**: If test generation fails, continue with warning, include in final report
+     - **Test Failures**: If generated tests fail, fix issues and re-run, or continue with warning
+     - **Success**: If tests are generated and pass, proceed to next step
+   - **Output**: Test generation report with new test files, test cases, coverage metrics
+
+2. **Run Test Suite**
    - Execute `/testing/run-test-suite` command
    - Wait for completion and review results
    - **Comprehensive Error Handling**: 
@@ -28,7 +38,7 @@ Execute all testing commands in sequence: test suite, evaluation suite, and LLM 
      - **Dependency Check**: Verify test suite completion before proceeding to evaluation
    - **Output**: Test execution report with pass/fail status, coverage metrics, performance data
 
-2. **Run Evaluation Suite**
+3. **Run Evaluation Suite**
    - Execute `/testing/run-evaluation-suite` command
    - Wait for completion and review results
    - **Comprehensive Error Handling**:
@@ -39,7 +49,7 @@ Execute all testing commands in sequence: test suite, evaluation suite, and LLM 
      - **Dependency Check**: Verify evaluation suite completion before proceeding to LLM Judge
    - **Output**: Evaluation report with metrics scores, cost analysis, trend comparison
 
-3. **Evaluate with LLM Judge**
+4. **Evaluate with LLM Judge**
    - Execute `/testing/evaluate-with-llm-judge` command
    - Wait for completion and review results
    - **Comprehensive Error Handling**:
@@ -50,9 +60,9 @@ Execute all testing commands in sequence: test suite, evaluation suite, and LLM 
      - **Partial Results**: Always include partial results even if evaluation fails
    - **Output**: LLM Judge evaluation report with score, verdict, efficiency rating, security assessment
 
-4. **Generate Comprehensive Testing Report**
+5. **Generate Comprehensive Testing Report**
    - **Aggregated Reporting**:
-     - Aggregate results from all three commands (test suite, evaluation suite, LLM Judge)
+     - Aggregate results from all four commands (write targeted tests, test suite, evaluation suite, LLM Judge)
      - Combine metrics, scores, and findings into unified report
      - Cross-reference findings across different evaluation methods
    - **Dependency Management**:
@@ -64,8 +74,15 @@ Execute all testing commands in sequence: test suite, evaluation suite, and LLM 
    - Provide prioritized recommendations across all testing dimensions
    - Include links to detailed reports from each command
    - **Trend Analysis**: Compare current results with previous runs if available
+   - **Execution Flow**: 
+     - `write-targeted-tests → [New code?] → run-test-suite → [Pass?] → run-evaluation-suite → [Pass?] → evaluate-with-llm-judge → Final Report`
+     - If no new code detected, skip write-targeted-tests step
+     - If test suite fails, stop execution and report blocking issues
+     - If evaluation suite fails, stop execution and report blocking issues
+     - If LLM Judge evaluation fails, report error but include partial results
 
 ## Data Sources
+- Results from `/testing/write-targeted-tests` command
 - Results from `/testing/run-test-suite` command
 - Results from `/testing/run-evaluation-suite` command
 - Results from `/testing/evaluate-with-llm-judge` command
@@ -73,6 +90,7 @@ Execute all testing commands in sequence: test suite, evaluation suite, and LLM 
 ## Output
 A comprehensive testing report including:
 - **Overall Testing Status**: Pass/Fail/Needs Attention with justification
+- **Targeted Tests Summary**: New test files created, test cases generated, coverage for new code
 - **Test Suite Summary**: Pass rate, failures, execution time, coverage metrics, performance data
 - **Evaluation Suite Summary**: Metrics scores, quality assessment, cost analysis, trend comparison
 - **LLM Judge Summary**: Score, verdict, critical failures, efficiency rating, security assessment
@@ -82,16 +100,3 @@ A comprehensive testing report including:
 - **Recommendations**: Prioritized suggestions for improvements across all testing dimensions
 - **Dependency Status**: Command execution status and dependency fulfillment
 - **Next Steps**: Actionable items based on all testing results with priority levels
-
-## Execution Flow
-```
-run-test-suite → [Pass?] → run-evaluation-suite → [Pass?] → evaluate-with-llm-judge → Final Report
-                    ↓ Fail                              ↓ Fail                              ↓
-                 [Stop]                              [Stop]                          [Report & Continue]
-```
-
-## Notes
-- Each command can be run independently if needed
-- Master command provides workflow orchestration
-- Error handling ensures critical issues are not missed
-- All reports are preserved for detailed analysis

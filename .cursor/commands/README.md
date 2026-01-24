@@ -73,6 +73,11 @@ Each command is a **markdown file** (`.md`) in the appropriate category director
 
 Testing and evaluation workflows for ensuring code quality and functionality.
 
+#### `/testing/write-targeted-tests`
+Systematically identify new or modified code and automatically generate comprehensive, targeted test cases following project testing standards. Ensures every new feature, function, or code change has corresponding test coverage. Includes test generation, coverage analysis, and test execution validation.
+
+**Rules Applied**: `tests-and-validation`, `core-python-standards`, `error-handling-and-resilience`, `monitoring-and-observability`, `code-review-and-collaboration`
+
 #### `/testing/run-test-suite`
 Execute the full test suite and systematically analyze results, identify failures, and provide actionable recommendations. Includes test coverage analysis and performance metrics collection.
 
@@ -89,7 +94,7 @@ Comprehensive evaluation using LLM-as-a-Judge protocol to analyze agent system p
 **Rules Applied**: `llm-judge-protocol`, `audit-protocol`, `llm-evaluation-and-metrics`, `monitoring-and-observability`, `error-handling-and-resilience`, `performance-optimization`, `security-governance-and-observability`
 
 #### `/testing/run-all-testing` (Master Command)
-Runs all testing commands in sequence: test suite → evaluation suite → LLM Judge evaluation. Includes comprehensive error handling, aggregated reporting, and dependency management.
+Runs all testing commands in sequence: write targeted tests → test suite → evaluation suite → LLM Judge evaluation. Includes comprehensive error handling, aggregated reporting, and dependency management.
 
 ### 2. Security Commands (`/security/`)
 

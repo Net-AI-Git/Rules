@@ -1,0 +1,325 @@
+---
+description: "Action translation component that converts strategic plans into concrete executable actions"
+alwaysApply: false
+---
+
+## Mandate
+
+All agentic systems **MUST** implement an **Executor** component that translates strategic plans from the Planner into concrete executable actions. The Executor coordinates action execution, responds to real-time changes, and monitors results. It operates between Planner/Orchestrator and Workers in the workflow.
+
+## 1. Executor Role and Position
+
+### Action Translation Component
+
+* **Role:** Translates strategic plans into concrete executable actions.
+* **Position in Workflow:** Between Planner/Orchestrator and Workers.
+* **Purpose:**
+  * Translate high-level plans to concrete actions
+  * Coordinate action execution
+  * Respond to real-time changes
+  * Monitor execution results
+  * Provide feedback on execution
+
+* **Workflow Position:**
+```
+[PLANNER] → [ORCHESTRATOR] → [EXECUTOR] → [WORKERS] → [Results]
+```
+
+**See:** `@examples_executor_node.py` for Executor node implementation following READ→DO→WRITE→CONTROL pattern.
+
+## 2. Core Responsibilities
+
+### Action Translation
+
+* **Mandate:** Executor must translate strategic plans into concrete executable actions.
+
+* **Translation Process:**
+  * **Input:** Strategic plan from Planner (goals, actions, sequence)
+  * **Processing:** Convert plan elements to concrete actions
+  * **Output:** List of concrete actions ready for execution
+  * **Format:** Structured actions with parameters and dependencies
+
+* **Action Types:**
+  * **API Calls:** HTTP requests to external services
+  * **Tool Invocations:** LangChain tool calls
+  * **File Operations:** Read, write, modify files
+  * **Database Operations:** Query, update, insert operations
+  * **System Commands:** Execute system-level commands
+
+**See:** `@examples_action_translation.py` for plan-to-action translation patterns and action structure.
+
+### Execution Coordination
+
+* **Mandate:** Executor must coordinate action execution with Workers and Tools.
+
+* **Coordination Responsibilities:**
+  * **Action Dispatch:** Send actions to appropriate Workers or Tools
+  * **Dependency Management:** Handle action dependencies and sequencing
+  * **Parallel Execution:** Coordinate parallel actions when possible
+  * **Result Collection:** Gather results from Workers/Tools
+
+* **Coordination Patterns:**
+  * **Sequential:** Execute actions in order when dependencies exist
+  * **Parallel:** Execute independent actions concurrently
+  * **Conditional:** Execute actions based on conditions
+  * **Retry:** Retry failed actions with backoff
+
+**See:** `@examples_execution_coordination.py` for coordination patterns with Workers and Tools.
+
+### Real-Time Response
+
+* **Mandate:** Executor must respond to real-time changes during execution.
+
+* **Response Capabilities:**
+  * **State Monitoring:** Monitor execution state and progress
+  * **Change Detection:** Detect changes in environment or requirements
+  * **Adaptive Execution:** Adjust actions based on changes
+  * **Error Handling:** Handle errors and failures in real-time
+
+* **Response Patterns:**
+  * **Reactive:** Respond to events and changes
+  * **Proactive:** Anticipate and prevent issues
+  * **Adaptive:** Adjust execution based on feedback
+  * **Resilient:** Recover from failures gracefully
+
+### Result Monitoring
+
+* **Mandate:** Executor must monitor execution results and provide feedback.
+
+* **Monitoring Responsibilities:**
+  * **Progress Tracking:** Track execution progress
+  * **Result Validation:** Validate action results
+  * **Error Detection:** Identify errors and failures
+  * **Feedback Generation:** Generate feedback for Planner and Memory Node
+
+* **Monitoring Output:**
+  * **Execution Status:** Success, failure, in-progress
+  * **Result Data:** Action results and outputs
+  * **Error Information:** Error details and context
+  * **Performance Metrics:** Execution time, resource usage
+
+## 3. Integration Points
+
+### Planner Integration
+
+* **Purpose:** Executor receives strategic plans from Planner.
+
+* **Integration Pattern:**
+  * Planner creates strategic plan with goals and actions
+  * Executor receives plan and translates to concrete actions
+  * Executor uses plan structure to guide translation
+  * Clear separation: Planner plans, Executor translates
+
+* **Plan Translation:**
+  * Parse strategic plan structure
+  * Extract action requirements
+  * Convert to concrete action format
+  * Validate action feasibility
+
+* **See:** `@planner-strategic-planning` for Planner integration patterns.
+
+### Orchestrator Integration
+
+* **Purpose:** Executor may receive SECTIONS from Orchestrator for execution.
+
+* **Integration Pattern:**
+  * Orchestrator creates SECTIONS for Workers
+  * Executor coordinates execution of SECTIONS
+  * Executor dispatches SECTIONS to appropriate Workers
+  * Executor collects results from Workers
+
+* **See:** `@multi-agent-systems` for Orchestrator and SECTIONS patterns.
+
+### Workers Integration
+
+* **Purpose:** Executor coordinates with Workers for specialized execution.
+
+* **Coordination Pattern:**
+  * Executor translates plans to actions
+  * Executor dispatches actions to Workers
+  * Workers execute specialized work
+  * Executor collects and monitors results
+
+* **Worker Coordination:**
+  * Match actions to appropriate Workers
+  * Handle Worker availability and capacity
+  * Coordinate parallel Worker execution
+  * Aggregate Worker results
+
+* **See:** `@multi-agent-systems` for Worker coordination patterns.
+
+### Memory Node Integration
+
+* **Purpose:** Executor feeds execution results to Memory Node for learning.
+
+* **Integration Pattern:**
+  * Executor monitors execution results
+  * Executor formats experiences for storage
+  * Executor sends experiences to Memory Node
+  * Memory Node stores experiences for future learning
+
+* **Experience Format:**
+  * Actions taken
+  * Context and environment
+  * Results and outcomes
+  * Success/failure indicators
+
+* **See:** `@memory-feedback-node` for Memory Node integration patterns.
+
+## 4. What Executor MUST NOT Do
+
+### Strategic Planning
+
+* **MUST NOT:** Plan strategically or set goals (Planner responsibility).
+* **Reason:** Executor translates plans, doesn't create them.
+* **Boundary:** Executor receives plans, doesn't plan strategically.
+
+### Task Decomposition
+
+* **MUST NOT:** Decompose tasks or create SECTIONS (Orchestrator responsibility).
+* **Reason:** Executor coordinates execution, doesn't decompose tasks.
+* **Boundary:** Executor receives SECTIONS, doesn't create them.
+
+### Domain Specialization
+
+* **MUST NOT:** Specialize in specific domains (Workers responsibility).
+* **Reason:** Executor coordinates general execution, Workers specialize.
+* **Boundary:** Executor coordinates, Workers specialize.
+
+## 5. Executor Node Implementation
+
+### LangGraph Node Structure
+
+* **Mandate:** Executor must be implemented as a LangGraph node following READ→DO→WRITE→CONTROL pattern.
+
+* **Node Structure:**
+  * **READ:** Read strategic plan, SECTIONS, and execution context
+  * **DO:** Translate plans to actions, coordinate execution, monitor results
+  * **WRITE:** Write actions, execution status, and results to state
+  * **CONTROL:** Route to Workers, Memory Node, or next node
+
+* **State Management:**
+  * Read: `strategic_plan`, `sections`, `context`
+  * Write: `concrete_actions`, `execution_status`, `results`
+  * Own: `concrete_actions` and `execution_status` fields (single owner)
+
+**See:** `@langgraph-architecture-and-nodes` for node implementation patterns and `@examples_executor_node.py` for complete Executor node implementation.
+
+### Execution Process
+
+* **Step 1: Plan Translation**
+  * Read strategic plan from state
+  * Parse plan structure and actions
+  * Convert to concrete action format
+  * Validate action feasibility
+
+* **Step 2: Action Coordination**
+  * Determine action dependencies
+  * Plan execution sequence (sequential/parallel)
+  * Dispatch actions to Workers/Tools
+  * Monitor execution progress
+
+* **Step 3: Result Monitoring**
+  * Collect results from Workers/Tools
+  * Validate result quality
+  * Detect errors and failures
+  * Generate execution feedback
+
+* **Step 4: Experience Storage**
+  * Format execution experiences
+  * Send experiences to Memory Node
+  * Update execution status
+  * Route to next node
+
+## 6. Integration with Other Systems
+
+### API Contract Integration
+
+* **Interface:** Executor must implement the Executor interface from `@agent-component-interfaces`.
+
+* **Required Methods:**
+  * `translate_plan(plan: StrategicPlan, context: ExecutionContext) -> List[ConcreteAction]`
+  * `execute_action(action: ConcreteAction, context: ExecutionContext) -> ActionResult`
+  * `monitor_execution(actions: List[ConcreteAction]) -> ExecutionStatus`
+
+* **See:** `@agent-component-interfaces` for interface definitions and contract patterns.
+
+### Tools Integration
+
+* **Purpose:** Executor coordinates with LangChain tools for action execution.
+
+* **Tool Coordination:**
+  * Bind tools to execution context
+  * Invoke tools for concrete actions
+  * Handle tool results and errors
+  * Monitor tool execution
+
+* **See:** `@agentic-logic-and-tools` for tool definition and usage patterns.
+
+### Error Handling
+
+* **Execution Failures:**
+  * Handle action execution failures
+  * Manage Worker unavailability
+  * Handle tool errors and timeouts
+  * Provide fallback execution strategies
+
+* **Error Recovery:**
+  * Retry failed actions with backoff
+  * Route to alternative Workers/Tools
+  * Provide partial results when possible
+  * Route to human review if needed
+
+* **See:** `@error-handling-and-resilience` for comprehensive error handling patterns.
+
+## 7. Best Practices
+
+### Action Translation Quality
+
+* **Clear Actions:**
+  * Translate plans to unambiguous actions
+  * Specify all required parameters
+  * Define action dependencies clearly
+  * Validate action feasibility
+
+* **Efficient Translation:**
+  * Minimize translation overhead
+  * Reuse action patterns when possible
+  * Optimize action sequences
+  * Batch similar actions
+
+### Execution Coordination
+
+* **Effective Coordination:**
+  * Coordinate parallel execution when possible
+  * Handle dependencies efficiently
+  * Monitor execution progress
+  * Respond to changes quickly
+
+* **Resource Management:**
+  * Manage Worker capacity
+  * Balance load across Workers
+  * Optimize resource usage
+  * Monitor execution performance
+
+### Result Monitoring
+
+* **Comprehensive Monitoring:**
+  * Track all execution results
+  * Validate result quality
+  * Detect errors early
+  * Generate useful feedback
+
+* **Feedback Quality:**
+  * Provide specific, actionable feedback
+  * Include error context
+  * Report performance metrics
+  * Enable learning from results
+
+## 8. Examples and Patterns
+
+**See:** `@examples_executor_node.py` for complete Executor node implementation following READ→DO→WRITE→CONTROL pattern, including plan translation, action coordination, and result monitoring.
+
+**See:** `@examples_action_translation.py` for plan-to-action translation patterns, action structure, and action validation.
+
+**See:** `@examples_execution_coordination.py` for coordination patterns with Workers and Tools, parallel execution, dependency management, and result collection.
