@@ -5,9 +5,46 @@ This file demonstrates the Executor node implementation following READ→DO→WR
 Reference this example from RULE.mdc using @examples_executor_node.py syntax.
 """
 
+import json
+import logging
+import time
+from datetime import datetime, timezone
 from typing import TypedDict, List, Dict, Any, Optional
 from dataclasses import dataclass
 from enum import Enum
+
+# See @examples_performance_timing in monitoring-and-observability for full implementation.
+logger = logging.getLogger(__name__)
+
+
+class PerformanceTimer:
+    """Minimal PerformanceTimer for structured latency logging (start/end/duration_ms)."""
+
+    def __init__(self, operation_name: str, **extra: Any) -> None:
+        self.operation_name = operation_name
+        self.extra = extra
+        self.duration_seconds: float = 0.0
+        self._start: float = 0.0
+        self._start_ts: str = ""
+
+    def __enter__(self) -> "PerformanceTimer":
+        self._start = time.perf_counter()
+        self._start_ts = datetime.now(timezone.utc).isoformat()
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        end_ts = datetime.now(timezone.utc).isoformat()
+        self.duration_seconds = time.perf_counter() - self._start
+        duration_ms = self.duration_seconds * 1000
+        log_data = {
+            "timestamp": end_ts,
+            "operation_name": self.operation_name,
+            "start_timestamp": self._start_ts,
+            "end_timestamp": end_ts,
+            "duration_ms": round(duration_ms, 2),
+            **self.extra,
+        }
+        logger.info("operation_completed %s", json.dumps(log_data))
 
 
 # ============================================================================
@@ -213,41 +250,40 @@ class ExecutorNode:
     def _execute_action(self, action: ConcreteAction, context: Dict[str, Any]) -> ActionResult:
         """
         Execute a single action.
-        
+
         This demonstrates:
         - Action execution
         - Error handling
         - Result formatting
+        - Structured latency logging via PerformanceTimer
         """
-        # Simplified execution - in production would call actual tools/APIs
-        import time
-        start_time = time.time()
-        
-        try:
-            # Execute based on action type
-            if action.action_type == "api_call":
-                result_data = {"status": "success", "data": "mock_result"}
-            elif action.action_type == "tool_invocation":
-                result_data = {"tool_result": "mock_tool_output"}
-            elif action.action_type == "worker_task":
-                result_data = {"worker_output": "mock_worker_result"}
-            else:
-                raise ValueError(f"Unknown action type: {action.action_type}")
-            
-            execution_time = time.time() - start_time
-            
-            return ActionResult(
-                action_id=action.action_id,
-                success=True,
-                result_data=result_data,
-                execution_time=execution_time
-            )
-        except Exception as e:
-            execution_time = time.time() - start_time
-            return ActionResult(
-                action_id=action.action_id,
-                success=False,
-                result_data={},
-                error=str(e),
-                execution_time=execution_time
-            )
+        correlation_id = context.get("correlation_id")
+        result_data: Dict[str, Any] = {}
+        error_msg: Optional[str] = None
+        success = False
+
+        with PerformanceTimer(
+            "execute_action",
+            action_id=action.action_id,
+            correlation_id=correlation_id or "",
+        ) as timer:
+            try:
+                if action.action_type == "api_call":
+                    result_data = {"status": "success", "data": "mock_result"}
+                elif action.action_type == "tool_invocation":
+                    result_data = {"tool_result": "mock_tool_output"}
+                elif action.action_type == "worker_task":
+                    result_data = {"worker_output": "mock_worker_result"}
+                else:
+                    raise ValueError(f"Unknown action type: {action.action_type}")
+                success = True
+            except Exception as e:
+                error_msg = str(e)
+
+        return ActionResult(
+            action_id=action.action_id,
+            success=success,
+            result_data=result_data,
+            error=error_msg,
+            execution_time=timer.duration_seconds,
+        )

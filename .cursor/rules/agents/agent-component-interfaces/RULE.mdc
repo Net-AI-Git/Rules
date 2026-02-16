@@ -7,6 +7,8 @@ alwaysApply: false
 
 All agentic systems **MUST** define clear API contracts between core components (Planner, Memory Node, Executor) using ABCs (Abstract Base Classes) and type hints. These contracts enable modularity, maintainability, testing, and implementation swapping without breaking the system.
 
+**See:** `@contract-scope-and-boundaries` for when to define explicit contracts vs. implicit contracts (boundary points, replaceability test, avoiding over-engineering).
+
 ## 1. Interface Definition Principles
 
 ### Contract-Based Design

@@ -29,23 +29,23 @@ Rules in this repository are organized by category:
 
 ### Rule Folder Structure
 
-Each rule is a **folder** containing a `RULE.md` file:
+Each rule is a **folder** containing a `RULE.mdc` file:
 
 ```
 .cursor/rules/
   category-name/
     rule-name/
-      RULE.md
+      RULE.mdc
 ```
 
 **Important:**
 - Each rule must be in its own folder
 - The folder name should be kebab-case (e.g., `core-python-standards`)
-- The file inside must be named exactly `RULE.md` (capital letters)
+- The file inside must be named exactly `RULE.mdc` (capital letters, `.mdc` extension)
 
 ## Rule Types
 
-Rules are applied automatically based on their type, defined in the YAML frontmatter at the start of each `RULE.md` file:
+Rules are applied automatically based on their type, defined in the YAML frontmatter at the start of each `RULE.mdc` file:
 
 ### 1. Always Apply
 
@@ -84,6 +84,7 @@ alwaysApply: false
 **Examples:**
 - `code-review-and-collaboration` - Code review standards
 - `multi-agent-systems` - Multi-agent architecture patterns
+- `contract-scope-and-boundaries` - When to define explicit API contracts
 - `llm-judge-protocol` - LLM-as-a-Judge evaluation
 - `performance-optimization` - Performance best practices
 
@@ -94,9 +95,7 @@ Applied when working on files that match the specified glob patterns.
 **Frontmatter:**
 ```yaml
 ---
-globs:
-  - "**/api/**/*.py"
-  - "**/routes/**/*.py"
+globs: **/api/**/*.py, **/routes/**/*.py
 alwaysApply: false
 ---
 ```
@@ -153,11 +152,14 @@ Security and governance:
 
 - **`security-governance-and-observability`** (Always Apply)
   - Security standards and governance requirements
-  - Security best practices and compliance
+  - Blast radius containment, OWASP LLM, NIST AI RMF
 
 - **`audit-protocol`** (Always Apply)
   - Audit procedures and compliance verification
-  - Security incident tracking and analysis
+  - Tool call auditing, state change auditing, LLM operation auditing
+
+- **`prompt-injection-prevention`** (Apply Intelligently)
+  - Prompt injection prevention and input sanitization
 
 ### Agent Rules (`agents/`)
 
@@ -166,6 +168,29 @@ Agent-specific architecture:
 - **`multi-agent-systems`** (Apply Intelligently)
   - Multi-agent system architecture patterns
   - Orchestrator/Worker/Synthesizer patterns
+  - Micro-agents over monolith principle
+
+- **`contract-scope-and-boundaries`** (Apply Intelligently)
+  - When to define explicit API contracts vs implicit contracts
+  - Boundary points, replaceability test, avoiding over-engineering
+
+- **`agent-component-interfaces`** (Apply Intelligently)
+  - API contracts between Planner, Memory, Executor
+  - ABC interfaces and implementation swapping
+
+- **`planner-strategic-planning`** (Apply Intelligently)
+  - Strategic goal setting and action planning
+  - Risk assessment before task decomposition
+
+- **`executor-action-translation`** (Apply Intelligently)
+  - Translates strategic plans to concrete actions
+  - Action execution and coordination
+
+- **`memory-feedback-node`** (Apply Intelligently)
+  - Memory Node for historical context and learning feedback
+
+- **`memory-and-archival-management`** (Apply Intelligently)
+  - Long-term memory and archival strategies
 
 - **`langgraph-architecture-and-nodes`** (Apply to Specific Files)
   - LangGraph workflow architecture
@@ -175,6 +200,21 @@ Agent-specific architecture:
 - **`agentic-logic-and-tools`** (Apply Intelligently)
   - LangChain fundamentals and tool definitions
   - Agent internals and tool implementation
+
+- **`cost-and-budget-management`** (Apply Intelligently)
+  - Token budget and cost guardrails
+
+- **`context-compression-and-optimization`** (Apply Intelligently)
+  - Context window compression and optimization
+
+- **`human-in-the-loop-approval`** (Apply Intelligently)
+  - Approval context schema for HITL interrupts
+
+- **`model-routing-and-selection`** (Apply Intelligently)
+  - Dynamic model routing based on task complexity
+
+- **`reflection-and-self-critique`** (Apply Intelligently)
+  - Self-critique and reflection patterns for quality assurance
 
 ### Infrastructure Rules (`infrastructure/`)
 
@@ -186,7 +226,12 @@ Deployment and operations:
 
 - **`monitoring-and-observability`** (Apply Intelligently)
   - Metrics, logging, tracing standards
-  - Observability best practices
+  - PerformanceTimer for latency measurement (start/end/duration_ms)
+  - Structured logging with timestamps per operation
+
+- **`rate-limiting-and-queue-management`** (Apply Intelligently)
+  - Multi-agent rate limiting and queue management
+  - API key protection and exponential backoff
 
 - **`performance-optimization`** (Apply Intelligently)
   - Performance optimization strategies
@@ -227,6 +272,10 @@ API development:
   - API documentation requirements
   - Applied to API files
 
+- **`mcp-protocol-implementation`** (Apply Intelligently)
+  - Model Context Protocol (MCP) servers and clients
+  - Dynamic tool management
+
 ### Data Rules (`data/`)
 
 Data management:
@@ -234,6 +283,7 @@ Data management:
 - **`data-schemas-and-interfaces`** (Apply Intelligently)
   - Pydantic schemas and data models
   - Structured interfaces and validation
+  - References `contract-scope-and-boundaries` for when to define schemas
 
 - **`data-migration-and-compatibility`** (Apply to Specific Files)
   - Data migration patterns
@@ -253,6 +303,17 @@ LLM evaluation and testing:
   - LLM-as-a-Judge evaluation protocol
   - Performance, safety, and logic analysis
 
+- **`graph-traversal-testing`** (Apply Intelligently)
+  - Graph traversal tests for agent workflow paths
+  - Node sequence validation
+
+- **`simulation-and-property-testing`** (Apply Intelligently)
+  - Property-based and chaos testing
+  - Edge case simulation
+
+- **`bias-detection-and-ethics`** (Apply Intelligently)
+  - Bias detection and ethical AI practices
+
 - **`final-review-protocol`** (Always Apply)
   - Final review process before commit
   - Compliance verification
@@ -268,7 +329,7 @@ Configuration and setup:
 - **`prompt-engineering-and-management`** (Apply to Specific Files)
   - Prompt engineering standards
   - Prompt management and versioning
-  - Applied to prompt files
+  - Applied to prompt files (`**/prompts/**/*.py`, `**/prompts/**/*.yaml`, `**/prompts/**/*.txt`)
 
 ### Meta-Rules
 
@@ -276,11 +337,12 @@ Rules for managing rules and commands:
 
 - **`rules-management`** (Apply to Specific Files)
   - Format and structure for creating/updating Rules
-  - Applied when working on `RULE.md` files
+  - Applied when working on `RULE.mdc` files
+  - References: `helper-files-guide`, `frontmatter-reference`
 
 - **`commands-management`** (Apply to Specific Files)
   - Format and structure for creating/updating Commands
-  - Applied when working on command files
+  - Applied when working on command files (`.cursor/commands/**/*.md`)
 
 ## Usage
 
@@ -330,22 +392,23 @@ Copy only the category folders you need:
 
 ## Creating and Updating Rules
 
-When creating or updating Rules, follow the format defined in `.cursor/rules/rules-management/RULE.md`:
+When creating or updating Rules, follow the format defined in `.cursor/rules/rules-management/RULE.mdc`:
 
 1. **Choose the appropriate category** folder
-2. **Create the folder structure**: `category-name/rule-name/RULE.md`
+2. **Create the folder structure**: `category-name/rule-name/RULE.mdc`
 3. **Write the frontmatter** based on the rule type:
    - Always Apply: `alwaysApply: true`
    - Apply Intelligently: `description: "..."` and `alwaysApply: false`
-   - Apply to Specific Files: `globs: [...]` and `alwaysApply: false`
+   - Apply to Specific Files: `globs: "pattern1, pattern2"` and `alwaysApply: false`
    - Apply Manually: `alwaysApply: false` (no description or globs)
 4. **Write the rule content** following the structure and format guidelines
+5. **Use helper files** for code examples (see `helper-files-guide`)
 
-See `.cursor/rules/rules-management/RULE.md` for detailed format specifications and examples.
+See `.cursor/rules/rules-management/RULE.mdc` for detailed format specifications and examples.
 
 ## Rule File Format
 
-Every `RULE.md` file must follow this structure:
+Every `RULE.mdc` file must follow this structure:
 
 1. **Frontmatter** (YAML between `---` markers)
    - Defines rule type and application behavior
@@ -354,9 +417,9 @@ Every `RULE.md` file must follow this structure:
 2. **Rule Content** (Markdown)
    - Mandate/Overview section
    - Detailed guidelines and standards
-   - Examples and best practices
+   - Examples via `@examples_*.py` helper files (keep rules under 400 lines)
 
-See `.cursor/rules/rules-management/RULE.md` for complete format specifications.
+See `.cursor/rules/rules-management/RULE.mdc` for complete format specifications.
 
 ## Integration with Commands
 
@@ -382,7 +445,8 @@ For example, the `/testing/run-test-suite` command references `tests-and-validat
 
 - **[Root README](../README.md)** - Overview of the entire repository
 - **[Commands Documentation](../commands/README.md)** - Complete guide to Cursor Commands
-- **[Rules Management Rule](rules-management/RULE.md)** - Format specifications for creating/updating rules
-- **[Commands Management Rule](commands-management/RULE.md)** - Format specifications for creating/updating commands
+- **[Rules Management Rule](rules-management/RULE.mdc)** - Format specifications for creating/updating rules
+- **[Helper Files Guide](rules-management/helper-files-guide/RULE.mdc)** - Using helper files for code examples
+- **[Frontmatter Reference](rules-management/frontmatter-reference/RULE.mdc)** - Frontmatter templates for all rule types
+- **[Commands Management Rule](commands-management/RULE.mdc)** - Format specifications for creating/updating commands
 - **[Cursor Rules Documentation](https://cursor.com/docs/context/rules)** - Official Cursor documentation
-- **[Cursor Commands Documentation](https://cursor.com/docs/agent/chat/commands)** - Official Cursor documentation

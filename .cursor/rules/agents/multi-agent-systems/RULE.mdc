@@ -6,6 +6,8 @@ alwaysApply: false
 ## Mandate
 All agentic systems in this codebase are designed as **Multi-Agent Systems**. This document defines the standard architecture patterns and rules for orchestrating multiple agents.
 
+* **Micro-Agents over Monolith:** Always use micro-agents (specialized, focused agents) rather than monolith agents. Decompose complex tasks into specialized workers rather than a single agent handling all responsibilities.
+
 ## 1. Core Architecture Components
 
 ### Orchestrator
@@ -83,6 +85,7 @@ All agentic systems in this codebase are designed as **Multi-Agent Systems**. Th
 ### API Contract (Component Interfaces)
 * **Role:** Defines clear interfaces between Planner, Memory, and Executor components.
 * **Purpose:** Enables modularity, maintainability, testing, and implementation swapping.
+* **See:** `@contract-scope-and-boundaries` for when contracts are required (boundary points).
 * **See:** `@agent-component-interfaces` for interface definitions and contract patterns.
 
 ## 2. SECTIONS Pattern

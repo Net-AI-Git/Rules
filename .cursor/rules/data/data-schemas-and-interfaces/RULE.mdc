@@ -3,6 +3,8 @@ description: "Standards for Pydantic schemas, data models, and structured interf
 alwaysApply: false
 ---
 
+**See:** `@contract-scope-and-boundaries` for when to define explicit schemas (boundary points such as Agent↔Tool, LLM↔code).
+
 ## 1. Schema Definition Standards
 * **Base Class:** Always inherit from `pydantic.BaseModel` for all data schemas.
 * **Field Descriptions:** Every field MUST include a `Field(description="...")`. This is critical for the LLM to understand the parameter's meaning.

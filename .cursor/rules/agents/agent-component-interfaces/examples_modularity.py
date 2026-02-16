@@ -5,9 +5,46 @@ This file demonstrates implementation swapping patterns, dependency injection, a
 Reference this example from RULE.mdc using @examples_modularity.py syntax.
 """
 
+import json
+import logging
+import time
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from abc import ABC, abstractmethod
 from enum import Enum
+
+# See @examples_performance_timing in monitoring-and-observability for full implementation.
+logger = logging.getLogger(__name__)
+
+
+class PerformanceTimer:
+    """Minimal PerformanceTimer for structured latency logging (start/end/duration_ms)."""
+
+    def __init__(self, operation_name: str, **extra: Any) -> None:
+        self.operation_name = operation_name
+        self.extra = extra
+        self.duration_seconds: float = 0.0
+        self._start: float = 0.0
+        self._start_ts: str = ""
+
+    def __enter__(self) -> "PerformanceTimer":
+        self._start = time.perf_counter()
+        self._start_ts = datetime.now(timezone.utc).isoformat()
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        end_ts = datetime.now(timezone.utc).isoformat()
+        self.duration_seconds = time.perf_counter() - self._start
+        duration_ms = self.duration_seconds * 1000
+        log_data = {
+            "timestamp": end_ts,
+            "operation_name": self.operation_name,
+            "start_timestamp": self._start_ts,
+            "end_timestamp": end_ts,
+            "duration_ms": round(duration_ms, 2),
+            **self.extra,
+        }
+        logger.info("operation_completed %s", json.dumps(log_data))
 
 
 # ============================================================================
@@ -265,19 +302,14 @@ class ABTestingService:
         basic_results = []
         advanced_results = []
         
-        for _ in range(iterations):
-            # Test basic planner
-            import time
-            start = time.time()
-            basic_plan = basic_planner.plan(user_request, context)
-            basic_time = time.time() - start
-            basic_results.append({"time": basic_time, "plan": basic_plan})
-            
-            # Test advanced planner
-            start = time.time()
-            advanced_plan = advanced_planner.plan(user_request, context)
-            advanced_time = time.time() - start
-            advanced_results.append({"time": advanced_time, "plan": advanced_plan})
+        for i in range(iterations):
+            with PerformanceTimer("ab_test_basic_planner", iteration=i) as t_basic:
+                basic_plan = basic_planner.plan(user_request, context)
+            basic_results.append({"time": t_basic.duration_seconds, "plan": basic_plan})
+
+            with PerformanceTimer("ab_test_advanced_planner", iteration=i) as t_adv:
+                advanced_plan = advanced_planner.plan(user_request, context)
+            advanced_results.append({"time": t_adv.duration_seconds, "plan": advanced_plan})
         
         # Calculate statistics
         basic_avg_time = sum(r["time"] for r in basic_results) / len(basic_results)

@@ -218,6 +218,7 @@ alwaysApply: false
     * **API Request Timing:** Every API request MUST include timing in logs and spans.
     * **Database Query Timing:** Every database query MUST include timing information.
 
+* **See:** `@examples_performance_timing` for PerformanceTimer context manager implementation.
 * **See:** `core-python-standards.md` for structured logging implementation details.
 * **See:** Section 2 (Distributed Tracing) for OpenTelemetry span creation patterns.
 * **See:** Section 3 (Log Aggregation Strategies) for structured logging requirements.

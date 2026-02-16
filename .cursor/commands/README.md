@@ -38,6 +38,7 @@ Commands are stored in three locations:
 │   ├── analyze-langsmith-traces.md
 │   ├── comprehensive-system-analysis.md
 │   ├── performance-analysis.md
+│   ├── profile-code-bottlenecks.md
 │   └── run-all-monitoring.md (Master Command)
 ├── deployment/       # Deployment and infrastructure commands
 │   ├── pre-deployment-check.md
@@ -148,6 +149,11 @@ Comprehensive analysis of LangSmith traces to understand LLM operations, tool us
 Comprehensive performance analysis to identify bottlenecks, optimize resource usage, and improve system efficiency. Includes SLI/SLO compliance checks, capacity planning recommendations, and performance regression detection.
 
 **Rules Applied**: `performance-optimization`, `monitoring-and-observability`, `core-python-standards`, `error-handling-and-resilience`, `deployment-and-infrastructure`, `rate-limiting-and-queue-management`
+
+#### `/monitoring/profile-code-bottlenecks`
+Run a code profiler (e.g., `cProfile`) on target code to identify real performance bottlenecks through measurement rather than guessing. Follows the principle that every optimization must start with measurement: profile first, identify 1–2 bottleneck functions, understand their Big-O complexity, then perform targeted refactoring.
+
+**Rules Applied**: `performance-optimization`, `monitoring-and-observability`, `core-python-standards`
 
 #### `/monitoring/comprehensive-system-analysis`
 Complete cross-system analysis combining all available data sources to provide holistic insights. Uses results from trace and performance analysis. Includes cross-system correlation, predictive analysis, and system health scoring.

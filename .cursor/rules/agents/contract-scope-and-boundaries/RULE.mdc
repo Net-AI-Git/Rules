@@ -1,0 +1,69 @@
+---
+description: "When to define explicit API contracts (Interface/ABC/Schema) vs implicit contracts - boundary points, replaceability test, avoiding over-engineering"
+alwaysApply: false
+---
+
+## Mandate
+
+Define explicit API contracts (Interface, ABC, Schema, Structured Output) **only at meaningful boundary points** between independent components. Do not define formal contracts for internal code, helpers, or local logic that do not constitute integration points. This prevents over-engineering and preserves productivity.
+
+## 1. Guiding Principle: Replaceability Test
+
+* **Contract Required:** If an implementation can or should be replaced without breaking the system, a formal contract is required.
+* **Implicit Sufficient:** If replacement is not expected or feasible, implicit contract and code readability suffice.
+
+## 2. When to Define Explicit Contracts
+
+### Boundary Points (Contract Required)
+
+Define formal contracts at integration boundaries where:
+* One component relies on another that may be **replaced** (e.g., switching providers)
+* One component may **evolve** independently (e.g., different team ownership)
+* Implementation may be done by a **different person or team**
+* The boundary is a **swappable dependency** (testing, A/B, provider change)
+
+### Examples of Boundary Points
+
+* **Planner↔Executor:** Strategic planning vs. action execution (different responsibilities, may swap implementations).
+* **Agent↔Tool:** Agent invokes tools; tools may be added, removed, or replaced.
+* **Agent↔Agent:** Worker-to-worker or Orchestrator-to-Worker communication.
+* **LLM↔Code:** LLM outputs consumed by code; structured output schemas enforce format.
+
+### Contract Requirements at Boundaries
+
+* **Input:** Typed parameters with clear descriptions.
+* **Output:** Typed return values with clear structure.
+* **Semantic Meaning:** Document expected behavior, not implementation details.
+* **Enforceability:** Use ABC, Pydantic, or JSON Schema for validation.
+
+**See:** `@agent-component-interfaces` for Planner, Memory, Executor interface definitions.
+
+**See:** `@data-schemas-and-interfaces` for Pydantic schemas and structured outputs for tools and LLM.
+
+## 3. When NOT to Define Formal Contracts
+
+### Internal Code (Implicit Contract Sufficient)
+
+Do **not** define formal contracts for:
+* **Internal helpers:** Utility functions used only within a module.
+* **Local logic:** Business logic that is not a swappable dependency.
+* **Private implementation details:** Code that is not an integration point.
+* **Single-use components:** Components with no foreseeable replacement.
+
+### Rationale
+
+* **Over-engineering:** Formal contracts add maintenance burden without benefit.
+* **Productivity:** Implicit contracts (clear naming, docstrings, type hints) suffice for internal code.
+* **Focus:** Invest contract effort where it matters—at boundaries.
+
+## 4. Integration with Other Rules
+
+* **Component Interfaces:** `@agent-component-interfaces` defines contracts for Planner, Memory, Executor—all boundary points per this rule.
+* **Data Schemas:** `@data-schemas-and-interfaces` defines schemas for tools and LLM outputs—boundary points (Agent↔Tool, LLM↔Code).
+* **Multi-Agent:** `@multi-agent-systems` defines SECTIONS and Agent↔Agent boundaries; contracts apply at those boundaries.
+
+## 5. Decision Flow
+
+1. **Is this a boundary between replaceable/evolvable components?** → Yes: Define explicit contract.
+2. **Is this internal code, helper, or single-owner logic?** → Yes: Use implicit contract (naming, types, docstrings).
+3. **Uncertain?** → Apply replaceability test: "Could we swap this implementation without breaking the system?" If yes, define contract.

@@ -5,10 +5,47 @@ This file demonstrates coordination patterns with Workers and Tools, parallel ex
 Reference this example from RULE.mdc using @examples_execution_coordination.py syntax.
 """
 
+import json
+import logging
+import time
+from datetime import datetime, timezone
 from typing import List, Dict, Any, Optional, Set
 from dataclasses import dataclass
 from enum import Enum
 from collections import defaultdict, deque
+
+# See @examples_performance_timing in monitoring-and-observability for full implementation.
+logger = logging.getLogger(__name__)
+
+
+class PerformanceTimer:
+    """Minimal PerformanceTimer for structured latency logging (start/end/duration_ms)."""
+
+    def __init__(self, operation_name: str, **extra: Any) -> None:
+        self.operation_name = operation_name
+        self.extra = extra
+        self.duration_seconds: float = 0.0
+        self._start: float = 0.0
+        self._start_ts: str = ""
+
+    def __enter__(self) -> "PerformanceTimer":
+        self._start = time.perf_counter()
+        self._start_ts = datetime.now(timezone.utc).isoformat()
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        end_ts = datetime.now(timezone.utc).isoformat()
+        self.duration_seconds = time.perf_counter() - self._start
+        duration_ms = self.duration_seconds * 1000
+        log_data = {
+            "timestamp": end_ts,
+            "operation_name": self.operation_name,
+            "start_timestamp": self._start_ts,
+            "end_timestamp": end_ts,
+            "duration_ms": round(duration_ms, 2),
+            **self.extra,
+        }
+        logger.info("operation_completed %s", json.dumps(log_data))
 
 
 # ============================================================================
@@ -292,37 +329,37 @@ class ExecutionCoordinationService:
     def _execute_action(self, action: ConcreteAction, context: Dict[str, Any]) -> ActionResult:
         """
         Execute a single action (simplified).
-        
+
         Args:
             action: Action to execute
             context: Execution context
-            
+
         Returns:
             Action result
         """
-        import time
-        start_time = time.time()
-        
-        try:
-            # Simplified execution
-            result_data = {"action_id": action.action_id, "status": "success"}
-            execution_time = time.time() - start_time
-            
-            return ActionResult(
-                action_id=action.action_id,
-                success=True,
-                result_data=result_data,
-                execution_time=execution_time
-            )
-        except Exception as e:
-            execution_time = time.time() - start_time
-            return ActionResult(
-                action_id=action.action_id,
-                success=False,
-                result_data={},
-                error=str(e),
-                execution_time=execution_time
-            )
+        correlation_id = context.get("correlation_id")
+        result_data: Dict[str, Any] = {}
+        error_msg: Optional[str] = None
+        success = False
+
+        with PerformanceTimer(
+            "execute_action",
+            action_id=action.action_id,
+            correlation_id=correlation_id or "",
+        ) as timer:
+            try:
+                result_data = {"action_id": action.action_id, "status": "success"}
+                success = True
+            except Exception as e:
+                error_msg = str(e)
+
+        return ActionResult(
+            action_id=action.action_id,
+            success=success,
+            result_data=result_data,
+            error=error_msg,
+            execution_time=timer.duration_seconds,
+        )
     
     def _should_stop_on_failure(self, context: Dict[str, Any]) -> bool:
         """
