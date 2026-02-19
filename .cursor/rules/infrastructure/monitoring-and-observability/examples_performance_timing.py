@@ -20,6 +20,7 @@ class PerformanceTimer:
     """
     Context manager for automatic timing with structured logging.
 
+    Uses `time.perf_counter()` per monitoring-and-observability for high-resolution duration measurement.
     Logs start_timestamp, end_timestamp, duration_ms per monitoring-and-observability.
     Exposes duration_ms and duration_seconds for use in return values.
     """

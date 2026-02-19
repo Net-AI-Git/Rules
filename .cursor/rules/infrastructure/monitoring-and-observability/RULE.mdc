@@ -194,6 +194,7 @@ alwaysApply: false
 
 * **Latency Measurement:**
     * **Mandatory Latency Tracking:** Calculate and log latency between every stage/operation.
+    * **Duration Calculation:** Use `time.perf_counter()` for duration calculation (not `time.time()`). `perf_counter` provides high resolution and is not affected by system clock adjustments. Required for accurate latency measurement and profiling.
     * **Metrics:** Track `stage_latency_ms`, `total_latency_ms`, `stage_name` for each operation.
     * **Bottleneck Identification:** Compare stage latencies to identify performance bottlenecks.
     * **Export:** Log latency metrics to both logs and metrics systems (Prometheus/StatsD) for aggregation.

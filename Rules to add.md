@@ -60,11 +60,6 @@ https://github.com/modelcontextprotocol/modelcontextprotocol
 בנה את ה־**Planner Node כ־Beam Search Planner**: בכל שלב תכנון, ה־Planner מייצר סט מועמדים (N) של פעולות/מיני־תוכניות אפשריות מה־State וה־Goal, מחשב לכל מועמד **ציון** באמצעות מנגנון ה־scoring הקיים (Risk/Cost/Benefit → `trade_off_score` + `recommendation`), ממיין את כל המועמדים לפי `trade_off_score` ומבצע את שלב ה־**Beam Search pruning**—שומר רק את **Top-K** (beam_width) ומוחק את כל היתר; לאחר מכן ה־Planner **מרחיב** רק את K המועמדים ששרדו לצעד הבא (generate→score→prune→expand) וחוזר על הלולאה לעומק מוגבל (למשל 2–3 צעדים) או עד עמידה בקריטריוני הצלחה/תקציב. הפעלת tools יקרים (RAG/Web/API) מתבצעת **רק אחרי pruning** ורק על מועמדים שעברו סף איכות/סיכון, כדי לשלוט בעלות ולמנוע בזבוז טוקנים; בסיום, ה־Planner בוחר את המועמד בעל הציון המצטבר הגבוה ביותר ככיוון המוביל, מעדכן את ה־State בתוצאות, וממשיך את התהליך עד להשגת ה־Goal.
 
 
-from __future__ import annotations
-משמש להפיכת type hints לעצלים (lazy evaluation), כך שאפשר להפנות לטיפוסים שעדיין לא הוגדרו בלי להשתמש במחרוזות. משתמשים בזה כשעובדים עם מחלקות שמפנות לעצמן או אחת לשנייה (כמו Trees, Graphs, Plans, States), ובעיקר בקוד מודרני עם type checking (IDE, mypy). היתרון: קוד נקי, קריא, ופחות תקלות בסידור תלות בין טיפוסים.
-from dataclasses import dataclass
-משמש ליצירת מחלקות נתונים קלות בלי לכתוב boilerplate. משתמשים בזה כשצריך לייצג state, תוצאה, קונפיגורציה או אובייקט תיאורי (למשל Plan, Action, Score). היתרון: פחות קוד, פחות באגים, מבנה ברור שמתאים במיוחד למערכות Agentic ו־AI.
-from time import perf_counter
-משמש למדידת זמני ריצה מדויקים ברזולוציה גבוהה. משתמשים בזה כשבודקים ביצועים, latency, או משווים בין אלגוריתמים (כמו decoding, beam search, planner loops). היתרון: מדידה אמינה ומדויקת, בניגוד ל־time.time, ומתאים ל־profiling ו־benchmarking בפרודקשן.
+
 
 

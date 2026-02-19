@@ -5,8 +5,14 @@ alwaysApply: false
 
 **See:** `@contract-scope-and-boundaries` for when to define explicit schemas (boundary points such as Agent↔Tool, LLM↔code).
 
+## 0. When to Use dataclass vs Pydantic
+
+* **Pydantic BaseModel:** Use for boundary schemas—Agent↔Tool, LLM↔Code, API contracts. Required for validation, serialization, and LLM binding. See Section 1 below.
+* **dataclass:** Use for internal structures—state objects, config, results, descriptive objects (e.g., Plan, Action, Score). Less boilerplate, no validation overhead. See `@contract-scope-and-boundaries` for boundary vs internal distinction.
+* **Rule:** At integration boundaries → Pydantic. Internal code → dataclass.
+
 ## 1. Schema Definition Standards
-* **Base Class:** Always inherit from `pydantic.BaseModel` for all data schemas.
+* **Base Class:** Always inherit from `pydantic.BaseModel` for all boundary data schemas (tools, LLM outputs, API contracts).
 * **Field Descriptions:** Every field MUST include a `Field(description="...")`. This is critical for the LLM to understand the parameter's meaning.
 * **Type Hints:** Use standard Python types (`str`, `int`, `float`, `bool`).
 

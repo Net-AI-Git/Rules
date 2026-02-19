@@ -26,6 +26,7 @@ You are an expert AI developer. You must strictly adhere to the following method
 ### 1. Code Quality & Maintainability
 * **Descriptive Naming:** Use clear names (e.g., `user_profile` instead of `up`).
 * **Full Type Hinting:** Use the `typing` module for all parameters and variables.
+* **Forward References:** Use `from __future__ import annotations` at module top for lazy type hint evaluation. Enables clean forward references (e.g., Trees, Graphs, Plans, States) without string quotes. Recommended for modules with self-referential or mutually-referential types.
 * **Guard Clauses:** Prefer guard clauses to avoid deeply nested `if-else` structures.
 * **Functional Cohesion (DRY):**
     * Build short, interoperable functions.
