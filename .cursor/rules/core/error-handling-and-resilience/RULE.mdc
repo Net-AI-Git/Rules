@@ -97,7 +97,7 @@ alwaysApply: true
 * **Sensitive Data:** Never log secrets, passwords, API keys, or PII in error messages.
     * Use masking or truncation for sensitive fields.
 
-* **Error Aggregation:** Use error tracking tools (e.g., Sentry, Datadog) to aggregate and analyze errors.
+* **Error Aggregation:** Send errors as structured events to **Splunk** (via HEC); use **SPL** for aggregation, search, and alerting (e.g., error rate, grouping by type).
 
 ## 7. Integration with LangGraph Nodes
 

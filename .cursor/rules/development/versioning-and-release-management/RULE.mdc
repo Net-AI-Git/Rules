@@ -65,18 +65,22 @@ alwaysApply: false
 
 ## 3. Release Process
 
-* **Release Preparation:**
-    1. **Update Version:** Update version in code (e.g., `__version__.py`, `pyproject.toml`).
-    2. **Update Changelog:** Add release entry to CHANGELOG.md with date.
+* **GitFlow:** Releases follow **GitFlow**. Release preparation is done on a **release branch** (created from `develop`). When ready, the release branch is merged to `master` and tagged; the same branch is merged back into `develop`. **See:** `@gitflow-branching-model` for branch workflow.
+
+* **Release Preparation (on the release branch):**
+    1. **Update Version:** Update version in code (e.g., `__version__.py`, `pyproject.toml`) on the release branch.
+    2. **Update Changelog:** Add release entry to CHANGELOG.md with date on the release branch.
     3. **Run Tests:** Ensure all tests pass.
     4. **Update Dependencies:** Update dependency versions if needed.
     5. **Code Review:** Get code review for release changes.
 
 * **Release Creation:**
-    1. **Create Tag:** Create Git tag with version number (e.g., `v1.2.0`).
-    2. **Tag Message:** Include release notes in tag message.
-    3. **Push Tag:** Push tag to remote repository.
-    4. **CI/CD Trigger:** CI/CD pipeline automatically builds and deploys.
+    1. **Merge to master:** Merge the release branch into `master`.
+    2. **Create Tag:** Create Git tag with version number **on `master`** (e.g., `v1.2.0`).
+    3. **Tag Message:** Include release notes in tag message.
+    4. **Push Tag:** Push tag to remote repository.
+    5. **Merge to develop:** Merge the release branch into `develop`.
+    6. **CI/CD Trigger:** CI/CD pipeline automatically builds and deploys (e.g. from tags or `master`).
 
 * **Post-Release:**
     1. **Verify Deployment:** Verify successful deployment to production.
@@ -87,7 +91,7 @@ alwaysApply: false
 * **Rollback Plan:**
     * **Procedure:** Document rollback procedure.
     * **Trigger:** Define conditions for rollback (error rate, critical bugs).
-    * **See:** `deployment-and-infrastructure.md` for rollback procedures.
+    * **See:** @deployment-and-infrastructure for rollback procedures.
 
 ## 4. Feature Flags/Toggles
 
@@ -153,14 +157,14 @@ alwaysApply: false
 * **Rollback Strategies:**
     * **Version Rollback:** Revert to previous code version.
     * **Feature Flag:** Disable feature using feature flag (if applicable).
-    * **Database Rollback:** Rollback database migrations if needed (see `data-migration-and-compatibility.md`).
+    * **Database Rollback:** Rollback database migrations if needed (see @data-migration-and-compatibility).
 
 * **Post-Rollback:**
     * **Investigation:** Investigate root cause of issue.
     * **Documentation:** Document incident and lessons learned.
     * **Prevention:** Update processes to prevent similar issues.
 
-* **See:** `deployment-and-infrastructure.md` for detailed rollback procedures.
+* **See:** @deployment-and-infrastructure for detailed rollback procedures.
 
 ## 7. Version Communication
 
@@ -196,5 +200,5 @@ alwaysApply: false
     * **Documentation:** Document security updates in changelog.
 
 * **Dependency Management:**
-    * **Requirements Files:** Maintain `requirements.txt` and `requirements-dev.txt`.
-    * **Lock Files:** Use lock files (e.g., `poetry.lock`, `Pipfile.lock`) for reproducible builds.
+    * **Default: Poetry.** Use Poetry for dependency management: maintain `pyproject.toml` (direct dependencies and project metadata) and `poetry.lock` (full resolved tree). Commit `poetry.lock` to the repository for reproducible installs.
+    * **Lock file:** `poetry.lock` is mandatory when using Poetry; do not omit it from version control.

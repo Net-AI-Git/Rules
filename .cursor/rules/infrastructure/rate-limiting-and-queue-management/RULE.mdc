@@ -162,7 +162,7 @@ All agentic systems **MUST** implement rate limiting and queue management to pre
   * **Exponent:** Backoff multiplier (e.g., 2 for exponential)
   * **Jitter:** Randomness to prevent synchronization
 
-**See:** `error-handling-and-resilience.md` for basic exponential backoff patterns.
+**See:** @error-handling-and-resilience for basic exponential backoff patterns.
 
 ### Distributed Backoff
 
@@ -218,9 +218,11 @@ All agentic systems **MUST** implement rate limiting and queue management to pre
   * **Transient:** Rate limit errors are transient (retry with backoff)
   * **Permanent:** Authentication errors are permanent (don't retry)
 
-* **See:** `error-handling-and-resilience.md` for error handling patterns.
+* **See:** @error-handling-and-resilience for error handling patterns.
 
 ### API Interface Integration
+
+* **HTTP API Layer:** At the HTTP API layer, implement rate limiting via FastAPI (middleware or dependencies). See @api-interface-and-streaming. This rule covers agent-level and queue-level rate limiting; API-level rate limiting is defined there.
 
 * **Rate Limit Headers:** Parse and respect rate limit headers from API responses.
 
@@ -229,8 +231,6 @@ All agentic systems **MUST** implement rate limiting and queue management to pre
   * `X-RateLimit-Remaining`: Remaining requests
   * `X-RateLimit-Reset`: When limit resets
   * `Retry-After`: Seconds to wait before retry
-
-* **See:** `api-interface-and-streaming.md` for API interface patterns.
 
 ### Monitoring Integration
 
@@ -245,7 +245,7 @@ All agentic systems **MUST** implement rate limiting and queue management to pre
   * Alert when queue size exceeds threshold
   * Alert on API key exhaustion
 
-* **See:** `monitoring-and-observability.md` for monitoring patterns.
+* **See:** @monitoring-and-observability for monitoring patterns.
 
 ## 7. Best Practices
 

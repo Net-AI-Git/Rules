@@ -41,10 +41,9 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
 
 ### Audit Log Storage
 
-* **Centralized Storage:** Store audit logs in a centralized, secure system (e.g., dedicated audit database, SIEM system).
-* **Retention Policy:** Retain audit logs according to regulatory requirements (minimum 7 years for financial data, 3 years for general business).
-* **Backup:** Regularly backup audit logs to immutable storage.
-* **Access Control:** Restrict access to audit logs (read-only for auditors, no deletion permissions).
+* **Centralized Storage:** Store audit logs in **Splunk** as the default SIEM and centralized audit store. Send audit events via **Splunk HEC** (HTTP Event Collector) to a dedicated index (e.g., `audit`). Configure retention in Splunk per regulatory requirements (minimum 7 years for financial data, 3 years for general business).
+* **Retention Policy:** Define retention and backup in Splunk (immutable storage, backup policies as per Splunk and compliance).
+* **Access Control:** Restrict access to audit logs in Splunk (read-only for auditors, no deletion permissions).
 
 ## 2. Compliance Checks
 
@@ -105,26 +104,26 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
 
 ### Distributed Tracing
 
-* **OpenTelemetry Integration:**
-  * **Span Creation:** Create spans for all significant operations (tool calls, API requests, database queries).
-  * **Span Attributes:** Add audit-related attributes to spans (user ID, tenant ID, action type).
-  * **Trace Context:** Propagate trace context across all service boundaries.
+* **Splunk as Tracing Backend:**
+  * **Span Events:** Emit span/trace events to **Splunk** (via HEC) for all significant operations (tool calls, API requests, database queries).
+  * **Span Attributes:** Include audit-related attributes (user ID, tenant ID, action type, correlation_id, operation.name, duration_ms).
+  * **Trace Context:** Propagate correlation_id across all service boundaries; use SPL to correlate events by correlation_id.
 
 * **Trace Retention:**
-  * **Duration:** Retain traces for at least 30 days (longer for compliance requirements).
-  * **Sampling:** Use intelligent sampling (100% for audit events, lower for general operations).
+  * **Duration:** Retain traces in Splunk for at least 30 days (longer for compliance); configure retention in Splunk.
+  * **Sampling:** Use intelligent sampling (100% for audit events, lower for general operations) when emitting to Splunk.
 
 ### Log Aggregation
 
 * **Centralized Logging:**
-  * **SIEM Integration:** Send audit logs to Security Information and Event Management (SIEM) systems.
-  * **Real-Time Monitoring:** Enable real-time monitoring of audit events for anomalies.
-  * **Alerting:** Set up alerts for suspicious patterns (unusual access, failed authorization attempts).
+  * **SIEM Integration:** Send audit logs to **Splunk** (via HEC). Use Splunk as the single SIEM for centralized security monitoring.
+  * **Real-Time Monitoring:** Use Splunk real-time search and dashboards to monitor audit events for anomalies.
+  * **Alerting:** Use **Splunk Alerts** (SPL-based) for suspicious patterns (unusual access, failed authorization attempts).
 
 * **Log Analysis:**
-  * **Query Interface:** Provide query interface for auditors to search and analyze audit logs.
-  * **Visualization:** Create dashboards for audit log analysis and compliance reporting.
-  * **Machine Learning:** Use ML for anomaly detection in audit logs.
+  * **Query Interface:** Use **SPL** (Search Processing Language) in Splunk for auditors to search and analyze audit logs.
+  * **Visualization:** Create Splunk dashboards for audit log analysis and compliance reporting.
+  * **Anomaly Detection:** Use SPL and Splunk capabilities for anomaly detection in audit logs.
 
 ## 4. Agent-Specific Audit Requirements
 
@@ -226,9 +225,9 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
 ### Integration Points
 
 * **Security Systems:**
-  * **SIEM Integration:** Integrate with SIEM systems for centralized security monitoring.
+  * **SIEM Integration:** Use **Splunk** as the SIEM for centralized security monitoring; all audit logs are sent to Splunk via HEC.
   * **IAM Integration:** Integrate with Identity and Access Management systems for user context.
-  * **Threat Intelligence:** Feed audit data into threat intelligence systems.
+  * **Threat Intelligence:** Feed audit data into threat intelligence systems as needed.
 
 * **Compliance Systems:**
   * **GRC Platforms:** Integrate with Governance, Risk, and Compliance (GRC) platforms.
@@ -236,8 +235,8 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
   * **Regulatory Reporting:** Support regulatory reporting requirements.
 
 * **Monitoring Systems:**
-  * **See:** `monitoring-and-observability.md` for comprehensive monitoring strategies.
-  * **See:** `security-governance-and-observability.md` for security governance requirements.
+  * **See:** @monitoring-and-observability for comprehensive monitoring strategies (Splunk and SPL).
+  * **See:** @security-governance-and-observability for security governance requirements.
 
 ## 8. Best Practices
 

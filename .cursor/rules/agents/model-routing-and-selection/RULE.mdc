@@ -220,7 +220,7 @@ All agentic systems **MUST** implement dynamic model routing to optimize cost an
 
 * **Performance Metrics:** Track latency and quality per model.
 
-* **See:** `monitoring-and-observability.md` for monitoring patterns.
+* **See:** @monitoring-and-observability for monitoring patterns (Splunk, SPL).
 
 ## 7. Best Practices
 

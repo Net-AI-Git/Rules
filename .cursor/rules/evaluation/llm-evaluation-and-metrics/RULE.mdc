@@ -9,7 +9,7 @@ alwaysApply: false
 
 * **Mandate:** You must implement **LLM-based Evaluations (Evals)** for every agentic workflow.
 
-* **Frameworks:** Use specialized libraries such as **Ragas**, **DeepEval**, or **LangSmith** evaluators.
+* **Frameworks:** Use **Ragas** or **DeepEval** for running evals. **Evaluation results and metrics MUST be sent to Splunk** (via HEC) for storage, dashboards, and analysis using **SPL**.
 
 
 ## 2. Mandatory Metrics

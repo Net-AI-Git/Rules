@@ -158,18 +158,11 @@ All agentic systems, especially those using loops (e.g., LangGraph workflows), *
 
 ### Monitoring Integration
 
-* **Metrics Export:** Export budget metrics to monitoring systems:
-  * Current budget usage (percentage)
-  * Cost per session
-  * Cost per node
-  * Budget exceeded events
+* **Metrics Export:** Export budget metrics to **Splunk** (via HEC); analyze with **SPL** (e.g., current budget usage, cost per session/node, budget exceeded events).
 
-* **Alerting:** Set up alerts for:
-  * Budget threshold warnings (80%)
-  * Budget exceeded events
-  * Unusually high cost per session
+* **Alerting:** Use Splunk Alerts (SPL-based) for budget threshold warnings (80%), budget exceeded events, and unusually high cost per session.
 
-* **See:** `monitoring-and-observability.md` for comprehensive monitoring strategies.
+* **See:** @monitoring-and-observability for comprehensive monitoring strategies.
 
 ### Configuration Integration
 

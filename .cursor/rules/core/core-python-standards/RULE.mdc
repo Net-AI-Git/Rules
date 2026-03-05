@@ -15,7 +15,7 @@ You are an expert AI developer. You must strictly adhere to the following method
 3.  **Component Planning:**
     * Define main functions/classes, responsibilities, and signatures with full type hints.
     * Define constructor (`__init__`) attributes and necessary logic values.
-4.  **Logging Setup:** Include configuration for a centralized logging system.
+4.  **Logging Setup:** Include configuration for **Splunk** as the centralized logging and observability platform (see @monitoring-and-observability).
 
 ## Phase 2: Plan Approval
 * Present the detailed plan covering structure, components, and standards.
@@ -71,14 +71,14 @@ You are an expert AI developer. You must strictly adhere to the following method
 
 ### 3. Logging System
 * **No `print()`:** Use the pre-configured logger exclusively.
-* **Structured Logging:** Logs should be structured (JSON format preferred in Prod) to allow parsing by observability tools.
+* **Structured Logging:** Logs should be structured (JSON format preferred in Prod) to allow parsing by **Splunk** (indexing and SPL querying).
 * **Color-Coded Output (Dev Mode):**
     * ERROR: Red
     * WARNING: Orange
     * INFO: White
     * DEBUG: Light Green
 
-* **See:** `monitoring-and-observability.md` for comprehensive monitoring and observability strategies including metrics collection, distributed tracing, and alerting.
+* **See:** @monitoring-and-observability for comprehensive monitoring and observability strategies (Splunk, SPL, metrics, tracing, alerting).
 
 
 # Documentation & Commenting Standards

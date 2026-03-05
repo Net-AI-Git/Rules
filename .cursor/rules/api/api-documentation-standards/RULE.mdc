@@ -9,7 +9,7 @@ alwaysApply: false
 
 * **FastAPI Integration:**
     * **Automatic Generation:** Use FastAPI's automatic OpenAPI schema generation.
-    * **Customization:** Enhance auto-generated schemas with additional details.
+    * **Customization:** Enhance auto-generated schemas with additional details; use `response_model`, `tags`, and `openapi_tags` to improve Swagger organization.
     * **Access:** Expose OpenAPI schema at `/openapi.json` and Swagger UI at `/docs`.
 
 * **Schema Completeness:**
@@ -19,7 +19,7 @@ alwaysApply: false
 
 * **Validation:**
     * **Pydantic Models:** Use Pydantic models for request/response validation and automatic schema generation.
-    * **Field Descriptions:** Include descriptions for all fields (see `data-schemas-and-interfaces.md`).
+    * **Field Descriptions:** Include descriptions for all fields (See: @data-schemas-and-interfaces).
 
 ## 2. API Versioning Strategy
 
@@ -42,7 +42,7 @@ alwaysApply: false
     * **Process:** Breaking changes require new version number (major version increment).
     * **Documentation:** Clearly document breaking changes in changelog.
 
-* **See:** `versioning-and-release-management.md` for versioning standards.
+* **See:** @versioning-and-release-management for versioning standards.
 
 ## 3. Endpoint Documentation Requirements
 
@@ -134,7 +134,7 @@ alwaysApply: false
     * **Document:** Document required scopes or permissions for each endpoint.
     * **Examples:** Show examples of requests with different permission levels.
 
-* **See:** `security-and-governance.md` for security implementation details.
+* **See:** @security-governance-and-observability for security implementation details.
 
 ## 7. Rate Limit Documentation
 
@@ -154,7 +154,7 @@ alwaysApply: false
     * **Response:** Document 429 response format.
     * **Retry-After:** Document `Retry-After` header usage.
 
-* **See:** `api-interface-and-streaming.md` for rate limiting implementation details.
+* **See:** @api-interface-and-streaming for rate limiting implementation details.
 
 ## 8. Documentation Maintenance
 

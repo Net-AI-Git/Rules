@@ -118,9 +118,9 @@ All agentic workflows **MUST** include Graph Traversal Tests to validate that ag
 * **Mandate:** Tests must use execution traces to validate traversal.
 
 * **Trace Sources:**
-  * **LangGraph Traces:** Execution traces from LangGraph workflows
-  * **LangSmith Traces:** Traces from LangSmith monitoring
-  * **Custom Logging:** Custom execution logging in nodes
+  * **LangGraph Traces:** Execution traces from LangGraph workflows (feed to Splunk via HEC).
+  * **Splunk:** Execution traces exported to Splunk (e.g., via HEC); use **SPL** to query and validate node sequences and traversal.
+  * **Custom Logging:** Custom execution logging in nodes (sent to Splunk); use SPL for test validation.
 
 * **Trace Structure:**
   * Node execution sequence
@@ -164,7 +164,7 @@ All agentic workflows **MUST** include Graph Traversal Tests to validate that ag
   * Track path distribution
   * Identify path regressions
 
-* **See:** `monitoring-and-observability.md` for monitoring integration.
+* **See:** @monitoring-and-observability for monitoring integration (Splunk, SPL).
 
 ### LangGraph Integration
 

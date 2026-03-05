@@ -186,8 +186,9 @@ Agent-specific architecture:
   - Translates strategic plans to concrete actions
   - Action execution and coordination
 
-- **`memory-feedback-node`** (Apply Intelligently)
+- **`memory-feedback-node`** (Apply to Specific Files)
   - Memory Node for historical context and learning feedback
+  - Applied to LangGraph/workflow/node files
 
 - **`memory-and-archival-management`** (Apply Intelligently)
   - Long-term memory and archival strategies
@@ -204,8 +205,9 @@ Agent-specific architecture:
 - **`cost-and-budget-management`** (Apply Intelligently)
   - Token budget and cost guardrails
 
-- **`context-compression-and-optimization`** (Apply Intelligently)
+- **`context-compression-and-optimization`** (Apply to Specific Files)
   - Context window compression and optimization
+  - Applied to LangGraph/workflow/agent files
 
 - **`human-in-the-loop-approval`** (Apply Intelligently)
   - Approval context schema for HITL interrupts
@@ -220,14 +222,18 @@ Agent-specific architecture:
 
 Deployment and operations:
 
+- **`uvicorn-asgi-server`** (Apply Intelligently)
+  - Uvicorn as default ASGI server; install `uvicorn[standard]`; `--reload` (dev), `--workers` (prod)
+
 - **`deployment-and-infrastructure`** (Apply Intelligently)
   - CI/CD, Docker, Kubernetes standards
   - Infrastructure deployment patterns
+  - Docker is the **default** for containerization; defaults include full Python base image (pinned), non-root, image scanning in CI, layer cache order, API-only (no model weights when using external APIs), logging to stdout/stderr, Docker Compose for local multi-service dev, BuildKit, and versioned registry
 
 - **`monitoring-and-observability`** (Apply Intelligently)
-  - Metrics, logging, tracing standards
-  - PerformanceTimer for latency measurement (start/end/duration_ms)
-  - Structured logging with timestamps per operation
+  - **Splunk** and **SPL** as the default platform for metrics, logging, tracing, and alerting
+  - Ingestion via Splunk HEC; analysis and dashboards with SPL
+  - PerformanceTimer for latency measurement (start/end/duration_ms); structured logging with timestamps per operation
 
 - **`rate-limiting-and-queue-management`** (Apply Intelligently)
   - Multi-agent rate limiting and queue management
@@ -258,14 +264,19 @@ Development workflow:
   - Semantic versioning standards
   - Changelog and release management
 
+- **`gitflow-branching-model`** (Apply Intelligently)
+  - GitFlow branching model: master, develop, release, hotfix, feature workflow
+  - When to push or merge to each branch
+
 ### API Rules (`api/`)
 
 API development:
 
 - **`api-interface-and-streaming`** (Apply to Specific Files)
-  - API design and interface standards
-  - Streaming patterns
-  - Applied to API route files
+  - FastAPI as default framework; Uvicorn, Pydantic, OpenAPI, SSE/WebSocket streaming
+  - Server run defaults (Uvicorn, `uvicorn[standard]`, `--reload`, `--workers`) are defined by **`uvicorn-asgi-server`** (infrastructure)
+  - API design and interface standards, rate limiting (slowapi/fastapi-limiter)
+  - Applied to API route files and `main.py`
 
 - **`api-documentation-standards`** (Apply to Specific Files)
   - OpenAPI/Swagger specifications

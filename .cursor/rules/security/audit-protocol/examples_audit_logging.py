@@ -81,9 +81,11 @@ class AuditLogger:
     def __init__(self, storage_backend: Any):
         """
         Initialize audit logger.
-        
+
         Args:
-            storage_backend: Storage backend for audit logs (database, file, SIEM)
+            storage_backend: Storage backend for audit logs. Default for production is
+                Splunk via HEC (SIEM); use database or file backends for tests or
+                alternate deployments. See @monitoring-and-observability for Splunk HEC.
         """
         self.storage = storage_backend
         self.logger = logging.getLogger(__name__)

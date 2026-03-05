@@ -76,7 +76,7 @@ Upon completing code changes and **before** submitting the final response, you m
 
 ### 7. Documentation & API
 
-* [ ] **API Docs:** Is OpenAPI/Swagger documentation complete?
+* [ ] **API Docs:** Is OpenAPI/Swagger documentation complete? (FastAPI provides `/docs` and `/openapi.json` per @api-documentation-standards.)
 
 * [ ] **Versioning:** Is API versioning strategy defined?
 
@@ -89,7 +89,7 @@ Upon completing code changes and **before** submitting the final response, you m
 
 * [ ] **CI/CD:** Is CI/CD pipeline configured?
 
-* [ ] **Containerization:** Are Docker images optimized (multi-stage builds, minimal size)?
+* [ ] **Containerization:** Are Docker images built per project defaults (see @deployment-and-infrastructure): multi-stage when applicable, non-root user, dependency layers before code for cache, no secrets in image, logs to stdout/stderr, and image scan (e.g. Trivy/Snyk) in CI?
 
 * [ ] **Health Checks:** Are health check endpoints implemented?
 

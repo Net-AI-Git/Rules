@@ -28,9 +28,9 @@ alwaysApply: true
 
 * **Human-in-the-Loop:** Require approval for critical or irreversible actions.
 
-* **Rate Limits:** Enforce budgets and rate limits to prevent runaway loops. See `api-interface-and-streaming.md` for implementation details.
+* **Rate Limits:** Enforce budgets and rate limits to prevent runaway loops. See @api-interface-and-streaming for implementation details.
 
-* **Auditing:** Enable full auditing and tracing to attribute every action to a specific agent and context. See `monitoring-and-observability.md` for comprehensive auditing and tracing strategies.
+* **Auditing:** Enable full auditing and tracing to attribute every action to a specific agent and context. See @monitoring-and-observability for comprehensive auditing and tracing strategies.
 ## AI Risk Management Framework (NIST AI RMF)
 
 * **Compliance:** Adhere to NIST AI RMF + Generative AI Profile for risk management, pre-deployment testing, and governance.
@@ -83,7 +83,7 @@ alwaysApply: true
 
 * **Metrics:** Track evaluation metrics alongside operational metrics.
 
-* **See:** `llm-evaluation-and-metrics.md` for comprehensive evaluation strategies.
+* **See:** @llm-evaluation-and-metrics for comprehensive evaluation strategies.
 
 * **Resources:** Reference OpenAI Evaluation best practices for detailed guidance on building evals to monitor quality and compliance in production.
 
@@ -135,7 +135,7 @@ alwaysApply: true
     * **Origin Validation:** Validate request origin for sensitive operations.
 
 * **Input Validation:**
-    * **Pydantic Models:** Use Pydantic models for request validation (see `data-schemas-and-interfaces.md`).
+    * **Pydantic Models:** Use Pydantic models for request validation (See: @data-schemas-and-interfaces).
     * **Type Validation:** Validate data types, ranges, and formats.
     * **Length Limits:** Enforce length limits on input fields.
     * **Pattern Validation:** Use regex patterns to validate input format (e.g., email, phone number).
@@ -160,6 +160,7 @@ alwaysApply: true
 * **FastAPI Implementation:**
     * **Middleware:** Use FastAPI middleware to add security headers to all responses.
     * **CORS Middleware:** Use FastAPI's CORSMiddleware for CORS configuration.
+    * **App Structure:** For app structure and middleware order, see @api-interface-and-streaming.
 
 
 

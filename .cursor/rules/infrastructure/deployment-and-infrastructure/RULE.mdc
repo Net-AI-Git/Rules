@@ -24,67 +24,105 @@ alwaysApply: false
 
 ## 2. Containerization (Docker Best Practices)
 
+**Docker is the default** for building, running, and deploying agentic AI and API services. All containerization standards below apply unless explicitly overridden.
+
 * **Multi-Stage Builds:** Use multi-stage builds to reduce image size.
     * **Build Stage:** Install build dependencies and compile code.
     * **Runtime Stage:** Copy only necessary files to minimal base image.
 
 * **Base Images:**
     * **Use Official Images:** Prefer official Python images from Docker Hub.
-    * **Pin Versions:** Pin specific image versions (e.g., `python:3.11-slim`) instead of `latest`.
-    * **Minimal Images:** Use `-slim` or `-alpine` variants to reduce image size.
+    * **Pin Versions:** Pin specific image versions; do **not** use `latest`.
+    * **Default:** Use **full** official Python image with pinned version (e.g. `python:3.11` or `python:3.12`).
+    * **Optional:** When a smaller image is explicitly required, `-slim` or `-alpine` may be used; still pin the full tag (e.g. `python:3.11-slim`).
 
 * **Layer Optimization:**
-    * **Order Matters:** Copy dependency files (`requirements.txt`) before source code to leverage Docker cache.
+    * **Order Matters:** Copy dependency files (`pyproject.toml`, `poetry.lock`) before source code to leverage Docker cache. Order Dockerfile instructions so that less frequently changing layers (dependencies) come **before** frequently changing ones (application code) to maximize build cache reuse.
     * **Combine RUN Commands:** Combine multiple `RUN` commands to reduce layers.
     * **Clean Up:** Remove package managers and cache in the same layer.
 
 * **Security:**
-    * **Non-Root User:** Run containers as non-root user.
+    * **Non-Root User:** Run containers as non-root user. The main process (e.g. Uvicorn) MUST run as a non-root user (e.g. `USER 1000` in Dockerfile) so that it does not have elevated privileges inside the container, reducing attack surface.
     * **Secrets:** Never embed secrets in Docker images. Use environment variables or secret management.
-    * **Scan Images:** Regularly scan images for vulnerabilities.
+    * **Scan Images:** Regularly scan images for vulnerabilities. In CI, include a vulnerability scan step (e.g. Trivy or Snyk) on the image **before** push to registry. Fail the pipeline on critical vulnerabilities (or define a clear policy). **See:** CI/CD Pipeline Stages (Section 1) where Security Scan is already listed.
 
-* **Example Structure:**
+* **API-Only Services (Agentic AI):** When the service **only calls external model APIs** (no local model loading or inference): do **not** include model weights or GPU runtimes in the image; do **not** use model-specific or CUDA base images unless required for another reason; inject API keys and secrets **only** via environment variables or secret management; never embed in image or code.
+
+* **Logging:** Applications MUST emit logs to **stdout** and **stderr** (not only to log files inside the container) so that the container runtime (Docker/Kubernetes) can collect them into the project's log pipeline (e.g. Splunk per @monitoring-and-observability).
+
+* **Docker Compose and BuildKit:** Use **Docker Compose** for local development when more than one service is involved (e.g. agent + database, agent + Redis). Enable **BuildKit** for image builds when available (`DOCKER_BUILDKIT=1`) for better cache and build speed. Store images in a **versioned registry** (tag by version or commit); do not rely only on `latest`.
+
+* **Dependencies:** Project dependencies **MUST** include `uvicorn[standard]` (see @uvicorn-asgi-server). Ensure `pyproject.toml` (or `requirements.txt`) declares `uvicorn[standard]` so the image gets uvloop, httptools, and watchfiles.
+
+* **Example Structure (Poetry as default):** Project default is full Python base image (not slim/alpine).
 ```dockerfile
-FROM python:3.11-slim as builder
+FROM python:3.11 as builder
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
+COPY pyproject.toml poetry.lock ./
+RUN pip install --no-cache-dir poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install --no-dev --no-interaction --no-ansi
 
-FROM python:3.11-slim
+FROM python:3.11
 WORKDIR /app
-COPY --from=builder /root/.local /root/.local
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY . .
-ENV PATH=/root/.local/bin:$PATH
 USER 1000
-CMD ["python", "main.py"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
 ```
+* **CMD:** Use Uvicorn with `--workers`; do not use `python main.py` for FastAPI. Adjust module path (e.g. `app.main:app`) and port/workers via env or build args if needed.
+* **Legacy:** Projects using only `requirements.txt` may continue with `COPY requirements.txt` and `RUN pip install -r requirements.txt`; ensure they install `uvicorn[standard]`.
 
-## 3. Orchestration (Kubernetes Patterns)
+## 3. Running FastAPI in Production
 
-* **Deployment Resources:**
-    * **Replicas:** Configure appropriate replica count for high availability.
-    * **Resource Limits:** Set CPU and memory limits and requests.
-    * **Health Checks:** Configure liveness and readiness probes.
+* **ASGI Server:** Use **Uvicorn** as the ASGI server for FastAPI apps (per @api-interface-and-streaming). For standard Uvicorn setup (installation, `--reload`, `--workers`), **see:** `@uvicorn-asgi-server`.
+
+* **Command:** Production run **MUST** include `--workers <N>` (e.g. `uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4`). Set N per environment (e.g. by CPU or load). Do not use `--reload` in production.
+
+* **Docker CMD:** In Dockerfile, CMD runs Uvicorn with `--workers` and no `--reload` (see Section 2 example).
+
+* **Health Probes:** Ensure `/health/live` and `/health/ready` (See: @monitoring-and-observability) are used for liveness and readiness probes.
+
+## 4. Orchestration (Kubernetes Patterns)
+
+* **Mandate:** Production and staging deployments **MUST** run on Kubernetes. The following patterns are the default for agentic AI and API services.
+
+* **Deployment (Required):**
+    * **Workload Type:** Define agent/API services as **Deployment** resources (not bare Pods).
+    * **Replicas:** Configure **minimum 2 replicas** in production for high availability.
+    * **Resource Limits:** Set **requests** and **limits** for CPU and memory on every container; required for scheduling and fairness.
+    * **Stateless Design:** Design applications as stateless so horizontal scaling and rolling updates work without per-pod state.
+
+* **Health Probes:**
+    * **Required:** Configure liveness and readiness probes on all Deployments.
+    * **Endpoints:** Use fixed paths `/health/live` and `/health/ready` (see @monitoring-and-observability).
+    * **Timing:** Set `initialDelaySeconds` and `periodSeconds` to match application startup (e.g., model loading).
 
 **See:** `@examples_kubernetes.py` for Kubernetes Deployment and Service resource patterns.
 
 * **Service Discovery:**
     * **Service Resources:** Use Kubernetes Services for internal service discovery.
-    * **DNS:** Services are accessible via DNS names (e.g., `service-name.namespace.svc.cluster.local`).
+    * **DNS Only:** Services MUST be accessed by DNS name (e.g., `service-name.namespace.svc.cluster.local`); never hardcode IP addresses.
+    * **Internal Traffic:** Traffic between pods is distributed by Kubernetes (kube-proxy) by default; do not mandate a specific algorithm or Headless Service.
 
 * **ConfigMaps & Secrets:**
-    * **ConfigMaps:** Store non-sensitive configuration.
-    * **Secrets:** Store sensitive data (API keys, passwords). Use Kubernetes Secrets or external secret management.
+    * **ConfigMaps:** Store non-sensitive configuration (endpoints, feature flags, service names).
+    * **Secrets:** Store sensitive data (API keys, passwords, tokens) in Kubernetes Secrets or external secret management; never embed in code or Docker images.
+    * **Application:** Application MUST read configuration from environment variables; Kubernetes injects these from ConfigMaps and Secrets.
+    * **See:** `@examples_kubernetes.py` for ConfigMap and Secret manifest examples.
 
 * **Horizontal Pod Autoscaling (HPA):**
-    * **Metrics:** Scale based on CPU, memory, or custom metrics.
+    * **When:** Define HorizontalPodAutoscaler for services with variable load (agents, inference, APIs).
     * **Min/Max Replicas:** Define minimum and maximum replica counts.
+    * **Metrics:** Scale on CPU, memory, or custom metrics; document which metric is used per service.
 
 * **Rolling Updates:**
-    * **Strategy:** Use RollingUpdate strategy for zero-downtime deployments.
-    * **Max Surge/Unavailable:** Configure how many pods can be created/terminated during updates.
+    * **Default Strategy:** Use **RollingUpdate** for zero-downtime deployments.
+    * **Max Surge/Unavailable:** Configure (e.g., `maxUnavailable: 0`) to avoid downtime during updates.
 
-## 4. Environment Promotion
+* **Blue-Green (Optional):** Use Blue-Green only when instant rollback or full pre-switch validation is required; do not combine Rolling and Blue-Green on the same Deployment.
+
+## 5. Environment Promotion
 
 * **Environment Hierarchy:**
     * **Development:** Local development and feature testing.
@@ -104,7 +142,7 @@ CMD ["python", "main.py"]
     * **Run Migrations:** Execute database migrations as part of deployment process.
     * **Rollback Plan:** Have a rollback plan for failed migrations.
 
-## 5. Blue-Green Deployments
+## 6. Blue-Green Deployments
 
 * **Concept:** Maintain two identical production environments (blue and green).
     * **Active Environment:** One environment serves live traffic.
@@ -126,7 +164,7 @@ CMD ["python", "main.py"]
 
 * **Implementation:** Use load balancer or service mesh to route traffic between environments.
 
-## 6. Rollback Procedures
+## 7. Rollback Procedures
 
 * **Automated Rollback:**
     * **Health Check Failures:** Automatically rollback if health checks fail after deployment.
@@ -141,14 +179,14 @@ CMD ["python", "main.py"]
 * **Rollback Strategies:**
     * **Image Rollback:** Revert to previous Docker image version.
     * **Code Rollback:** Revert Git commit and redeploy.
-    * **Database Rollback:** Rollback database migrations if needed (see `data-migration-and-compatibility.md`).
+    * **Database Rollback:** Rollback database migrations if needed (See: @data-migration-and-compatibility).
 
 * **Post-Rollback:**
     * **Investigation:** Investigate root cause of deployment failure.
     * **Documentation:** Document the incident and lessons learned.
     * **Prevention:** Update processes to prevent similar issues.
 
-## 7. Infrastructure as Code (IaC)
+## 8. Infrastructure as Code (IaC)
 
 * **Terraform:**
     * **State Management:** Use remote state (S3, Terraform Cloud) for team collaboration.
@@ -169,7 +207,7 @@ CMD ["python", "main.py"]
     * **Mandatory Tags:** Tag all resources with: environment, project, owner, cost-center.
     * **Automation:** Use tags for cost allocation and resource management.
 
-## 8. Scaling Strategies
+## 9. Scaling Strategies
 
 * **Horizontal Scaling:**
     * **Add Instances:** Scale by adding more instances/pods.
@@ -194,4 +232,4 @@ CMD ["python", "main.py"]
     * **Application Cache:** Use in-memory cache (Redis) to reduce database load.
     * **CDN:** Use CDN for static assets and API responses when applicable.
 
-* **See:** `performance-optimization.md` for detailed performance optimization strategies.
+* **See:** @performance-optimization for detailed performance optimization strategies.

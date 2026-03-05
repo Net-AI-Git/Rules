@@ -21,6 +21,11 @@ spec:
   selector:
     matchLabels:
       app: application
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   template:
     metadata:
       labels:
@@ -50,11 +55,6 @@ spec:
             port: 8000
           initialDelaySeconds: 5
           periodSeconds: 5
-      strategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
 """
 
 SERVICE_MANIFEST = """
@@ -97,4 +97,29 @@ spec:
       target:
         type: Utilization
         averageUtilization: 80
+"""
+
+# ============================================================================
+# ConfigMap and Secret (inject via env in Deployment)
+# ============================================================================
+
+CONFIGMAP_MANIFEST = """
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: application-config
+data:
+  LOG_LEVEL: "info"
+  SERVICE_ENDPOINT: "http://other-service:8000"
+"""
+
+SECRET_MANIFEST = """
+apiVersion: v1
+kind: Secret
+metadata:
+  name: application-secrets
+type: Opaque
+stringData:
+  API_KEY: "your-api-key"
+  DB_PASSWORD: "your-db-password"
 """

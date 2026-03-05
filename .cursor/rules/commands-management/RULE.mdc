@@ -539,7 +539,7 @@ Comprehensive security review to identify and fix vulnerabilities in the codebas
    - Audit network security
 
 ## Data Sources
-- Dependency files (`requirements.txt`, `pyproject.toml`)
+- Dependency files (`pyproject.toml`, `poetry.lock`); if present, `requirements.txt` for legacy projects
 - Source code files
 - Environment configuration files
 - Infrastructure configuration

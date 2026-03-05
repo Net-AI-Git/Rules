@@ -333,4 +333,4 @@ All agentic systems **MUST** implement long-term memory and archival strategies 
   * User feedback on memory accuracy
   * Memory usage effectiveness
 
-* **See:** `monitoring-and-observability.md` for comprehensive monitoring strategies.
+* **See:** @monitoring-and-observability for comprehensive monitoring strategies.

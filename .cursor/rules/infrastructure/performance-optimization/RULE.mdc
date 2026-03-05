@@ -174,7 +174,7 @@ alwaysApply: false
 ## 8. Performance Monitoring
 
 * **Profiling:**
-    * **Application Profiling:** Use profiling tools to identify bottlenecks (see `monitoring-and-observability.md`).
+    * **Application Profiling:** Use profiling tools to identify bottlenecks; send timing and metrics to **Splunk** for analysis (see @monitoring-and-observability).
     * **Database Profiling:** Enable slow query logs and analyze query performance.
 
 * **Metrics:**

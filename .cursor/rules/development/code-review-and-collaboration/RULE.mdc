@@ -40,23 +40,15 @@ alwaysApply: false
 
 ## 2. Git Workflow
 
-* **Branching Strategies:**
-    * **Feature Branches:** Create feature branch from `main` for new features.
-    * **Naming:** Use descriptive branch names (e.g., `feature/add-user-authentication`, `fix/memory-leak`).
+* **Branching model:** The project uses **GitFlow** as the **only** branching model. All feature work integrates via `develop`; releases are prepared on release branches and merged to `master`; hotfixes branch from `master`. For branch types, when to create each branch, and where to push/merge, **see:** `@gitflow-branching-model`.
+
+* **Feature branches:**
+    * Create feature branch **from `develop`** (not from `main`) for new features and non-urgent fixes.
+    * **Naming:** Use descriptive branch names; see `@gitflow-branching-model` for full naming (e.g. `feature/add-user-authentication`, `fix/memory-leak`, `release-*`, `hotfix-*`).
     * **Short-Lived:** Keep branches short-lived (merge within days, not weeks).
 
-* **Trunk-Based Development:**
-    * **Main Branch:** `main` branch is always deployable.
-    * **Small PRs:** Prefer small, focused PRs over large changes.
-    * **Frequent Merges:** Merge to `main` frequently to avoid conflicts.
-
-* **GitFlow (Alternative):**
-    * **Develop Branch:** Use `develop` branch for integration.
-    * **Release Branches:** Create release branches for preparing releases.
-    * **Hotfix Branches:** Create hotfix branches for urgent production fixes.
-
 * **Branch Protection:**
-    * **Main Branch:** Protect `main` branch (require PR, require approvals, require CI checks).
+    * **Protected branches:** Protect **both** `main` (or `master`) **and** `develop` (require PR/MR, require approvals, require CI checks where applicable).
     * **No Direct Pushes:** Prevent direct pushes to protected branches.
 
 ## 3. Commit Message Standards
@@ -103,28 +95,24 @@ Fixes #456
 
 ## 4. Branch Naming Conventions
 
-* **Format:** `<type>/<description>`
+* **GitFlow alignment:** Use prefixes and names per `@gitflow-branching-model`. Reserved names: do not use `master`, `main`, `develop`, or prefixes `release-*`, `hotfix-*` for feature work.
 
 * **Types:**
-    * `feature/`: New features
-    * `fix/`: Bug fixes
-    * `hotfix/`: Urgent production fixes
-    * `refactor/`: Code refactoring
-    * `docs/`: Documentation updates
-    * `test/`: Test additions or changes
-    * `chore/`: Maintenance tasks
+    * `feature/`: New features (merge to `develop`)
+    * `fix/`: Bug fixes, non-urgent (merge to `develop`)
+    * `release-*`: Release preparation (e.g. `release-1.2`; merge to `master` and `develop`)
+    * `hotfix-*`: Urgent production fixes (e.g. `hotfix-1.2.1`; merge to `master` and `develop`)
+    * `refactor/`, `docs/`, `test/`, `chore/`: Other work (merge to `develop`)
 
 * **Description:**
     * **Lowercase:** Use lowercase letters.
     * **Hyphens:** Separate words with hyphens.
     * **Descriptive:** Be descriptive but concise.
-    * **Examples:**
-        * `feature/user-authentication`
-        * `fix/memory-leak-connection-pool`
-        * `hotfix/critical-security-patch`
+    * **Examples:** `feature/user-authentication`, `fix/memory-leak-connection-pool`, `release-1.2`, `hotfix-1.2.1`.
 
-* **Issue References:**
-    * **Optional:** Include issue number in branch name (e.g., `feature/123-add-caching`).
+* **Issue references:** Optional; include issue number in branch name (e.g. `feature/123-add-caching`).
+
+* **Full naming and workflow:** **See** `@gitflow-branching-model`.
 
 ## 5. Code Ownership & Responsibility
 

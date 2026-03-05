@@ -67,29 +67,20 @@ alwaysApply: false
 
 **See:** `@examples_prompt_testing.py` for unit testing patterns and test framework implementation.
 
-## 5. LangSmith Prompt Hub Integration
+## 5. Prompt Registry and Splunk Observability
 
-* **Mandate:** Use LangSmith Prompt Hub for centralized prompt management in production systems.
+* **Mandate:** Use a **Prompt Registry** as the single source of truth for prompts (YAML files, app config, or in-app registry). All prompt usage, version changes, and performance metrics MUST be sent to **Splunk** (via HEC) for audit and analysis.
 
-* **Prompt Hub Benefits:**
-  * **Centralized Storage:** Single source of truth for all prompts
-  * **Version Management:** Built-in version control and history
-  * **Collaboration:** Team collaboration on prompt development
-  * **Deployment:** Easy deployment and rollback of prompts
+* **Prompt Registry:**
+  * **Centralized Storage:** Store prompts in YAML, config, or a registry module; version and history are tracked and emitted to Splunk as events.
+  * **Version Management:** Track versions and changes; log version selection and updates to Splunk for audit.
+  * **Retrieval:** Retrieve prompts from the registry at runtime; log retrieval events (prompt id, version, correlation_id) to Splunk.
 
-* **Integration Patterns:**
-  * **Prompt Registration:** Register prompts in Prompt Hub with metadata
-  * **Prompt Retrieval:** Retrieve prompts from Hub at runtime
-  * **Version Selection:** Select specific prompt versions from Hub
-  * **Update Workflow:** Update prompts through Hub with approval process
+* **Splunk Integration:**
+  * **Audit and History:** Send prompt load/retrieval events and version changes to Splunk via HEC (index e.g. `audit` or `prompts`).
+  * **Performance Metrics:** Measure and send latency, cost, and quality metrics per prompt version to Splunk; build dashboards and run analysis using **SPL**.
 
-* **Metadata Management:**
-  * **Tags:** Tag prompts with categories, use cases, models
-  * **Descriptions:** Document prompt purpose, inputs, outputs
-  * **Performance Metrics:** Track performance metrics per prompt version
-  * **Dependencies:** Document prompt dependencies and relationships
-
-**See:** `@examples_langsmith_integration.py` for LangSmith Prompt Hub integration patterns.
+**See:** @examples_prompt_registry_splunk for Prompt Registry with Splunk logging pattern.
 
 ## 6. YAML Management
 

@@ -174,7 +174,7 @@ All agentic systems **MUST** implement bias detection and ethical AI practices t
 
 * **Integration:**
   * **Production Monitoring:** Integrate with production monitoring
-  * **Dashboard Integration:** Display fairness metrics in dashboards
+  * **Dashboard Integration:** Display fairness metrics in **Splunk** dashboards (metrics sent via HEC; visualize with SPL)
   * **Alert Integration:** Integrate with alerting systems
   * **Reporting Integration:** Integrate with reporting systems
 
@@ -320,7 +320,7 @@ All agentic systems **MUST** implement bias detection and ethical AI practices t
   * **Ethical Monitoring:** Monitor ethical compliance in production
   * **Alerting:** Alert on bias or fairness violations
 
-**See:** `monitoring-and-observability.md` for monitoring integration.
+**See:** @monitoring-and-observability for monitoring integration (Splunk, SPL).
 
 ## 7. Best Practices
 

@@ -1,5 +1,5 @@
 ---
-globs: **/api/**/*.py, **/routes/**/*.py
+globs: **/api/**/*.py, **/routes/**/*.py, **/main.py
 alwaysApply: false
 ---
 
@@ -12,11 +12,19 @@ alwaysApply: false
 * **Protocol:** Use **Server-Sent Events (SSE)** or **WebSockets**. Standard REST (JSON response) is allowed only for background batch jobs.
 
 
-## 2. Framework Choice
+## 2. Framework Choice (Default Stack)
 
-* **FastAPI:** Use `FastAPI` as the standard server framework due to its native Async support and Pydantic integration.
+* **Framework:** Use **FastAPI** as the standard server framework (mandate for all API code in this project).
 
-* **Async Generators:** Endpoints must be implemented as `async def` generators that `yield` chunks of data.
+* **Supporting Libraries:**
+    * **Pydantic:** Use for request/response models and validation (built into FastAPI). Define schemas for all API boundaries.
+    * **OpenAPI/Swagger:** Rely on FastAPI's automatic OpenAPI schema generation; expose at `/openapi.json` and `/docs`.
+
+* **ASGI Server:** Use **Uvicorn** as the ASGI server to run the FastAPI app (development and production). Do not reference Starlette directly—it is the underlying layer of FastAPI. For Uvicorn installation (`uvicorn[standard]`), development (`--reload`), and production (`--workers`) defaults, **see:** `@uvicorn-asgi-server`.
+
+* **Streaming:** Use FastAPI's `StreamingResponse` for SSE or WebSocket support. Endpoints must be implemented as `async def` that `yield` chunks (generators) or return a `StreamingResponse`.
+
+* **See:** `@examples_fastapi_streaming.py` for a minimal FastAPI app with SSE and rate limiting.
 
 
 ## 3. Standardized Response Format
@@ -89,4 +97,4 @@ alwaysApply: false
     * **Redis:** Use Redis for distributed rate limiting (recommended for multi-instance deployments).
     * **In-Memory:** Use in-memory storage for single-instance deployments (simpler but not distributed).
 
-* **See:** `security-governance-and-observability.md` for governance-level rate limiting requirements. `api-documentation-standards.md` for documenting rate limits in API documentation.
+* **See:** `@security-governance-and-observability` for governance-level rate limiting requirements. `@api-documentation-standards` for documenting rate limits in API documentation.

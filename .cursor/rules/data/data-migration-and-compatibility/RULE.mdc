@@ -31,7 +31,7 @@ alwaysApply: false
 ## 2. Backward Compatibility Guarantees
 
 * **API Compatibility:**
-    * **Versioning:** Use API versioning to manage breaking changes (see `api-documentation-standards.md`).
+    * **Versioning:** Use API versioning to manage breaking changes (see @api-documentation-standards).
     * **Deprecation:** Deprecate old versions before removing them.
     * **Migration Period:** Provide migration period (e.g., 6 months) before removing deprecated versions.
 
@@ -42,7 +42,7 @@ alwaysApply: false
 
 * **Code Compatibility:**
     * **Gradual Rollout:** Roll out changes gradually to detect compatibility issues.
-    * **Feature Flags:** Use feature flags to control new functionality (see `versioning-and-release-management.md`).
+    * **Feature Flags:** Use feature flags to control new functionality (see @versioning-and-release-management).
     * **Monitoring:** Monitor for compatibility issues during rollout.
 
 * **Client Compatibility:**
@@ -114,7 +114,7 @@ alwaysApply: false
 * **API Data Versioning:**
     * **Request/Response Versions:** Version request and response formats.
     * **Transformation:** Transform between versions as needed.
-    * **See:** `api-documentation-standards.md` for API versioning.
+    * **See:** @api-documentation-standards for API versioning.
 
 * **Storage Format Versioning:**
     * **File Formats:** Version file formats (e.g., configuration files, data exports).
@@ -145,7 +145,7 @@ alwaysApply: false
     * **Fix:** Fix issues before retrying migration.
     * **Documentation:** Document lessons learned.
 
-* **See:** `deployment-and-infrastructure.md` for general rollback procedures.
+* **See:** @deployment-and-infrastructure for general rollback procedures.
 
 ## 7. Migration Testing
 
