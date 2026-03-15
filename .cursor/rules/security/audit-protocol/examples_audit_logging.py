@@ -1,16 +1,18 @@
 """
 Audit Logging Implementation Example
 
-This file demonstrates the generic audit log structure and event logging pattern.
+This file demonstrates the generic audit log structure and event logging pattern
+using structlog for structured logging.
 Reference this example from RULE.mdc using @examples_audit_logging.py syntax.
 """
 
+import hashlib
 import json
-import logging
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from typing import Any, Dict, Literal
-from dataclasses import dataclass, asdict
-import hashlib
+
+import structlog
 
 
 # ============================================================================
@@ -70,10 +72,10 @@ class AuditLogEntry:
 
 class AuditLogger:
     """
-    Generic audit logger for structured audit log entries.
+    Generic audit logger for structured audit log entries using structlog.
     
     This demonstrates the pattern for logging audit events with:
-    - Structured JSON format
+    - Structured JSON format via structlog
     - Immutable append-only logging
     - Cryptographic hashing for integrity
     """
@@ -88,7 +90,7 @@ class AuditLogger:
                 alternate deployments. See @monitoring-and-observability for Splunk HEC.
         """
         self.storage = storage_backend
-        self.logger = logging.getLogger(__name__)
+        self.logger = structlog.get_logger(__name__)
     
     def log_event(
         self,
@@ -150,7 +152,7 @@ class AuditLogger:
         """
         try:
             self.storage.append(entry)
-            self.logger.debug(f"Audit log entry written: {entry['correlation_id']}")
+            self.logger.debug("audit_entry_written", correlation_id=entry["correlation_id"])
         except Exception as e:
-            self.logger.error(f"Failed to write audit log: {e}", exc_info=True)
+            self.logger.error("audit_write_failed", error=str(e), exc_info=True)
             raise

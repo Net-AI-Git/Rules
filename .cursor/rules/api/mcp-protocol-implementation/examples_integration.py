@@ -7,16 +7,14 @@ Reference these examples from RULE.md using @examples_integration.py syntax.
 """
 
 import asyncio
-import logging
-from typing import Any, Dict, List, Optional
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
+import structlog
 from mcp import ClientSession, types
 from mcp.client.stdio import stdio_client, StdioServerParameters
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 # ============================================================================
@@ -58,13 +56,13 @@ class MCPOrchestrator:
         self.session = ClientSession(self.read_stream, self.write_stream)
         await self.session.__aenter__()
         await self.session.initialize()
-        logger.info("Connected to MCP server")
+        logger.info("mcp_connected")
     
     async def disconnect(self):
         """Close connection to MCP server."""
         if self.session:
             await self.session.__aexit__(None, None, None)
-        logger.info("Disconnected from MCP server")
+        logger.info("mcp_disconnected")
     
     async def get_tools_for_agent(
         self,
@@ -99,9 +97,7 @@ class MCPOrchestrator:
             if self._tool_matches_profile(tool, agent_profile, scopes):
                 filtered_tools.append(tool)
         
-        logger.info(
-            f"Agent {agent_profile} has access to {len(filtered_tools)} tools"
-        )
+        logger.info("agent_tools_filtered", agent_profile=agent_profile.value, tool_count=len(filtered_tools))
         return filtered_tools
     
     def _tool_matches_profile(
@@ -156,13 +152,13 @@ class MCPOrchestrator:
         if not self.session:
             raise RuntimeError("Not connected to MCP server")
         
-        logger.info(f"Executing tool: {tool_name}")
+        logger.info("executing_tool", tool_name=tool_name)
         result = await self.session.call_tool(tool_name, arguments)
         
         if result.isError:
-            logger.error(f"Tool execution failed: {tool_name}")
+            logger.error("tool_execution_failed", tool_name=tool_name)
         else:
-            logger.info(f"Tool execution succeeded: {tool_name}")
+            logger.info("tool_execution_succeeded", tool_name=tool_name)
         
         return result
 
@@ -207,10 +203,7 @@ class DynamicToolAgent:
         # Cache tools by name for quick lookup
         self.tool_cache = {tool.name: tool for tool in self.available_tools}
         
-        logger.info(
-            f"Agent discovered {len(self.available_tools)} tools: "
-            f"{[t.name for t in self.available_tools]}"
-        )
+        logger.info("tools_discovered", tool_count=len(self.available_tools), tools=[t.name for t in self.available_tools])
     
     def get_tool_schema(self, tool_name: str) -> Optional[Dict[str, Any]]:
         """
@@ -363,18 +356,18 @@ async def complete_integration_example():
         data_prompt = create_dynamic_tool_prompt(data_agent)
         comm_prompt = create_dynamic_tool_prompt(comm_agent)
         
-        logger.info("Data agent prompt created with dynamic tools")
-        logger.info("Communication agent prompt created with dynamic tools")
+        logger.info("prompt_created", agent="data_agent")
+        logger.info("prompt_created", agent="communication_agent")
         
         # Step 5: Example tool execution
         if data_agent.available_tools:
             first_tool = data_agent.available_tools[0]
-            logger.info(f"Data agent using tool: {first_tool.name}")
+            logger.info("agent_using_tool", agent="data_agent", tool_name=first_tool.name)
             # result = await data_agent.use_tool(first_tool.name, {})
         
         if comm_agent.available_tools:
             first_tool = comm_agent.available_tools[0]
-            logger.info(f"Comm agent using tool: {first_tool.name}")
+            logger.info("agent_using_tool", agent="comm_agent", tool_name=first_tool.name)
             # result = await comm_agent.use_tool(first_tool.name, {})
     
     finally:
@@ -429,10 +422,7 @@ class AgentView:
             self.profile,
             scope_strings
         )
-        logger.info(
-            f"View refreshed: {self.profile} with scopes {self.scopes} "
-            f"has {len(self.tools)} tools"
-        )
+        logger.info("view_refreshed", profile=self.profile.value, scopes=[s.value for s in self.scopes], tool_count=len(self.tools))
     
     def get_tool_by_name(self, name: str) -> Optional[types.Tool]:
         """Get a tool by name from this view."""
@@ -452,7 +442,7 @@ class AgentView:
 
 async def main():
     """Run integration examples."""
-    logger.info("Running complete integration example...")
+    logger.info("running_example", example="complete_integration")
     # Uncomment to run:
     # await complete_integration_example()
 

@@ -202,7 +202,7 @@ All agentic systems **MUST** implement prompt injection prevention and input san
 
 * **Security Framework:** Integrate with security governance framework.
 
-* **Audit Logging:** Log all sanitization and detection events.
+* **Audit Logging:** Log all sanitization and detection events using **structlog** for structured logging.
 
 * **See:** `security-governance-and-observability.md` and `audit-protocol.md` for security integration.
 

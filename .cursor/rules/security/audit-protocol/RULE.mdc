@@ -20,8 +20,10 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
 
 ### Audit Log Structure
 
+* **Built with structlog:** Audit log entries are constructed using **structlog** for consistent structured logging. Use structlog's bound loggers and processors to build entries with required fields.
+
 * **Required Fields:**
-  * `timestamp`: ISO 8601 format with timezone
+  * `timestamp`: ISO 8601 format with timezone (UTC)
   * `event_type`: Categorized event type (tool_call, state_change, api_request, etc.)
   * `actor_id`: User ID or agent ID who performed the action
   * `actor_type`: "user" | "agent" | "system"
@@ -35,9 +37,9 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
 * **Immutable Logs:**
   * Audit logs must be append-only (no updates or deletions).
   * Use write-once storage (WORM - Write Once Read Many).
-  * Implement cryptographic hashing for log integrity verification.
+  * Implement cryptographic hashing (SHA-256) for log integrity verification.
 
-**See:** `@examples_audit_logging.py` for audit log structure and event logging implementation pattern.
+**See:** `@examples_audit_logging.py` for audit log structure and event logging implementation pattern using structlog.
 
 ### Audit Log Storage
 
@@ -88,9 +90,9 @@ All agentic systems must maintain comprehensive audit trails, compliance checks,
 
 ### Structured Logging
 
-* **Log Format:** Use structured JSON logging for all audit-related logs.
-  * **Consistency:** Maintain consistent log structure across all services.
-  * **Parsing:** Enable easy parsing and querying of logs.
+* **Log Format:** Use **structlog** with JSON rendering for all audit-related logs.
+  * **Consistency:** Maintain consistent log structure across all services using structlog processors.
+  * **Parsing:** Enable easy parsing and querying of logs in Splunk via SPL.
 
 * **Log Levels:**
   * **AUDIT:** For all audit trail events (mandatory for compliance).

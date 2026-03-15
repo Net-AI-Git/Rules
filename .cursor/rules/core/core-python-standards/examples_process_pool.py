@@ -7,12 +7,13 @@ Reference this example from RULE.mdc using @examples_process_pool.py syntax.
 """
 
 import os
-import logging
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import List, Dict, Any
 import random
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from typing import Any, Dict, List
 
-logger = logging.getLogger(__name__)
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 # ============================================================================
@@ -86,7 +87,7 @@ class ParallelDataGenerator:
                         Defaults to CPU count for optimal performance.
         """
         self.max_workers = max_workers or os.cpu_count()
-        logger.info(f"Initialized ProcessPoolExecutor with {self.max_workers} workers")
+        logger.info("process_pool_initialized", max_workers=self.max_workers)
     
     def generate_batch(
         self,
@@ -122,7 +123,7 @@ class ParallelDataGenerator:
                     results.append(result)
                 except Exception as e:
                     item_id = futures[future]
-                    logger.error(f"Failed to generate item {item_id}: {e}")
+                    logger.error("item_generation_failed", item_id=item_id, error=str(e))
         
         return results
     
@@ -197,10 +198,10 @@ class ParallelAgentInitializer:
                 try:
                     result = future.result()
                     results.append(result)
-                    logger.info(f"Agent {result['agent_id']} initialized successfully")
+                    logger.info("agent_initialized", agent_id=result["agent_id"])
                 except Exception as e:
                     agent_id = futures[future]
-                    logger.error(f"Failed to initialize agent {agent_id}: {e}")
+                    logger.error("agent_initialization_failed", agent_id=agent_id, error=str(e))
                     results.append({
                         "agent_id": agent_id,
                         "status": "failed",
@@ -225,9 +226,9 @@ def production_data_generation_example():
     """
     generator = ParallelDataGenerator(max_workers=os.cpu_count())
     
-    logger.info("Starting parallel data generation...")
+    logger.info("parallel_data_generation_started", num_items=10000)
     results = generator.generate_batch(num_items=10000)
-    logger.info(f"Generated {len(results)} items successfully")
+    logger.info("parallel_data_generation_completed", generated_count=len(results))
     
     return results
 
@@ -244,11 +245,11 @@ def production_agent_initialization_example():
     initializer = ParallelAgentInitializer(max_workers=os.cpu_count())
     
     agent_ids = list(range(50))
-    logger.info(f"Initializing {len(agent_ids)} agents in parallel...")
+    logger.info("agent_parallel_init_started", agent_count=len(agent_ids))
     
     results = initializer.initialize_agents(agent_ids)
     
     successful = sum(1 for r in results if r.get("status") == "initialized")
-    logger.info(f"Successfully initialized {successful}/{len(results)} agents")
+    logger.info("agent_parallel_init_completed", successful=successful, total=len(results))
     
     return results

@@ -6,11 +6,11 @@ Reference these examples from RULE.md using @examples_client.py syntax.
 """
 
 import asyncio
-import logging
 from typing import Any
 from urllib.parse import parse_qs, urlparse
 
 import httpx
+import structlog
 from pydantic import AnyUrl
 
 from mcp import ClientSession, types
@@ -19,9 +19,7 @@ from mcp.client.stdio import stdio_client, StdioServerParameters
 from mcp.client.streamable_http import streamable_http_client
 from mcp.shared.auth import OAuthClientInformationFull, OAuthClientMetadata, OAuthToken
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 # ============================================================================
@@ -47,7 +45,7 @@ async def basic_stdio_client_example():
             
             # List available tools
             tools = await session.list_tools()
-            logger.info(f"Available tools: {[tool.name for tool in tools.tools]}")
+            logger.info("tools_listed", tools=[tool.name for tool in tools.tools])
             
             # Call a tool
             result = await session.call_tool("echo", {"message": "Hello, MCP!"})
@@ -55,11 +53,11 @@ async def basic_stdio_client_example():
             # Parse result
             for content in result.content:
                 if isinstance(content, types.TextContent):
-                    logger.info(f"Tool result: {content.text}")
+                    logger.info("tool_result", result=content.text)
             
             # List available resources
             resources = await session.list_resources()
-            logger.info(f"Available resources: {[r.uri for r in resources.resources]}")
+            logger.info("resources_listed", resources=[str(r.uri) for r in resources.resources])
 
 
 # ============================================================================
@@ -81,7 +79,7 @@ async def http_client_example():
             
             # List available tools
             tools = await session.list_tools()
-            logger.info(f"Available tools: {[tool.name for tool in tools.tools]}")
+            logger.info("tools_listed", tools=[tool.name for tool in tools.tools])
             
             # Call a tool
             result = await session.call_tool("add", {"a": 5, "b": 3})
@@ -89,7 +87,7 @@ async def http_client_example():
             # Parse result
             for content in result.content:
                 if isinstance(content, types.TextContent):
-                    logger.info(f"Tool result: {content.text}")
+                    logger.info("tool_result", result=content.text)
 
 
 # ============================================================================
@@ -126,7 +124,7 @@ class InMemoryTokenStorage(TokenStorage):
 
 async def handle_redirect(auth_url: str) -> None:
     """Handle OAuth redirect URL display."""
-    logger.info(f"Visit: {auth_url}")
+    logger.info("oauth_auth_url", url=auth_url)
 
 
 async def handle_callback() -> tuple[str, str | None]:
@@ -169,11 +167,11 @@ async def oauth_client_example():
                 
                 # List available tools
                 tools = await session.list_tools()
-                logger.info(f"Available tools: {[tool.name for tool in tools.tools]}")
+                logger.info("tools_listed", tools=[tool.name for tool in tools.tools])
                 
                 # List available resources
                 resources = await session.list_resources()
-                logger.info(f"Available resources: {[r.uri for r in resources.resources]}")
+                logger.info("resources_listed", resources=[str(r.uri) for r in resources.resources])
 
 
 # ============================================================================
@@ -191,14 +189,14 @@ async def parse_tool_results_example(session: ClientSession):
     result = await session.call_tool("get_data", {"format": "text"})
     for content in result.content:
         if isinstance(content, types.TextContent):
-            logger.info(f"Text: {content.text}")
+            logger.info("text_content", text=content.text)
     
     # Example 2: Parsing structured content from JSON tools
     result = await session.call_tool("get_user", {"id": "123"})
     if hasattr(result, "structuredContent") and result.structuredContent:
         # Access structured data directly
         user_data = result.structuredContent
-        logger.info(f"User: {user_data.get('name')}, Age: {user_data.get('age')}")
+        logger.info("user_data", name=user_data.get("name"), age=user_data.get("age"))
     
     # Example 3: Parsing embedded resources
     result = await session.call_tool("read_config", {})
@@ -206,23 +204,23 @@ async def parse_tool_results_example(session: ClientSession):
         if isinstance(content, types.EmbeddedResource):
             resource = content.resource
             if isinstance(resource, types.TextResourceContents):
-                logger.info(f"Config from {resource.uri}: {resource.text}")
+                logger.info("config_resource", uri=str(resource.uri), text=resource.text)
             elif isinstance(resource, types.BlobResourceContents):
-                logger.info(f"Binary data from {resource.uri}")
+                logger.info("binary_resource", uri=str(resource.uri))
     
     # Example 4: Parsing image content
     result = await session.call_tool("generate_chart", {"data": [1, 2, 3]})
     for content in result.content:
         if isinstance(content, types.ImageContent):
-            logger.info(f"Image ({content.mimeType}): {len(content.data)} bytes")
+            logger.info("image_content", mime_type=content.mimeType, size_bytes=len(content.data))
     
     # Example 5: Handling errors
     result = await session.call_tool("failing_tool", {})
     if result.isError:
-        logger.error("Tool execution failed!")
+        logger.error("tool_execution_failed")
         for content in result.content:
             if isinstance(content, types.TextContent):
-                logger.error(f"Error: {content.text}")
+                logger.error("tool_error", error=content.text)
 
 
 # ============================================================================
@@ -263,7 +261,7 @@ async def display_tools(session: ClientSession):
     tools = await session.list_tools()
     for tool in tools.tools:
         display_name = get_display_name(tool)
-        logger.info(f"Tool: {display_name} ({tool.name})")
+        logger.info("tool_display", display_name=display_name, name=tool.name)
 
 
 async def display_resources(session: ClientSession):
@@ -271,7 +269,7 @@ async def display_resources(session: ClientSession):
     resources = await session.list_resources()
     for resource in resources.resources:
         display_name = get_display_name(resource)
-        logger.info(f"Resource: {display_name} ({resource.uri})")
+        logger.info("resource_display", display_name=display_name, uri=str(resource.uri))
 
 
 # ============================================================================
@@ -296,16 +294,16 @@ async def complete_client_workflow():
         async with ClientSession(read, write) as session:
             # Step 1: Initialize
             await session.initialize()
-            logger.info("Connected to MCP server")
+            logger.info("mcp_connected")
             
             # Step 2: Discover tools
             tools_response = await session.list_tools()
-            logger.info(f"Discovered {len(tools_response.tools)} tools")
+            logger.info("tools_discovered", count=len(tools_response.tools))
             
             # Step 3: Execute a tool
             if tools_response.tools:
                 first_tool = tools_response.tools[0]
-                logger.info(f"Calling tool: {first_tool.name}")
+                logger.info("calling_tool", tool_name=first_tool.name)
                 
                 # Prepare arguments based on tool schema
                 arguments = {}
@@ -317,25 +315,25 @@ async def complete_client_workflow():
                 
                 # Step 4: Handle results
                 if result.isError:
-                    logger.error("Tool execution failed")
+                    logger.error("tool_execution_failed")
                 else:
                     for content in result.content:
                         if isinstance(content, types.TextContent):
-                            logger.info(f"Result: {content.text}")
+                            logger.info("tool_result", result=content.text)
             
             # Step 5: Access resources
             resources_response = await session.list_resources()
-            logger.info(f"Discovered {len(resources_response.resources)} resources")
+            logger.info("resources_discovered", count=len(resources_response.resources))
             
             if resources_response.resources:
                 first_resource = resources_response.resources[0]
-                logger.info(f"Reading resource: {first_resource.uri}")
+                logger.info("reading_resource", uri=str(first_resource.uri))
                 
                 try:
                     resource_content = await session.read_resource(first_resource.uri)
-                    logger.info(f"Resource content: {resource_content.contents}")
+                    logger.info("resource_content", contents=str(resource_content.contents))
                 except Exception as e:
-                    logger.error(f"Failed to read resource: {e}")
+                    logger.error("resource_read_failed", error=str(e))
 
 
 # ============================================================================
@@ -344,15 +342,15 @@ async def complete_client_workflow():
 
 async def main():
     """Run client examples."""
-    logger.info("Running basic stdio client example...")
+    logger.info("running_example", example="basic_stdio_client")
     # Uncomment to run:
     # await basic_stdio_client_example()
     
-    logger.info("Running HTTP client example...")
+    logger.info("running_example", example="http_client")
     # Uncomment to run:
     # await http_client_example()
     
-    logger.info("Running complete workflow example...")
+    logger.info("running_example", example="complete_workflow")
     # Uncomment to run:
     # await complete_client_workflow()
 

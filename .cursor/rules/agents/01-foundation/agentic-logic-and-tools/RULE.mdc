@@ -10,6 +10,7 @@ alwaysApply: false
 * **Documentation:** Provide deep explanations for every tool: what it does, parameters, return values, input/output examples, and docstrings.
 
 ## Agent Internals
+* **Structured Output in LangGraph Nodes:** When implementing agent logic **inside a LangGraph node**, use **Pydantic BaseModel** for structured outputs (define schemas with `Field(description="...")` for LLM binding). Use `with_structured_output()` or `.bind_tools()` for LLM integration. See: `@data-schemas-and-interfaces` for schema standards.
 * **Scratchpad:** Maintain an internal scratchpad for each agent, saved to a long LOG file for debugging, but **excluded** from the context window passed to the model.
 * **Tool Binding:** Bind tools to the model.
 * **Tool Usage Display:** Print the sequence of messages and tools used using `stream_mode` with `print_stream` for a clean, readable presentation.

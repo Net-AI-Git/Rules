@@ -23,6 +23,6 @@ alwaysApply: false
 
 ## 3. Secrets Management
 
-* **No Leaks:** Never print config objects to logs without masking sensitive fields (using Pydantic's `SecretStr`).
+* **No Leaks:** Never log config objects to **structlog** (or any logger) without masking sensitive fields (using Pydantic's `SecretStr`).
 
 * **Kubernetes:** In Kubernetes deployments, application **MUST** read configuration from environment variables; Kubernetes injects these from ConfigMaps and Secrets. Do not assume config files on disk for runtime secrets or environment-specific values. **See:** @deployment-and-infrastructure.

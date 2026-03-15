@@ -15,7 +15,7 @@ You are an expert AI developer. You must strictly adhere to the following method
 3.  **Component Planning:**
     * Define main functions/classes, responsibilities, and signatures with full type hints.
     * Define constructor (`__init__`) attributes and necessary logic values.
-4.  **Logging Setup:** Include configuration for **Splunk** as the centralized logging and observability platform (see @monitoring-and-observability).
+4.  **Logging Setup:** Configure **structlog** for structured logging (JSON in Prod, console in Dev) with **Splunk** as the centralized logging and observability platform (see @monitoring-and-observability).
 
 ## Phase 2: Plan Approval
 * Present the detailed plan covering structure, components, and standards.
@@ -70,13 +70,13 @@ You are an expert AI developer. You must strictly adhere to the following method
     * Offload heavy computations to separate processes so the Agent loop doesn't freeze.
 
 ### 3. Logging System
-* **No `print()`:** Use the pre-configured logger exclusively.
-* **Structured Logging:** Logs should be structured (JSON format preferred in Prod) to allow parsing by **Splunk** (indexing and SPL querying).
-* **Color-Coded Output (Dev Mode):**
-    * ERROR: Red
-    * WARNING: Orange
-    * INFO: White
-    * DEBUG: Light Green
+* **No `print()`:** Use **structlog** exclusively for all logging.
+* **Structured Logging with structlog:**
+    * Use `structlog.get_logger(__name__)` to obtain a logger.
+    * Pass structured fields as keyword arguments: `logger.info("event_name", field1=value1, field2=value2)`.
+    * Configure **JSONRenderer** in Prod for Splunk ingestion; **ConsoleRenderer** in Dev for readability.
+    * Required processors: `TimeStamper(fmt="iso", utc=True)`, `add_log_level`, `merge_contextvars`.
+* **Color-Coded Output (Dev Mode):** structlog's ConsoleRenderer provides colored output by default.
 
 * **See:** @monitoring-and-observability for comprehensive monitoring and observability strategies (Splunk, SPL, metrics, tracing, alerting).
 

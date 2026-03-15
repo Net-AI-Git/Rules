@@ -6,25 +6,24 @@ Reference these examples from RULE.md using @examples_server.py syntax.
 """
 
 import asyncio
-import logging
 from typing import Any, Sequence
+
+import structlog
 from mcp.server import Server
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
 from mcp.types import (
-    Tool,
-    TextContent,
-    ImageContent,
     EmbeddedResource,
-    Resource,
+    ImageContent,
     Prompt,
-    PromptMessage,
     PromptArgument,
+    PromptMessage,
+    Resource,
+    TextContent,
+    Tool,
 )
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # ============================================================================
 # Example 1: Basic Server with Tools
@@ -419,7 +418,7 @@ def create_complete_server() -> Server:
                 )
             ]
         except Exception as e:
-            logger.error(f"Error listing tools: {e}")
+            logger.error("tools_list_error", error=str(e))
             return []
     
     @server.call_tool()
@@ -438,7 +437,7 @@ def create_complete_server() -> Server:
             raise ValueError(f"Unknown tool: {name}")
         
         except Exception as e:
-            logger.error(f"Error calling tool {name}: {e}")
+            logger.error("tool_call_error", tool_name=name, error=str(e))
             return [TextContent(type="text", text=f"Error: {str(e)}")]
     
     @server.list_resources()

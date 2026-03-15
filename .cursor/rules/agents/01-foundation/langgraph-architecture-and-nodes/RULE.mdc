@@ -28,6 +28,23 @@ alwaysApply: false
 * **Executable Only:** Do not create "comment-only" nodes. Nodes must perform work or governance.
 * **Classes:** Separate logic into structured classes that are easily extensible for the State.
 
+## PydanticAI as Agent Engine in Nodes
+* **Division of Responsibility:** LangGraph owns high-level flow: graph structure, state (TypedDict), edges and conditional routing, interrupts (human-in-the-loop), checkpoints and persistence. Do not move this responsibility to PydanticAI. PydanticAI is used optionally **inside** a node to implement the **DO** (agent logic) when the node calls an LLM and needs structured output: prompt, tools for that step, and validated output.
+* **When to Use PydanticAI in a Node:** Use when the node calls the LLM and needs **structured output** (e.g. a Pydantic model with `summary`, `technologies`, `structure`) — use PydanticAI with `output_type` for validated output without manual parsing. Use when the node needs **dependency injection** (DB, HTTP client, settings) — PydanticAI's DI is cleaner than Runnable/LCEL inside a node. For **deterministic-only** nodes (no LLM call), PydanticAI is not required; use plain logic or LangChain as usual.
+* **READ→DO→WRITE→CONTROL:** **READ** from graph state as today. **DO:** optionally call a PydanticAI agent (e.g. `result = await agent.run(...)` with input derived from state); the result is a validated object per the output model. **WRITE:** update state from `result` (already typed and validated). **CONTROL:** unchanged — edges and routing remain LangGraph's responsibility.
+
+```mermaid
+flowchart LR
+  subgraph langgraph [LangGraph]
+    NodeA[Node A] --> NodeB[Node B]
+    NodeB --> NodeC[Node C]
+  end
+  subgraph nodeB_internal [Node B internal]
+    Read[READ state] --> Do[DO: PydanticAI agent]
+    Do --> Write[WRITE to state]
+  end
+```
+
 ## Error Handling & Reliability
 * **Explicit Handling:** Wrap core logic in `try/except`. Append errors to a dedicated `errors` field.
 * **Routing:** Route persistent failures to dedicated error-handling or human review nodes.

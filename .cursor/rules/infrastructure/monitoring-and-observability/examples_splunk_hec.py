@@ -6,14 +6,12 @@ Reference this example from RULE.mdc using @examples_splunk_hec.py syntax.
 All events MUST include mandatory fields: timestamp, correlation_id, operation_name (or equivalent).
 """
 
-import json
-import logging
-from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 import httpx
+import structlog
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SplunkHECClient:
@@ -65,10 +63,10 @@ class SplunkHECClient:
                 resp = client.post(self.hec_url, json=payload, headers=headers, timeout=10.0)
             if resp.status_code == 200:
                 return True
-            logger.warning("Splunk HEC returned %s: %s", resp.status_code, resp.text)
+            logger.warning("splunk_hec_error", status_code=resp.status_code, response=resp.text)
             return False
         except Exception as e:
-            logger.error("Failed to send event to Splunk HEC: %s", e, exc_info=True)
+            logger.error("splunk_hec_send_failed", error=str(e), exc_info=True)
             return False
 
     def send_timed_operation(

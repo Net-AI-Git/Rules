@@ -42,6 +42,7 @@ alwaysApply: false
 ## 3. Log Aggregation
 
 * **Splunk as Centralized Logging:** Send all logs to **Splunk** only. Use **Splunk HEC** for ingestion (HTTP POST with JSON payloads).
+    * **Structured Logging with structlog:** Use **structlog** for all structured logging. Configure `JSONRenderer` in Prod for Splunk ingestion, `ConsoleRenderer` in Dev.
     * **Structured Format:** JSON format for all log entries to enable Splunk indexing and **SPL** querying.
     * **Log Levels:** Use appropriate levels (DEBUG, INFO, WARNING, ERROR, CRITICAL); include as a field for SPL filtering.
 
@@ -60,7 +61,7 @@ alwaysApply: false
 
 * **Log Retention:** Configure retention and indexes in Splunk (e.g., 90 days for ERROR and above in production; shorter for DEBUG in development).
 
-* **See:** @examples_splunk_hec for HEC ingestion. **See:** @core-python-standards for structured logging implementation details.
+* **See:** @examples_splunk_hec for HEC ingestion. **See:** @core-python-standards for structlog configuration and structured logging implementation details.
 * **See:** Section 9 for performance timing and latency measurement patterns.
 
 ## 4. Alerting Rules & Thresholds
@@ -122,10 +123,10 @@ alwaysApply: false
 
 * **Span/Trace Events:** Every significant operation MUST emit a span-like event to Splunk with: `start_time`, `end_time`, `duration_ms`, `operation.name`, `operation.type`, `correlation_id`. Use context managers to ensure events are emitted even on failure.
 
-* **Structured Logging Requirements:**
+* **Structured Logging Requirements (using structlog):**
     * Mandatory log fields: `timestamp`, `correlation_id`, `operation_name` (or `stage`).
     * Operations MUST log: `start_timestamp`, `end_timestamp`, `duration_ms`.
-    * JSON format for Splunk indexing and SPL.
+    * Use structlog with `JSONRenderer` for Splunk indexing and SPL.
     * Multi-stage: log `stage_latency_ms` and `total_latency_ms`.
 
 * **Correlation ID:** Mandatory (UUID); propagate across boundaries; include in all logs and span events.

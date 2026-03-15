@@ -5,17 +5,17 @@ This file demonstrates coordination patterns with Workers and Tools, parallel ex
 Reference this example from RULE.mdc using @examples_execution_coordination.py syntax.
 """
 
-import json
-import logging
 import time
-from datetime import datetime, timezone
-from typing import List, Dict, Any, Optional, Set
-from dataclasses import dataclass
-from enum import Enum
 from collections import defaultdict, deque
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Any, Dict, List, Optional, Set
+
+import structlog
 
 # See @examples_performance_timing in monitoring-and-observability for full implementation.
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class PerformanceTimer:
@@ -45,7 +45,7 @@ class PerformanceTimer:
             "duration_ms": round(duration_ms, 2),
             **self.extra,
         }
-        logger.info("operation_completed %s", json.dumps(log_data))
+        logger.info("operation_completed", **log_data)
 
 
 # ============================================================================

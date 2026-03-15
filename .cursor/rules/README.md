@@ -455,6 +455,7 @@ For example, the `/testing/run-test-suite` command references `tests-and-validat
 ## Related Documentation
 
 - **[Root README](../README.md)** - Overview of the entire repository
+- **[README_HE.md](README_HE.md)** - Hebrew documentation: what each rule says, when to use it, which libraries it defines (quick reference + full sections)
 - **[Commands Documentation](../commands/README.md)** - Complete guide to Cursor Commands
 - **[Rules Management Rule](rules-management/RULE.mdc)** - Format specifications for creating/updating rules
 - **[Helper Files Guide](rules-management/helper-files-guide/RULE.mdc)** - Using helper files for code examples
