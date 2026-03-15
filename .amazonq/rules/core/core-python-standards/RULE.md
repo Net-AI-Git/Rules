@@ -1,0 +1,97 @@
+## Mandate
+You are an expert AI developer. You must strictly adhere to the following methodology and standards for all coding tasks.
+
+## Phase 1: System Planning (Pre-Coding)
+**Before any code is written**, you must perform the following planning steps:
+
+1.  **Requirement Analysis:** Analyze the task to understand objectives, inputs/outputs, and core logic.
+2.  **Architecture Design:**
+    * Propose a modular file structure (e.g., `main.py`, `utils.py`, `config.py`).
+    * If the system is complex, suggest splitting into multiple files based on responsibility.
+3.  **Component Planning:**
+    * Define main functions/classes, responsibilities, and signatures with full type hints.
+    * Define constructor (`__init__`) attributes and necessary logic values.
+4.  **Logging Setup:** Configure **structlog** for structured logging (JSON in Prod, console in Dev) with **Splunk** as the centralized logging and observability platform (See rule: monitoring-and-observability (in .amazonq/rules)).
+
+## Phase 2: Plan Approval
+* Present the detailed plan covering structure, components, and standards.
+* **DO NOT** proceed with writing code until you receive explicit user approval.
+
+## Phase 3: Code Implementation (Post-Approval)
+
+### 1. Code Quality & Maintainability
+* **Descriptive Naming:** Use clear names (e.g., `user_profile` instead of `up`).
+* **Full Type Hinting:** Use the `typing` module for all parameters and variables.
+* **Forward References:** Use `from __future__ import annotations` at module top for lazy type hint evaluation. Enables clean forward references (e.g., Trees, Graphs, Plans, States) without string quotes. Recommended for modules with self-referential or mutually-referential types.
+* **Guard Clauses:** Prefer guard clauses to avoid deeply nested `if-else` structures.
+* **Functional Cohesion (DRY):**
+    * Build short, interoperable functions.
+    * Any repetitive logic must be extracted to a helper function.
+    * Do not rewrite existing logic; call helper functions.
+* **STRICT Function Length & Splitting:**
+    * **Max 20 Lines:** Functions **MUST NOT** exceed 20 lines of actual code.
+    * **Mandatory Refactoring:** If a function grows longer, you **MUST** split it immediately using helper functions.
+    * **One Task:** Each function should do exactly one thing.
+
+### 2. Advanced Concurrency (Async & Parallelism)
+* **Context:** AI Agents are hybrid systems. They wait for APIs (I/O Bound) and process data (CPU Bound). You must choose the right tool.
+* **I/O Bound (LLM Calls/DB/Network):**
+    * **MUST** use Python's **`asyncio`** (`async`/`await`) patterns.
+    * Never use blocking code (e.g., `requests`) in the main agent loop; use `httpx` or async SDK clients.
+    * Use `asyncio.gather()` to run independent tool calls in parallel.
+* **CPU Bound (Data Processing/Embeddings):**
+    * **MUST** use `concurrent.futures.ProcessPoolExecutor` to utilize all CPU cores.
+    * **Mandatory Identification:** Before writing code, identify if the task is CPU-bound. If yes, **MUST** use `ProcessPoolExecutor` - never use sequential loops (`for` loops) for CPU-bound batch operations.
+    * **Common CPU-Bound Tasks (MUST use ProcessPoolExecutor):**
+        * **Data Generation:** Synthetic data generation, test data creation, random data generation
+        * **Data Processing:** Parsing large files (PDFs, CSVs, JSON), data transformations, calculations
+        * **Embeddings:** Generating embeddings for multiple items, vector computations
+        * **Heavy Computations:** Mathematical operations, image processing, encryption/decryption
+        * **Batch Operations:** Any loop that processes multiple items with CPU-intensive work
+    * **Implementation Pattern:**
+        * Extract the CPU-bound function to module level (not nested) for `ProcessPoolExecutor` compatibility
+        * Use `ProcessPoolExecutor.submit()` or `ProcessPoolExecutor.map()` for parallel execution
+        * Never use sequential `for` loops when processing multiple CPU-bound items
+    * **Production Requirements:**
+        * **MUST** use `ProcessPoolExecutor` in production for all CPU-bound batch operations
+        * Configure pool size based on CPU cores: `ProcessPoolExecutor(max_workers=os.cpu_count())`
+        * Monitor process pool usage and adjust `max_workers` based on system load
+        * Handle process failures gracefully with error handling and retries
+        * **Agent Parallel Execution:** When creating/initializing multiple agents or processing agent workloads in parallel, use `ProcessPoolExecutor` for CPU-bound agent initialization tasks (e.g., loading models, generating embeddings, data preprocessing)
+    * **Examples:**
+        * **Synthetic Data Generation:** Generating 1000 synthetic data items **MUST** use `ProcessPoolExecutor`, not a `for` loop
+        * **Agent Initialization:** Initializing 10 agents with CPU-bound setup (model loading, embedding generation) **MUST** use `ProcessPoolExecutor`
+        * **Batch Processing:** Processing 500 items through CPU-intensive transformations **MUST** use `ProcessPoolExecutor`
+    * For examples see the file `examples_process_pool.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for complete ProcessPoolExecutor implementation patterns including synthetic data generation and parallel agent initialization for production systems.
+    * Offload heavy computations to separate processes so the Agent loop doesn't freeze.
+
+### 3. Logging System
+* **No `print()`:** Use **structlog** exclusively for all logging.
+* **Structured Logging with structlog:**
+    * Use `structlog.get_logger(__name__)` to obtain a logger.
+    * Pass structured fields as keyword arguments: `logger.info("event_name", field1=value1, field2=value2)`.
+    * Configure **JSONRenderer** in Prod for Splunk ingestion; **ConsoleRenderer** in Dev for readability.
+    * Required processors: `TimeStamper(fmt="iso", utc=True)`, `add_log_level`, `merge_contextvars`.
+* **Color-Coded Output (Dev Mode):** structlog's ConsoleRenderer provides colored output by default.
+
+* See rule: monitoring-and-observability (in .amazonq/rules) for comprehensive monitoring and observability strategies (Splunk, SPL, metrics, tracing, alerting).
+
+
+# Documentation & Commenting Standards
+
+## 1. Language & Style
+* **English Only:** All code, comments, variable names, and docstrings must be written exclusively in English.
+* **Clarity:** Write for other developers. Be concise but descriptive.
+
+## 2. Docstring Requirements
+* **Mandatory Coverage:** Every public function, method, and class must have a comprehensive docstring.
+* **Structure:**
+    * **The 'Why':** Explain the purpose and the business/logical need it fulfills.
+    * **The 'What':** Briefly explain the implementation approach or logical steps.
+    * **Args:** List each parameter with its type and a description of its role.
+    * **Returns:** Describe the return value and its type.
+    * **Raises:** Explicitly list all exceptions that might be raised.
+
+## 3. Inline Documentation
+* **Self-Documenting Code:** Prioritize clear variable names and structure over excessive comments.
+* **Complex Logic:** Add inline comments **only** to explain "why" a complex or non-obvious logic block exists. Do not explain "what" the code does (the code shows that).

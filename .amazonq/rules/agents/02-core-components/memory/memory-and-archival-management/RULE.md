@@ -1,0 +1,331 @@
+## Mandate
+
+All agentic systems **MUST** implement long-term memory and archival strategies to maintain user context across sessions. Short-term memory (current conversation messages) is insufficient for personalized, context-aware interactions. Agents must store and retrieve user insights, preferences, and patterns from a separate archival system without overloading the context window.
+
+## 1. Long-Term Memory Architecture
+
+### Separate Vector Database
+
+* **Mandate:** Long-term memory must be stored in a separate Vector Database (Vector DB), not in the conversation context.
+
+* **Architecture Pattern:**
+  * **Short-term Memory:** Current conversation messages in LangGraph state
+  * **Long-term Memory:** User profiles, insights, preferences in Vector DB
+  * **Retrieval:** Semantic search to load relevant memories into context when needed
+
+* **Storage Separation:** Long-term memory must be:
+  * Session-independent (persists across conversations)
+  * User-specific (isolated per user/tenant)
+  * Searchable (semantic search capabilities)
+  * Versioned (track changes over time)
+
+For examples see the file `examples_memory_storage.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for Vector DB integration and user profile storage patterns.
+
+### Storage Strategy Decision
+
+* **Mandate:** Senior engineers must define clear criteria for choosing between Vector DB and PostgreSQL for different types of memory.
+
+* **Vector DB Use Cases:**
+  * **Semantic Search:** When you need to find memories by meaning/similarity, not exact matches
+  * **Embeddings:** When storing vector embeddings for similarity search
+  * **Unstructured Insights:** Contextual insights, facts, patterns that need semantic retrieval
+  * **RAG Integration:** When memories are used for Retrieval-Augmented Generation
+  * **Examples:** "User mentioned they prefer morning meetings", "User has experience with Python"
+
+* **PostgreSQL Use Cases:**
+  * **Structured User Profiles:** User preferences, settings, configuration (key-value pairs)
+  * **Relational Data:** Data with relationships (user → preferences → settings)
+  * **Exact Queries:** When you need exact matches, filtering, or SQL queries
+  * **Transactional Data:** Data that requires ACID guarantees
+  * **Examples:** User email, subscription tier, feature flags, account settings
+
+* **Decision Criteria:**
+  * **Query Type:** Semantic search → Vector DB, Exact match → PostgreSQL
+  * **Data Structure:** Unstructured text → Vector DB, Structured JSON/relational → PostgreSQL
+  * **Retrieval Pattern:** "Find similar memories" → Vector DB, "Get user profile" → PostgreSQL
+  * **Update Frequency:** Frequently updated structured data → PostgreSQL, Rarely updated insights → Vector DB
+
+For examples see the file `examples_storage_strategy.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for storage decision logic and Vector DB vs PostgreSQL patterns.
+
+### Hybrid Storage Pattern
+
+* **Mandate:** Most production systems should use both Vector DB and PostgreSQL together.
+
+* **Architecture:**
+  * **PostgreSQL:** Store structured user profiles, settings, metadata
+  * **Vector DB:** Store embeddings and semantic memories
+  * **Cross-Reference:** Link Vector DB memories to PostgreSQL user profiles via IDs
+
+* **Retrieval Pattern:**
+  1. Load user profile from PostgreSQL (structured data)
+  2. Query Vector DB for relevant semantic memories
+  3. Combine both into context window
+  4. Use PostgreSQL for filtering/validation, Vector DB for relevance
+
+* **Benefits:**
+  * Best of both worlds: structured queries + semantic search
+  * Efficient storage: right tool for right data type
+  * Scalable: PostgreSQL for transactional, Vector DB for search
+
+### Memory Types
+
+* **User Profile Memory:**
+  * User preferences and settings
+  * Communication style and tone preferences
+  * Domain expertise and interests
+  * Historical interaction patterns
+
+* **Contextual Insights:**
+  * Important facts mentioned in past conversations
+  * User goals and objectives
+  * Constraints and limitations
+  * Success patterns and failures
+
+* **Behavioral Patterns:**
+  * Common request types
+  * Preferred response formats
+  * Interaction frequency and timing
+  * Tool usage patterns
+
+## 2. Memory Update Strategies
+
+### When to Update
+
+* **Post-Session Updates:**
+  * Update memory after each conversation session ends
+  * Extract key insights and preferences from the conversation
+  * Update user profile with new information
+  * Store important facts and patterns
+
+* **Incremental Updates:**
+  * Update memory during conversation when significant insights emerge
+  * Real-time updates for critical information (e.g., user preferences)
+  * Batch updates for non-critical information
+
+* **Event-Driven Updates:**
+  * Update memory when specific events occur (e.g., user confirms preference)
+  * Trigger updates based on conversation milestones
+  * Update on explicit user feedback
+
+For examples see the file `examples_memory_updates.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for update strategies, incremental updates, and event-driven patterns.
+
+### What to Store
+
+* **Extraction Criteria:**
+  * Store information that is:
+    * User-specific (preferences, constraints, goals)
+    * Persistent (unlikely to change frequently)
+    * Actionable (useful for future interactions)
+    * Non-sensitive (respecting privacy requirements)
+
+* **Storage Format:**
+  * Structured data (JSON) for user profiles
+  * Embeddings for semantic search
+  * Metadata (timestamp, source, confidence)
+  * Relationships (links between related memories)
+
+* **Avoid Storing:**
+  * Temporary information (current task state)
+  * Sensitive data (without proper consent)
+  * Redundant information (already stored)
+  * Context-specific details (belong in short-term memory)
+
+## 3. Memory Retrieval Patterns
+
+### Relevance-Based Retrieval
+
+* **Semantic Search:** Use vector similarity search to find relevant memories based on current context.
+
+* **Retrieval Triggers:**
+  * At conversation start (load user profile)
+  * When context is needed (on-demand retrieval)
+  * When user mentions past topics (triggered retrieval)
+  * Periodically during long conversations (refresh context)
+
+* **Retrieval Strategy:**
+  * Query current conversation context
+  * Find top-K most relevant memories
+  * Filter by recency and relevance score
+  * Load into context window (with token limits)
+
+For examples see the file `examples_memory_retrieval.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for semantic search and relevance-based retrieval patterns.
+
+### Context Loading
+
+* **Token-Aware Loading:**
+  * Load memories within token budget
+  * Prioritize most relevant memories
+  * Summarize less critical memories
+  * Exclude redundant information
+
+* **Selective Loading:**
+  * Load only memories relevant to current task
+  * Filter by domain/topic
+  * Exclude outdated information
+  * Respect privacy filters
+
+* **Loading Format:**
+  * Structured summary of user profile
+  * Key insights and preferences
+  * Relevant historical context
+  * Actionable patterns
+
+## 4. Context Compression Integration
+
+### Smart Context Compression
+
+* **Mandate:** Long-term memory retrieval must integrate with context compression to prevent context window overflow.
+
+* **Compression-Aware Retrieval:**
+  * **Token Budget:** Allocate token budget for memories before retrieval
+  * **Priority Loading:** Load high-priority memories first, compress or skip low-priority
+  * **Progressive Loading:** Load memories incrementally as context space becomes available
+
+* **Integration with Context Compression:**
+  * **Before Compression:** Load critical memories into context
+  * **During Compression:** Preserve loaded memories in compression process
+  * **After Compression:** Reload additional memories if space becomes available
+
+* **Compression Triggers:**
+  * When context window exceeds threshold, compress old conversation history
+  * Preserve loaded memories during compression
+  * Use compression to make room for additional memory retrieval
+
+* **See:** `context-compression-and-optimization.md` for comprehensive context compression strategies.
+
+### Memory-Aware Compression
+
+* **Memory Preservation:** During context compression, prioritize preserving:
+  * Recently loaded memories (high relevance)
+  * User profile summaries
+  * Critical contextual insights
+
+* **Compression Strategy:**
+  1. Identify compressible content (old conversation history)
+  2. Preserve loaded memories and user profile
+  3. Compress/summarize old conversation
+  4. Reload additional memories if space available
+
+* **Token Allocation:**
+  * Reserve tokens for memory retrieval (e.g., 20% of context window)
+  * Allocate remaining tokens for conversation history
+  * Dynamically adjust based on memory relevance scores
+
+## 5. Memory Compression and Retention
+
+### Compression Strategies
+
+* **Summarization:** Periodically summarize old memories to reduce storage and improve retrieval.
+
+* **Importance Scoring:** Score memories by importance and recency to prioritize retention.
+
+* **Deduplication:** Remove duplicate or highly similar memories.
+
+* **Archival:** Move old, less-relevant memories to cold storage.
+
+### Retention Policies
+
+* **Time-Based Retention:**
+  * Keep recent memories (e.g., last 90 days) in hot storage
+  * Archive older memories to cold storage
+  * Delete very old memories (based on policy)
+
+* **Relevance-Based Retention:**
+  * Keep frequently accessed memories
+  * Keep high-importance memories
+  * Archive low-relevance memories
+
+* **User-Controlled Retention:**
+  * Allow users to delete specific memories
+  * Respect user privacy preferences
+  * Support GDPR right to be forgotten
+
+## 6. Privacy and Compliance
+
+### Data Protection
+
+* **PII Handling:**
+  * Detect and mask PII in stored memories
+  * Encrypt sensitive information
+  * Implement access controls
+  * Audit memory access
+
+* **User Consent:**
+  * Obtain consent before storing long-term memory
+  * Allow users to opt-out
+  * Provide memory management interface
+  * Support data export and deletion
+
+* **GDPR Compliance:**
+  * Right to access stored memories
+  * Right to rectification
+  * Right to erasure
+  * Data portability
+
+* **See:** `security-governance-and-observability.md` for comprehensive security and privacy requirements.
+
+## 7. Integration Points
+
+### LangGraph Integration
+
+* **State Management:** Long-term memory is separate from GraphState but can be loaded into state when needed.
+
+* **Node Integration:**
+  * **Load Memory Node:** Load relevant memories at conversation start
+  * **Update Memory Node:** Update memory after conversation ends
+  * **Retrieve Memory Node:** On-demand retrieval during conversation
+
+* **Checkpoint Integration:** Memory updates should be persisted independently of workflow checkpoints.
+
+### RAG Integration
+
+* **Hybrid Search:** Combine vector search (semantic) with keyword search for memory retrieval.
+
+* **Reranking:** Use reranking models to improve memory retrieval relevance.
+
+* **See:** `data-schemas-and-interfaces.md` for RAG system integration patterns.
+
+### Multi-Tenant Isolation
+
+* **Tenant Isolation:** Each tenant must have isolated memory storage.
+
+* **Access Control:** Enforce tenant-level access controls on memory operations.
+
+* **Data Segregation:** Store memories in tenant-specific namespaces or databases.
+
+## 8. Best Practices
+
+### Memory Quality
+
+* **Validation:** Validate extracted memories before storage.
+
+* **Confidence Scoring:** Store confidence scores for memories to prioritize high-confidence information.
+
+* **Source Attribution:** Track source of each memory (which conversation, which agent).
+
+* **Versioning:** Version memories to track changes over time.
+
+### Performance Optimization
+
+* **Caching:** Cache frequently accessed memories in application memory.
+
+* **Batch Operations:** Batch memory updates for efficiency.
+
+* **Async Updates:** Perform memory updates asynchronously to avoid blocking workflow.
+
+* **Indexing:** Maintain proper indexes for fast retrieval.
+
+### Monitoring
+
+* **Memory Metrics:**
+  * Number of memories per user
+  * Memory retrieval latency
+  * Memory update frequency
+  * Storage usage
+
+* **Quality Metrics:**
+  * Memory relevance scores
+  * User feedback on memory accuracy
+  * Memory usage effectiveness
+
+* See rule: monitoring-and-observability (in .amazonq/rules) for comprehensive monitoring strategies.

@@ -1,0 +1,136 @@
+## 1. Metrics Collection
+
+* **Splunk Metrics:** Use Splunk as the single platform for metrics. Ingest metrics via **Splunk HEC** (HTTP Event Collector) or Splunk SDK.
+    * **Counter:** Send cumulative metrics as events (e.g., total requests, errors) with numeric fields; aggregate in Splunk using **SPL** (e.g., `stats sum(metric_value)`).
+    * **Gauge:** Send gauge values (e.g., active connections, queue size) as events; query current/latest in SPL.
+    * **Histogram/Distribution:** Send request duration, response size as event fields; compute percentiles in SPL (e.g., `stats perc95(duration_ms)`, `perc99(duration_ms)`).
+
+* **Mandatory Metrics:**
+    * **Request Rate:** Requests per second/minute (ingest as events; use SPL `timechart count` or `stats count`).
+    * **Error Rate:** Errors per second/minute (filter by result/level in SPL).
+    * **Latency:** P50, P95, P99 percentiles (send `duration_ms` per event; use SPL `stats perc50(duration_ms), perc95(duration_ms), perc99(duration_ms)`).
+    * **Throughput:** Successful operations per time unit.
+    * **Resource Usage:** CPU, memory, disk, network (send as metric events to Splunk).
+
+* **Custom Business Metrics:** Track domain-specific metrics (e.g., LLM token usage, agent step count, tool call success rate) as structured events; analyze with **SPL**.
+
+* **Reference:** [Splunk Search Reference](https://help.splunk.com/en/splunk-enterprise/spl-search-reference/9.2/introduction/welcome-to-the-search-reference) for SPL syntax and aggregation commands. **See:** @examples_spl_queries for example SPL queries (latency, errors, correlation_id, timechart).
+
+## 2. Distributed Tracing
+
+* **Splunk as Tracing Backend:** Use Splunk as the single destination for trace/span data. Emit spans as structured events (e.g., one event per span) via **HEC** with required fields.
+    * **Span Events:** Each operation (API call, database query, LLM call) MUST emit a span event to Splunk with: `operation.name`, `operation.type`, `correlation_id`, `duration_ms`, `start_time`, `end_time`.
+    * **Trace Context:** Propagate `correlation_id` across service boundaries (HTTP headers, message queues, async operations) so all spans for a request share the same ID.
+    * **Correlation:** Use SPL to correlate spans by `correlation_id` (e.g., `transaction correlation_id` or `stats values(operation.name) by correlation_id`).
+
+* **Mandatory Span Fields:**
+    * **Timestamps:** Every span event MUST include `start_time` and `end_time` (ISO 8601, UTC).
+    * **Duration:** Include `duration_ms` for latency measurement.
+    * **Attributes:** `operation.name`, `operation.type`, `correlation_id` MUST be present.
+
+* **Trace Sampling:** Optionally sample a percentage of traces in high-traffic scenarios; always send span events via HEC to Splunk. Use SPL for filtering and analysis.
+
+* **Integration Points:** Instrument FastAPI, database drivers, HTTP clients, and agent steps to emit span events to Splunk (e.g., via a shared HEC client or logging handler). See @examples_splunk_hec for ingestion pattern.
+
+* **See:** Section 9 (Performance Timing & Latency Measurement) for timing requirements and PerformanceTimer pattern.
+
+## 3. Log Aggregation
+
+* **Splunk as Centralized Logging:** Send all logs to **Splunk** only. Use **Splunk HEC** for ingestion (HTTP POST with JSON payloads).
+    * **Structured Logging with structlog:** Use **structlog** for all structured logging. Configure `JSONRenderer` in Prod for Splunk ingestion, `ConsoleRenderer` in Dev.
+    * **Structured Format:** JSON format for all log entries to enable Splunk indexing and **SPL** querying.
+    * **Log Levels:** Use appropriate levels (DEBUG, INFO, WARNING, ERROR, CRITICAL); include as a field for SPL filtering.
+
+* **Mandatory Timestamp Requirements:**
+    * **All Log Entries MUST Include Timestamps:** Every log entry MUST include a `timestamp` field (ISO 8601 format with UTC timezone).
+    * **Operation Timing:** Operations that span time MUST log both `start_timestamp` and `end_timestamp`.
+    * **Duration Logging:** Operations MUST log `duration_ms` to enable latency analysis in SPL.
+    * **Timestamp Format:** Use `datetime.now(timezone.utc).isoformat()` for consistency.
+
+* **Mandatory Log Fields:**
+    * Every log entry MUST include: `timestamp`, `correlation_id`, `operation_name` (or `stage`).
+    * Operations MUST include: `start_timestamp`, `end_timestamp`, `duration_ms` (when applicable).
+    * Include `stage_latency_ms` and `total_latency_ms` for multi-stage operations.
+
+* **Correlation IDs:** Include correlation_id in all log entries. Propagate via HTTP headers, message queues, and async operations. Generate UUID when no trace context exists.
+
+* **Log Retention:** Configure retention and indexes in Splunk (e.g., 90 days for ERROR and above in production; shorter for DEBUG in development).
+
+* **See:** @examples_splunk_hec for HEC ingestion. See rule: core-python-standards (in .amazonq/rules) for structlog configuration and structured logging implementation details.
+* **See:** Section 9 for performance timing and latency measurement patterns.
+
+## 4. Alerting Rules & Thresholds
+
+* **Splunk Alerts:** Implement alerting using **Splunk Alerts** (SPL-based saved searches that trigger on threshold).
+    * **Thresholds:** Define clear thresholds (e.g., error rate > 5%, latency P99 > 1s); express in SPL (e.g., `where error_count > X` or `where perc99_duration_ms > 1000`).
+    * **Duration:** Require threshold violation for a duration before alerting (e.g., 5 minutes) via Splunk alert settings.
+    * **Severity:** Classify alerts by severity (critical, warning, info).
+
+* **Alert Targets:** Configure Splunk to send alerts to PagerDuty, Opsgenie, Slack, or email as needed.
+
+* **Alert Fatigue Prevention:** Use Splunk grouping, suppression windows, and escalation for unacknowledged critical alerts.
+
+* **SLI/SLO-Based Alerts:** Build SPL searches that compute SLI/SLO and error budget; trigger Splunk alerts when limits are exceeded.
+
+## 5. Performance Profiling
+
+* **Application Profiling:** Use Python profilers (`cProfile`, `py-spy`, `pyinstrument`) for CPU; `memory_profiler` or `py-spy` for memory. Export profiling summaries or key metrics to **Splunk** (via HEC) for central analysis.
+
+* **Production Profiling:** Send application timing and latency data to Splunk continuously. Use **SPL** to identify bottlenecks (e.g., slow operations, high P95 by `operation_name`).
+
+* **Key Areas:** LLM API calls, database queries, tool execution—ensure duration and metadata are sent to Splunk; analyze with SPL.
+
+## 6. Health Check Endpoints
+
+* **Liveness Probe:** Path `/health/live` or `/healthz`; response 200 OK when service is alive.
+
+* **Readiness Probe:** Path `/health/ready` or `/ready`; verify database, external services, resources; 200 if ready, 503 if not.
+
+* **Startup Probe:** Path `/health/startup` for services with long startup.
+
+* **Implementation:** Use FastAPI dependency injection; cache results briefly (e.g., 5 seconds). See rule: api-interface-and-streaming (in .amazonq/rules) for default FastAPI app context.
+
+* **Kubernetes:** These endpoints are required for Kubernetes liveness and readiness probes; See rule: deployment-and-infrastructure (in .amazonq/rules).
+
+## 7. SLI/SLO Definitions
+
+* **Service Level Indicators (SLI):** Availability, latency (P95/P99), error rate, throughput. Compute in Splunk using **SPL** over ingested events.
+
+* **Service Level Objectives (SLO):** Define target values (e.g., 99.9% availability, P95 < 500ms). Track in Splunk dashboards (SPL-based).
+
+* **Error Budget:** 100% - SLO; track consumption in Splunk and alert when approaching limits.
+
+* **Documentation:** Document SLIs, SLOs, and error budgets for all services.
+
+## 8. Tracing and Evaluation Visibility
+
+* **Tracing and evaluation visibility:** Send all traces and evaluation-related events to **Splunk** via HEC. Use **SPL** for analysis (e.g., correlation by `correlation_id`, latency percentiles, error grouping).
+
+* See rule: security-governance-and-observability (in .amazonq/rules) for auditing requirements.
+
+## 9. Performance Timing & Latency Measurement
+
+* **Mandate:** All operations MUST include timestamps and latency measurements. Apply to every function, node, tool call, API request, database query, and agent step.
+
+* **Timestamp Requirements:**
+    * All operations MUST log `start_timestamp` and `end_timestamp` (ISO 8601, UTC).
+    * Timestamps MUST be included in logs (and thus in Splunk) for querying.
+
+* **Span/Trace Events:** Every significant operation MUST emit a span-like event to Splunk with: `start_time`, `end_time`, `duration_ms`, `operation.name`, `operation.type`, `correlation_id`. Use context managers to ensure events are emitted even on failure.
+
+* **Structured Logging Requirements (using structlog):**
+    * Mandatory log fields: `timestamp`, `correlation_id`, `operation_name` (or `stage`).
+    * Operations MUST log: `start_timestamp`, `end_timestamp`, `duration_ms`.
+    * Use structlog with `JSONRenderer` for Splunk indexing and SPL.
+    * Multi-stage: log `stage_latency_ms` and `total_latency_ms`.
+
+* **Correlation ID:** Mandatory (UUID); propagate across boundaries; include in all logs and span events.
+
+* **Latency Measurement:**
+    * Use `time.perf_counter()` for duration (not `time.time()`).
+    * Track `stage_latency_ms`, `total_latency_ms`, `stage_name`.
+    * **Export:** Send all latency data to **Splunk** via HEC. Use **SPL** for percentile analysis (P50, P95, P99) and bottleneck identification.
+
+* **Implementation Pattern:** Use context managers (e.g., `with PerformanceTimer("operation_name"):`) that log structured JSON and/or send events to Splunk HEC. **See:** @examples_performance_timing and @examples_splunk_hec.
+
+* See rule: core-python-standards (in .amazonq/rules) for structured logging. **See:** Section 2 (Distributed Tracing) and Section 3 (Log Aggregation) for Splunk usage.

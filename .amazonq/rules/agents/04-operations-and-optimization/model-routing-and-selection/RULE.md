@@ -1,0 +1,372 @@
+## Mandate
+
+All agentic systems **MUST** implement dynamic model routing to optimize cost and performance. Senior engineers use smaller, cheaper models (e.g., Haiku/Flash) for simple tasks like classification or entity extraction, and reserve powerful models (Opus/GPT-4) only for complex logic. Model selection must be based on task complexity assessment, not hardcoded.
+
+## 1. Routing Strategy
+
+### Task Complexity Assessment
+
+* **Mandate:** Every task must be assessed for complexity before model selection.
+
+* **Complexity Factors:**
+  * **Task Type:** Classification, extraction, reasoning, synthesis, generation
+  * **Input Complexity:** Length, structure, ambiguity
+  * **Output Requirements:** Format, detail level, creativity needed
+  * **Context Requirements:** Amount of context needed, reasoning depth
+
+* **Complexity Levels:**
+  * **Simple:** Classification, simple extraction, pattern matching
+  * **Medium:** Multi-step reasoning, structured generation, analysis
+  * **Complex:** Deep reasoning, creative generation, complex synthesis
+
+For examples see the file `examples_routing.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for task complexity assessment and model selection logic.
+
+### Model Capability Matching
+
+* **Capability Matrix:** Map model capabilities to task requirements.
+
+* **Model Tiers:**
+  * **Tier 1 (Small/Fast/Cheap):** Haiku, Flash, GPT-3.5-turbo - Simple tasks
+  * **Tier 2 (Medium):** Sonnet, GPT-4-turbo - Medium complexity tasks
+  * **Tier 3 (Large/Powerful):** Opus, GPT-4 - Complex tasks
+
+* **Capability Matching:**
+  * Match task requirements to model capabilities
+  * Consider cost-performance trade-off
+  * Account for latency requirements
+
+For examples see the file `examples_model_tiers.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for model tier definitions and cost-performance optimization.
+
+## 2. Model Tiers
+
+### Tier 1: Small Models (Simple Tasks)
+
+* **Models:** Claude Haiku, GPT-3.5-turbo, Flash models
+
+* **Use Cases:**
+  * Classification (sentiment, category, intent)
+  * Named Entity Recognition (NER)
+  * Simple extraction (dates, numbers, keywords)
+  * Routing decisions
+  * Format validation
+
+* **Characteristics:**
+  * Fast response time
+  * Low cost per token
+  * Good for high-volume, low-complexity tasks
+
+### Tier 2: Medium Models (Standard Tasks)
+
+* **Models:** Claude Sonnet, GPT-4-turbo
+
+* **Use Cases:**
+  * Multi-step reasoning
+  * Structured generation (JSON, XML)
+  * Analysis and summarization
+  * Code generation (simple to medium)
+  * Translation
+
+* **Characteristics:**
+  * Balanced cost and performance
+  * Good for most standard agent tasks
+  * Reliable quality
+
+### Tier 3: Large Models (Complex Tasks)
+
+* **Models:** Claude Opus, GPT-4
+
+* **Use Cases:**
+  * Deep reasoning and problem-solving
+  * Creative generation
+  * Complex synthesis
+  * Advanced code generation
+  * Multi-document analysis
+
+* **Characteristics:**
+  * Highest quality
+  * Higher cost per token
+  * Slower response time
+  * Use only when necessary
+
+## 3. Task Classification
+
+### Classification Rules
+
+* **Simple Tasks:**
+  * Binary classification (yes/no, true/false)
+  * Multi-class classification (categories)
+  * Sentiment analysis
+  * Intent detection
+  * Simple entity extraction
+
+* **Extraction Tasks:**
+  * Named Entity Recognition
+  * Date/time extraction
+  * Number extraction
+  * Keyword extraction
+  * Simple structured data extraction
+
+* **Reasoning Tasks:**
+  * Multi-step problem solving
+  * Logical reasoning
+  * Cause-effect analysis
+  * Decision making
+
+* **Synthesis Tasks:**
+  * Document summarization
+  * Multi-source synthesis
+  * Report generation
+  * Complex content creation
+
+For examples see the file `examples_routing.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for task classification implementation.
+
+## 4. Dynamic Selection Patterns
+
+### Runtime Model Selection
+
+* **Selection Process:**
+  1. Assess task complexity
+  2. Determine required capabilities
+  3. Select appropriate model tier
+  4. Consider cost constraints
+  5. Check model availability
+  6. Select specific model
+
+* **Selection Criteria:**
+  * Task complexity (primary)
+  * Cost budget (secondary)
+  * Latency requirements (tertiary)
+  * Model availability
+
+* **Fallback Strategy:**
+  * If preferred model unavailable, fall back to next tier
+  * If budget exceeded, downgrade to cheaper model
+  * If latency critical, prefer faster model
+
+For examples see the file `examples_routing.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for runtime model selection implementation.
+
+### SECTION-Based Routing
+
+* **Per-SECTION Routing:** In multi-agent systems, route each SECTION to appropriate model.
+
+* **Routing Logic:**
+  * Assess SECTION complexity
+  * Route to model matching complexity
+  * Track cost per SECTION
+  * Optimize overall workflow cost
+
+* **Integration:** Works with Orchestrator/Worker/Synthesizer patterns.
+
+* **See:** `multi-agent-systems.md` for SECTION pattern integration.
+
+## 5. Cost Optimization
+
+### Cost-Aware Routing
+
+* **Budget Consideration:** Consider remaining budget when selecting models.
+
+* **Cost-Performance Trade-off:**
+  * Use cheaper models when quality difference is minimal
+  * Reserve expensive models for critical tasks
+  * Balance cost and quality requirements
+
+* **Dynamic Adjustment:**
+  * Adjust model selection based on budget status
+  * Downgrade when approaching budget limits
+  * Upgrade when budget allows and quality critical
+
+* **See:** `cost-and-budget-management.md` for budget integration.
+
+### Token Efficiency
+
+* **Model Efficiency:** Consider token efficiency, not just cost per token.
+
+* **Context Efficiency:** Some models handle context more efficiently.
+
+* **Output Efficiency:** Consider output quality vs token count.
+
+## 6. Integration Points
+
+### Multi-Agent Systems Integration
+
+* **Worker Model Selection:** Each worker selects model based on SECTION complexity.
+
+* **Orchestrator Model:** Orchestrator can use medium model for planning.
+
+* **Synthesizer Model:** Synthesizer typically needs medium to large model.
+
+* **See:** `multi-agent-systems.md` for integration patterns.
+
+### Configuration Integration
+
+* **Model Configuration:** Configure available models and tiers via configuration.
+
+* **Routing Rules:** Define routing rules in configuration files.
+
+* **Cost Tables:** Maintain model pricing in configuration.
+
+* **See:** `configuration-and-dependency-injection.md` for configuration patterns.
+
+### Monitoring Integration
+
+* **Model Usage Metrics:** Track which models are used for which tasks.
+
+* **Cost Tracking:** Track cost per model tier.
+
+* **Performance Metrics:** Track latency and quality per model.
+
+* See rule: monitoring-and-observability (in .amazonq/rules) for monitoring patterns (Splunk, SPL).
+
+## 7. Best Practices
+
+### Model Selection Guidelines
+
+* **Start Small:** Default to smaller models, upgrade only when needed.
+
+* **Test Quality:** Validate that smaller models meet quality requirements.
+
+* **Monitor Performance:** Track quality metrics per model to optimize selection.
+
+* **A/B Testing:** Test different models for same tasks to find optimal routing.
+
+### Cost Optimization
+
+* **Batch Simple Tasks:** Batch simple tasks to use cheaper models efficiently.
+
+* **Cache Results:** Cache model outputs when appropriate to avoid redundant calls.
+
+* **Progressive Enhancement:** Start with simple model, upgrade if quality insufficient.
+
+### Quality Assurance
+
+* **Quality Gates:** Set quality thresholds for model outputs.
+
+* **Fallback to Better Model:** If quality insufficient, retry with better model.
+
+* **Validation:** Validate outputs regardless of model used.
+
+## 8. Multi-Provider Failover
+
+### Mandate
+
+All agentic systems **MUST** implement multi-provider failover strategies to ensure High Availability (HA). When a primary LLM provider (e.g., OpenAI) fails, the system must automatically failover to secondary providers (e.g., Anthropic, Cohere) without user-visible disruption. This is critical for production systems where API failures, rate limits, or outages can occur.
+
+### Provider Health Monitoring
+
+* **Health Checks:**
+  * **Periodic Health Checks:** Monitor provider health at regular intervals (e.g., every 30 seconds)
+  * **Request-Based Health Checks:** Check provider health before each request if recent failures detected
+  * **Health Metrics:** Track success rate, latency, error rate per provider
+  * **Health Status:** Maintain health status (healthy, degraded, unhealthy) for each provider
+
+* **Health Indicators:**
+  * **API Availability:** Provider API is responding
+  * **Rate Limit Status:** Provider has available rate limit capacity
+  * **Latency Thresholds:** Provider latency within acceptable range
+  * **Error Rate:** Provider error rate below threshold
+
+For examples see the file `examples_multi_provider_failover.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for provider health monitoring implementation.
+
+### Automatic Failover Triggers
+
+* **Failure Conditions:**
+  * **API Failures:** HTTP 5xx errors, connection timeouts, service unavailable
+  * **Rate Limits:** HTTP 429 (Too Many Requests) errors
+  * **Authentication Failures:** HTTP 401/403 errors (may indicate key rotation needed)
+  * **Timeout Errors:** Request timeouts exceeding threshold
+  * **Consecutive Failures:** Multiple consecutive failures trigger failover
+
+* **Failover Decision:**
+  * **Immediate Failover:** Failover immediately on critical errors (5xx, timeouts)
+  * **Gradual Failover:** Failover after threshold of failures (e.g., 3 failures in 60 seconds)
+  * **Circuit Breaker Integration:** Use circuit breaker pattern to prevent cascading failures
+  * **Provider Priority:** Failover to providers in priority order (Primary → Secondary → Tertiary)
+
+**See:** `error-handling-and-resilience.md` for retry strategies and circuit breaker patterns.
+
+### Provider Priority Configuration
+
+* **Priority Chain:**
+  * **Primary Provider:** Preferred provider for normal operations
+  * **Secondary Provider:** First fallback when primary fails
+  * **Tertiary Provider:** Final fallback when secondary fails
+  * **Provider Selection:** Select provider based on priority, health status, and cost
+
+* **Configuration:**
+  * **Provider List:** Configure list of providers with priorities
+  * **Provider-Specific Models:** Map models to providers (e.g., GPT-4 → OpenAI, Claude → Anthropic)
+  * **Cost Considerations:** Consider provider costs when selecting fallback
+  * **Latency Requirements:** Prefer faster providers when latency critical
+
+For examples see the file `examples_multi_provider_failover.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for provider priority configuration and routing.
+
+### Load Balancing Strategies
+
+* **Load Distribution:**
+  * **Round-Robin:** Distribute requests evenly across healthy providers
+  * **Weighted Round-Robin:** Distribute based on provider capacity and cost
+  * **Least Connections:** Route to provider with fewest active connections
+  * **Health-Based:** Route only to healthy providers
+
+* **Traffic Splitting:**
+  * **Primary/Backup:** Route all traffic to primary, use backup only on failure
+  * **Active-Active:** Split traffic across multiple providers for redundancy
+  * **Percentage-Based:** Split traffic by percentage (e.g., 80% primary, 20% secondary)
+
+* **Implementation:**
+  * **Provider Pool:** Maintain pool of available providers
+  * **Selection Algorithm:** Select provider based on load balancing strategy
+  * **Health-Aware Routing:** Exclude unhealthy providers from routing
+  * **Automatic Recovery:** Re-include providers when health recovers
+
+### Cost Tracking Per Provider
+
+* **Cost Monitoring:**
+  * **Per-Provider Costs:** Track costs separately for each provider
+  * **Cost Per Request:** Calculate cost per request for each provider
+  * **Cost Comparison:** Compare costs across providers for same tasks
+  * **Budget Allocation:** Allocate budget per provider if needed
+
+* **Cost Optimization:**
+  * **Provider Selection:** Consider cost when selecting provider for failover
+  * **Cost-Aware Routing:** Prefer cheaper providers when quality acceptable
+  * **Cost Reporting:** Report costs per provider for analysis
+  * **Budget Alerts:** Alert when provider costs exceed budget
+
+* **See:** `cost-and-budget-management.md` for budget integration.
+
+### Fallback Chain Implementation
+
+* **Fallback Sequence:**
+  1. Attempt request with primary provider
+  2. On failure, retry with secondary provider (with exponential backoff)
+  3. On secondary failure, retry with tertiary provider
+  4. If all providers fail, return error or use cached response if available
+
+* **Retry Strategy:**
+  * **Per-Provider Retries:** Retry with same provider before failing over
+  * **Failover Retries:** Retry with next provider in chain
+  * **Max Attempts:** Limit total retry attempts across all providers
+  * **Exponential Backoff:** Use exponential backoff between retries
+
+* **Error Handling:**
+  * **Provider-Specific Errors:** Handle provider-specific error codes appropriately
+  * **Transient vs Permanent:** Distinguish transient errors (retry) from permanent (failover)
+  * **Error Propagation:** Propagate errors only after all providers exhausted
+  * **Graceful Degradation:** Return partial results or cached data when possible
+
+For examples see the file `examples_multi_provider_failover.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for fallback chain implementation and error handling.
+
+### Integration with Error Handling
+
+* **Error Classification:**
+  * **Transient Errors:** Retry with same provider (network timeouts, rate limits)
+  * **Permanent Errors:** Failover to next provider (authentication failures, invalid requests)
+  * **Provider Failures:** Failover immediately (service unavailable, connection errors)
+
+* **Circuit Breaker Integration:**
+  * **Per-Provider Circuit Breakers:** Maintain circuit breaker per provider
+  * **Circuit Breaker States:** Track circuit breaker state (closed, open, half-open) per provider
+  * **Automatic Recovery:** Automatically recover providers when circuit breaker closes
+
+* **See:** `error-handling-and-resilience.md` for comprehensive error handling patterns.

@@ -1,0 +1,196 @@
+## Mandate
+
+All agentic systems, especially those using loops (e.g., LangGraph workflows), **MUST** implement real-time cost and token budget management to prevent runaway costs. Agents can inadvertently consume thousands of dollars in tokens if not properly guarded.
+
+## 1. BudgetState Integration
+
+### GraphState Integration
+
+* **Mandatory Field:** Every `GraphState` must include a `BudgetState` field that tracks cumulative token costs in real-time.
+
+* **State Structure:** The BudgetState must track:
+  * Cumulative token count (input + output)
+  * Cumulative cost in USD (or configured currency)
+  * Per-model token usage and costs
+  * Per-node cost attribution
+  * Session start time and duration
+
+* **Real-Time Updates:** BudgetState must be updated after every LLM call, tool execution, and state transition.
+
+For examples see the file `examples_budget_state.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for BudgetState TypedDict definition and cost tracking implementation.
+
+### Cost Tracking Requirements
+
+* **Input/Output Separation:** Track input tokens and output tokens separately for accurate cost calculation.
+
+* **Model-Specific Pricing:** Use model-specific pricing tables to calculate costs accurately:
+  * Different models have different pricing (e.g., GPT-4 vs GPT-3.5, Claude Opus vs Haiku)
+  * Pricing may vary by region or provider
+  * Track pricing per 1K tokens for input and output separately
+
+* **Cumulative Tracking:** Maintain running totals across the entire workflow execution, not just per-node.
+
+* **Cost Attribution:** Track costs per node, per agent, and per user/tenant for multi-tenant systems.
+
+## 2. Threshold Management
+
+### Per-Session Budget Limits
+
+* **Mandatory Configuration:** Every agent workflow must have a configurable per-session budget limit.
+
+* **Threshold Levels:**
+  * **Warning Threshold:** Alert when budget reaches 80% of limit (non-blocking)
+  * **Hard Limit:** Halt agent execution when budget exceeds 100% of limit
+  * **Soft Limit:** Optional intermediate threshold (e.g., 90%) for graceful degradation
+
+* **Configuration:** Budget limits should be:
+  * Configurable per workflow type
+  * Configurable per user/tenant (for multi-tenant systems)
+  * Overridable for specific high-value tasks (with approval)
+
+* **Default Limits:** Set conservative default limits (e.g., $10 per session) unless explicitly configured otherwise.
+
+### Budget Reset
+
+* **Session-Based:** Budget resets at the start of each new conversation/session.
+
+* **Checkpoint Integration:** When using LangGraph checkpoints, budget state must be persisted and restored correctly.
+
+* **Multi-Tenant Isolation:** Each tenant/user must have independent budget tracking and limits.
+
+## 3. Guardrail Enforcement
+
+### Automatic Halt
+
+* **Mandate:** When budget threshold is exceeded, the agent **MUST** halt execution immediately.
+
+* **Halt Behavior:**
+  * Stop all LLM calls
+  * Stop all tool executions
+  * Save current state to checkpoint (if using LangGraph)
+  * Return error message to user explaining budget exceeded
+
+* **Graceful Degradation:** Before hard halt, consider:
+  * Switching to cheaper models (if configured)
+  * Reducing context window size
+  * Skipping non-critical tool calls
+  * Summarizing context to reduce token usage
+
+For examples see the file `examples_guardrails.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for threshold checking and graceful degradation patterns.
+
+### Pre-Call Budget Checking in Worker Nodes
+
+* **Mandate:** Every Worker Node **MUST** check `accumulated_cost_usd` (or `total_cost_usd` in BudgetState) before making any LLM call.
+
+* **Pre-Call Validation:**
+  * **Check Before LLM Call:** Verify that current accumulated cost plus estimated call cost does not exceed budget threshold
+  * **Check Before Tool Execution:** For expensive tools, verify budget allows execution
+  * **Fail Fast:** If budget would be exceeded, halt immediately rather than making the call and then halting
+
+* **Implementation Pattern:**
+  * **Read Phase:** Read current `BudgetState` from GraphState
+  * **Check Phase:** Call `check_budget_before_llm_call()` to verify budget allows operation
+  * **Do Phase:** Only proceed with LLM call if budget check passes
+  * **Write Phase:** Update BudgetState after successful call
+
+* **Budget Check Logic:**
+  * Calculate estimated cost for upcoming LLM call (based on model, estimated tokens)
+  * Add estimated cost to current `total_cost_usd`
+  * Compare against `budget_limit_usd` and thresholds
+  * Return decision: proceed, degrade, or halt
+
+* **Worker Node Pattern:**
+  * Every Worker Node must implement budget-aware pattern
+  * Use `budget_aware_worker_node()` wrapper or inline budget checking
+  * Handle budget exceeded errors gracefully (don't crash, return error state)
+
+For examples see the file `examples_guardrails.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for `check_budget_before_llm_call()` implementation and `budget_aware_worker_node()` pattern.
+
+### Error Handling
+
+* **Budget Exceeded Error:** Return a clear error message indicating:
+  * Budget limit that was exceeded
+  * Current cost vs limit
+  * Suggestion to retry with higher budget or simplified request
+
+* **State Preservation:** On budget exceeded, preserve workflow state to allow resumption if budget is increased.
+
+* **Audit Logging:** Log all budget exceeded events with full context for cost analysis.
+
+## 4. Cost Attribution
+
+### Per-Node Tracking
+
+* **Node-Level Costs:** Track costs for each node in the workflow to identify expensive operations.
+
+* **Cost Breakdown:** For each node, track:
+  * LLM call costs (input + output tokens)
+  * Tool execution costs (if tools have associated costs)
+  * Total node cost
+  * Node execution time
+
+* **Expensive Node Detection:** Identify nodes that consistently consume high budgets for optimization.
+
+### Multi-Tenant Cost Isolation
+
+* **Tenant Budgets:** Each tenant must have independent budget tracking and limits.
+
+* **Cost Reporting:** Provide per-tenant cost reports for billing and analysis.
+
+* **Budget Enforcement:** Enforce tenant-specific budget limits at the workflow level.
+
+## 5. Integration Points
+
+### LangGraph Integration
+
+* **State Management:** BudgetState must be part of the GraphState TypedDict.
+
+* **Checkpoint Persistence:** Budget state must be included in checkpoint saves/loads.
+
+* **Node Updates:** Every node that makes LLM calls must update BudgetState.
+
+* **Conditional Routing:** Use budget state in conditional edges to route to budget-aware nodes.
+
+### Monitoring Integration
+
+* **Metrics Export:** Export budget metrics to **Splunk** (via HEC); analyze with **SPL** (e.g., current budget usage, cost per session/node, budget exceeded events).
+
+* **Alerting:** Use Splunk Alerts (SPL-based) for budget threshold warnings (80%), budget exceeded events, and unusually high cost per session.
+
+* See rule: monitoring-and-observability (in .amazonq/rules) for comprehensive monitoring strategies.
+
+### Configuration Integration
+
+* **Environment Variables:** Budget limits should be configurable via environment variables or configuration files.
+
+* **Runtime Configuration:** Support runtime configuration updates (with proper validation).
+
+* **See:** `configuration-and-dependency-injection.md` for configuration management patterns.
+
+## 6. Best Practices
+
+### Cost Optimization
+
+* **Model Selection:** Use cheaper models for simple tasks (see `model-routing-and-selection.md`).
+
+* **Context Management:** Implement context compression to reduce token usage (see `context-compression-and-optimization.md`).
+
+* **Caching:** Cache LLM responses when appropriate to avoid redundant calls.
+
+* **Batch Operations:** Batch similar operations to reduce API call overhead.
+
+### Budget Planning
+
+* **Estimate Before Execution:** Estimate costs before starting expensive workflows when possible.
+
+* **Progressive Budgets:** Start with conservative budgets and increase as needed.
+
+* **Budget Reviews:** Regularly review budget usage patterns to optimize workflows.
+
+### Error Recovery
+
+* **Graceful Degradation:** Implement fallback strategies when approaching budget limits.
+
+* **Partial Results:** Return partial results if budget is exceeded mid-workflow (when appropriate).
+
+* **User Communication:** Clearly communicate budget constraints and exceeded limits to users.

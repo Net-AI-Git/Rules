@@ -1,0 +1,230 @@
+## 1. CI/CD Pipeline Standards
+
+* **Pipeline Stages:**
+    * **Lint:** Run code linters (ruff, black, mypy).
+    * **Test:** Run unit tests and integration tests.
+    * **Build:** Build Docker images.
+    * **Security Scan:** Scan for vulnerabilities (Snyk, Trivy).
+    * **Deploy Staging:** Deploy to staging environment.
+    * **E2E Tests:** Run end-to-end tests in staging.
+    * **Deploy Production:** Deploy to production (manual approval required).
+
+* **Mandate:** All code changes must pass through CI/CD pipeline. No direct production deployments.
+
+* **Fast Feedback:** Fail fast on early stages (lint, test) to provide quick feedback to developers.
+
+* **Parallel Execution:** Run independent stages in parallel to reduce pipeline duration.
+
+* **Artifact Management:** Store build artifacts (Docker images, packages) in a registry with versioning.
+
+## 2. Containerization (Docker Best Practices)
+
+**Docker is the default** for building, running, and deploying agentic AI and API services. All containerization standards below apply unless explicitly overridden.
+
+* **Multi-Stage Builds:** Use multi-stage builds to reduce image size.
+    * **Build Stage:** Install build dependencies and compile code.
+    * **Runtime Stage:** Copy only necessary files to minimal base image.
+
+* **Base Images:**
+    * **Use Official Images:** Prefer official Python images from Docker Hub.
+    * **Pin Versions:** Pin specific image versions; do **not** use `latest`.
+    * **Default:** Use **full** official Python image with pinned version (e.g. `python:3.11` or `python:3.12`).
+    * **Optional:** When a smaller image is explicitly required, `-slim` or `-alpine` may be used; still pin the full tag (e.g. `python:3.11-slim`).
+
+* **Layer Optimization:**
+    * **Order Matters:** Copy dependency files (`pyproject.toml`, `poetry.lock`) before source code to leverage Docker cache. Order Dockerfile instructions so that less frequently changing layers (dependencies) come **before** frequently changing ones (application code) to maximize build cache reuse.
+    * **Combine RUN Commands:** Combine multiple `RUN` commands to reduce layers.
+    * **Clean Up:** Remove package managers and cache in the same layer.
+
+* **Security:**
+    * **Non-Root User:** Run containers as non-root user. The main process (e.g. Uvicorn) MUST run as a non-root user (e.g. `USER 1000` in Dockerfile) so that it does not have elevated privileges inside the container, reducing attack surface.
+    * **Secrets:** Never embed secrets in Docker images. Use environment variables or secret management.
+    * **Scan Images:** Regularly scan images for vulnerabilities. In CI, include a vulnerability scan step (e.g. Trivy or Snyk) on the image **before** push to registry. Fail the pipeline on critical vulnerabilities (or define a clear policy). **See:** CI/CD Pipeline Stages (Section 1) where Security Scan is already listed.
+
+* **API-Only Services (Agentic AI):** When the service **only calls external model APIs** (no local model loading or inference): do **not** include model weights or GPU runtimes in the image; do **not** use model-specific or CUDA base images unless required for another reason; inject API keys and secrets **only** via environment variables or secret management; never embed in image or code.
+
+* **Logging:** Applications MUST emit logs to **stdout** and **stderr** (not only to log files inside the container) so that the container runtime (Docker/Kubernetes) can collect them into the project's log pipeline (e.g. Splunk See rule: monitoring-and-observability (in .amazonq/rules)).
+
+* **Docker Compose and BuildKit:** Use **Docker Compose** for local development when more than one service is involved (e.g. agent + database, agent + Redis). Enable **BuildKit** for image builds when available (`DOCKER_BUILDKIT=1`) for better cache and build speed. Store images in a **versioned registry** (tag by version or commit); do not rely only on `latest`.
+
+* **Dependencies:** Project dependencies **MUST** include `uvicorn[standard]` (See rule: uvicorn-asgi-server (in .amazonq/rules)). Ensure `pyproject.toml` (or `requirements.txt`) declares `uvicorn[standard]` so the image gets uvloop, httptools, and watchfiles.
+
+* **Example Structure (Poetry as default):** Project default is full Python base image (not slim/alpine).
+```dockerfile
+FROM python:3.11 as builder
+WORKDIR /app
+COPY pyproject.toml poetry.lock ./
+RUN pip install --no-cache-dir poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install --no-dev --no-interaction --no-ansi
+
+FROM python:3.11
+WORKDIR /app
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY . .
+USER 1000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+```
+* **CMD:** Use Uvicorn with `--workers`; do not use `python main.py` for FastAPI. Adjust module path (e.g. `app.main:app`) and port/workers via env or build args if needed.
+* **Legacy:** Projects using only `requirements.txt` may continue with `COPY requirements.txt` and `RUN pip install -r requirements.txt`; ensure they install `uvicorn[standard]`.
+
+## 3. Running FastAPI in Production
+
+* **ASGI Server:** Use **Uvicorn** as the ASGI server for FastAPI apps (See rule: api-interface-and-streaming (in .amazonq/rules)). For standard Uvicorn setup (installation, `--reload`, `--workers`), **see:** rule: uvicorn-asgi-server (in .amazonq/rules).
+
+* **Command:** Production run **MUST** include `--workers <N>` (e.g. `uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers 4`). Set N per environment (e.g. by CPU or load). Do not use `--reload` in production.
+
+* **Docker CMD:** In Dockerfile, CMD runs Uvicorn with `--workers` and no `--reload` (see Section 2 example).
+
+* **Health Probes:** Ensure `/health/live` and `/health/ready` (See: (See rule: monitoring-and-observability in .amazonq/rules)) are used for liveness and readiness probes.
+
+## 4. Orchestration (Kubernetes Patterns)
+
+* **Mandate:** Production and staging deployments **MUST** run on Kubernetes. The following patterns are the default for agentic AI and API services.
+
+* **Deployment (Required):**
+    * **Workload Type:** Define agent/API services as **Deployment** resources (not bare Pods).
+    * **Replicas:** Configure **minimum 2 replicas** in production for high availability.
+    * **Resource Limits:** Set **requests** and **limits** for CPU and memory on every container; required for scheduling and fairness.
+    * **Stateless Design:** Design applications as stateless so horizontal scaling and rolling updates work without per-pod state.
+
+* **Health Probes:**
+    * **Required:** Configure liveness and readiness probes on all Deployments.
+    * **Endpoints:** Use fixed paths `/health/live` and `/health/ready` (See rule: monitoring-and-observability (in .amazonq/rules)).
+    * **Timing:** Set `initialDelaySeconds` and `periodSeconds` to match application startup (e.g., model loading).
+
+For examples see the file `examples_kubernetes.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for Kubernetes Deployment and Service resource patterns.
+
+* **Service Discovery:**
+    * **Service Resources:** Use Kubernetes Services for internal service discovery.
+    * **DNS Only:** Services MUST be accessed by DNS name (e.g., `service-name.namespace.svc.cluster.local`); never hardcode IP addresses.
+    * **Internal Traffic:** Traffic between pods is distributed by Kubernetes (kube-proxy) by default; do not mandate a specific algorithm or Headless Service.
+
+* **ConfigMaps & Secrets:**
+    * **ConfigMaps:** Store non-sensitive configuration (endpoints, feature flags, service names).
+    * **Secrets:** Store sensitive data (API keys, passwords, tokens) in Kubernetes Secrets or external secret management; never embed in code or Docker images.
+    * **Application:** Application MUST read configuration from environment variables; Kubernetes injects these from ConfigMaps and Secrets.
+    * For examples see the file `examples_kubernetes.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for ConfigMap and Secret manifest examples.
+
+* **Horizontal Pod Autoscaling (HPA):**
+    * **When:** Define HorizontalPodAutoscaler for services with variable load (agents, inference, APIs).
+    * **Min/Max Replicas:** Define minimum and maximum replica counts.
+    * **Metrics:** Scale on CPU, memory, or custom metrics; document which metric is used per service.
+
+* **Rolling Updates:**
+    * **Default Strategy:** Use **RollingUpdate** for zero-downtime deployments.
+    * **Max Surge/Unavailable:** Configure (e.g., `maxUnavailable: 0`) to avoid downtime during updates.
+
+* **Blue-Green (Optional):** Use Blue-Green only when instant rollback or full pre-switch validation is required; do not combine Rolling and Blue-Green on the same Deployment.
+
+## 5. Environment Promotion
+
+* **Environment Hierarchy:**
+    * **Development:** Local development and feature testing.
+    * **Staging:** Pre-production environment matching production configuration.
+    * **Production:** Live environment serving real users.
+
+* **Promotion Process:**
+    * **Automated Promotion:** Automatically promote to staging after successful CI/CD.
+    * **Manual Approval:** Require manual approval for production deployments.
+    * **Smoke Tests:** Run smoke tests after each promotion.
+
+* **Configuration Management:**
+    * **Environment-Specific Configs:** Use separate configuration files or environment variables per environment.
+    * **No Hardcoding:** Never hardcode environment-specific values in code.
+
+* **Database Migrations:**
+    * **Run Migrations:** Execute database migrations as part of deployment process.
+    * **Rollback Plan:** Have a rollback plan for failed migrations.
+
+## 6. Blue-Green Deployments
+
+* **Concept:** Maintain two identical production environments (blue and green).
+    * **Active Environment:** One environment serves live traffic.
+    * **Inactive Environment:** The other environment is updated with new version.
+
+* **Deployment Process:**
+    1. Deploy new version to inactive environment.
+    2. Run health checks and smoke tests.
+    3. Switch traffic from active to inactive environment.
+    4. Monitor for issues.
+    5. Keep previous environment as backup for quick rollback.
+
+For examples see the file `examples_blue_green.py` in this folder. When using this rule, add the relevant example file(s) to the chat context. for blue-green deployment traffic switching pattern.
+
+* **Benefits:**
+    * **Zero Downtime:** No downtime during deployments.
+    * **Quick Rollback:** Instant rollback by switching traffic back.
+    * **Testing:** Test new version in production-like environment before switching.
+
+* **Implementation:** Use load balancer or service mesh to route traffic between environments.
+
+## 7. Rollback Procedures
+
+* **Automated Rollback:**
+    * **Health Check Failures:** Automatically rollback if health checks fail after deployment.
+    * **Error Rate Threshold:** Rollback if error rate exceeds threshold.
+    * **Latency Threshold:** Rollback if latency exceeds acceptable limits.
+
+* **Manual Rollback:**
+    * **Process:** Document clear rollback procedure.
+    * **Access:** Ensure team has access to rollback tools and permissions.
+    * **Communication:** Notify stakeholders before and after rollback.
+
+* **Rollback Strategies:**
+    * **Image Rollback:** Revert to previous Docker image version.
+    * **Code Rollback:** Revert Git commit and redeploy.
+    * **Database Rollback:** Rollback database migrations if needed (See: (See rule: data-migration-and-compatibility in .amazonq/rules)).
+
+* **Post-Rollback:**
+    * **Investigation:** Investigate root cause of deployment failure.
+    * **Documentation:** Document the incident and lessons learned.
+    * **Prevention:** Update processes to prevent similar issues.
+
+## 8. Infrastructure as Code (IaC)
+
+* **Terraform:**
+    * **State Management:** Use remote state (S3, Terraform Cloud) for team collaboration.
+    * **Modules:** Create reusable modules for common infrastructure patterns.
+    * **Versioning:** Version Terraform modules and pin provider versions.
+
+* **Pulumi:**
+    * **Language Support:** Use Python for infrastructure definitions (consistent with application code).
+    * **Type Safety:** Leverage type checking for infrastructure code.
+
+* **Best Practices:**
+    * **Version Control:** Store IaC code in version control (Git).
+    * **Review Process:** Require code review for infrastructure changes.
+    * **Testing:** Test infrastructure changes in staging before production.
+    * **Documentation:** Document infrastructure architecture and dependencies.
+
+* **Resource Tagging:**
+    * **Mandatory Tags:** Tag all resources with: environment, project, owner, cost-center.
+    * **Automation:** Use tags for cost allocation and resource management.
+
+## 9. Scaling Strategies
+
+* **Horizontal Scaling:**
+    * **Add Instances:** Scale by adding more instances/pods.
+    * **Load Balancing:** Distribute traffic across instances using load balancer.
+    * **Stateless Design:** Ensure application is stateless to enable horizontal scaling.
+
+* **Vertical Scaling:**
+    * **Increase Resources:** Scale by increasing CPU/memory of instances.
+    * **Limitations:** Limited by instance size and cost.
+
+* **Auto-Scaling:**
+    * **Metrics-Based:** Scale based on CPU, memory, request rate, or custom metrics.
+    * **Predictive Scaling:** Use predictive algorithms to scale before load increases.
+    * **Scheduled Scaling:** Scale based on known patterns (e.g., business hours).
+
+* **Database Scaling:**
+    * **Read Replicas:** Use read replicas for read-heavy workloads.
+    * **Sharding:** Partition data across multiple databases for write scaling.
+    * **Connection Pooling:** Use connection pooling to manage database connections efficiently.
+
+* **Caching:**
+    * **Application Cache:** Use in-memory cache (Redis) to reduce database load.
+    * **CDN:** Use CDN for static assets and API responses when applicable.
+
+* See rule: performance-optimization (in .amazonq/rules) for detailed performance optimization strategies.
