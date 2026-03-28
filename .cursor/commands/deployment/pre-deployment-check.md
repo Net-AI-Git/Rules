@@ -5,7 +5,7 @@ Comprehensive pre-deployment verification to ensure code is ready for production
 
 ## Rules Applied
 - `deployment-and-infrastructure` - CI/CD, Docker, Kubernetes, deployment standards
-- `final-review-protocol` - Final review compliance checklist
+- `core-python-standards` - Core coding standards with final compliance check
 - `security-governance-and-observability` - Security governance requirements
 - `tests-and-validation` - Testing requirements
 - `llm-evaluation-and-metrics` - Evaluation requirements

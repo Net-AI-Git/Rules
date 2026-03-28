@@ -15,7 +15,7 @@ You are an expert AI developer. You must strictly adhere to the following method
 3.  **Component Planning:**
     * Define main functions/classes, responsibilities, and signatures with full type hints.
     * Define constructor (`__init__`) attributes and necessary logic values.
-4.  **Logging Setup:** Configure **structlog** for structured logging (JSON in Prod, console in Dev) with **Splunk** as the centralized logging and observability platform (see @monitoring-and-observability).
+4.  **Logging Setup:** Configure structured JSON logging sent to **Splunk via HEC** as the centralized observability platform (see @monitoring-and-observability).
 
 ## Phase 2: Plan Approval
 * Present the detailed plan covering structure, components, and standards.
@@ -70,15 +70,11 @@ You are an expert AI developer. You must strictly adhere to the following method
     * Offload heavy computations to separate processes so the Agent loop doesn't freeze.
 
 ### 3. Logging System
-* **No `print()`:** Use **structlog** exclusively for all logging.
-* **Structured Logging with structlog:**
-    * Use `structlog.get_logger(__name__)` to obtain a logger.
-    * Pass structured fields as keyword arguments: `logger.info("event_name", field1=value1, field2=value2)`.
-    * Configure **JSONRenderer** in Prod for Splunk ingestion; **ConsoleRenderer** in Dev for readability.
-    * Required processors: `TimeStamper(fmt="iso", utc=True)`, `add_log_level`, `merge_contextvars`.
-* **Color-Coded Output (Dev Mode):** structlog's ConsoleRenderer provides colored output by default.
+* **No `print()`:** All logging must produce structured JSON events sent to **Splunk via HEC** (HTTP Event Collector).
+* **HEC Direct:** Use the project's Splunk HEC client (HTTP POST with JSON). Every event MUST include: `timestamp` (ISO 8601, UTC), `correlation_id` (UUID), `operation_name`.
+* **Timed operations:** Also include `start_time`, `end_time`, `duration_ms` (use `time.perf_counter()`).
 
-* **See:** @monitoring-and-observability for comprehensive monitoring and observability strategies (Splunk, SPL, metrics, tracing, alerting).
+* **See:** @monitoring-and-observability for mandatory fields, metrics, naming conventions, and alerting. Use `@splunk-instrumentation` skill to add instrumentation to existing code.
 
 
 # Documentation & Commenting Standards
@@ -99,3 +95,6 @@ You are an expert AI developer. You must strictly adhere to the following method
 ## 3. Inline Documentation
 * **Self-Documenting Code:** Prioritize clear variable names and structure over excessive comments.
 * **Complex Logic:** Add inline comments **only** to explain "why" a complex or non-obvious logic block exists. Do not explain "what" the code does (the code shows that).
+
+## Final Check
+Before submitting code, verify: all functions are under 20 lines, all I/O is async, all types are hinted, logging uses Splunk HEC (no `print()`), and error handling follows `error-handling-and-resilience` (retry with backoff, circuit breaker, error classification).

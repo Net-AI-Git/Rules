@@ -6,7 +6,7 @@ Systematic audit that goes through **every single RULE.mdc file** in the `.curso
 ## Rules Applied
 - **ALL RULES** - This command systematically checks every rule in the repository
 - `rules-management` - Rule structure and format validation
-- `final-review-protocol` - Final review compliance checklist
+- `core-python-standards` - Core coding standards with final compliance check
 - `code-review-and-collaboration` - Code review standards
 
 ## Steps
@@ -14,7 +14,7 @@ Systematic audit that goes through **every single RULE.mdc file** in the `.curso
 1. **Discover All Rules**
    - Scan `.cursor/rules` directory recursively
    - Find all `RULE.mdc` files
-   - Build complete inventory of all rules (currently 39 rules)
+   - Build complete inventory of all rules (currently 42 rules)
    - Categorize rules by type:
      - Always Apply rules
      - Apply Intelligently rules
@@ -29,7 +29,7 @@ Systematic audit that goes through **every single RULE.mdc file** in the `.curso
      - **API Rules**: `api-interface-and-streaming`, `api-documentation-standards`, `mcp-protocol-implementation`
      - **Data Rules**: `data-schemas-and-interfaces`, `data-migration-and-compatibility`
      - **Configuration Rules**: `configuration-and-dependency-injection`, `prompt-engineering-and-management`
-     - **Evaluation Rules**: `llm-evaluation-and-metrics`, `llm-judge-protocol`, `graph-traversal-testing`, `simulation-and-property-testing`, `bias-detection-and-ethics`, `final-review-protocol`
+     - **Evaluation Rules**: `llm-evaluation-and-metrics` (LLM-as-a-Judge: Skill `@evaluate-with-llm-judge`)
 
 2. **Read and Parse Each Rule**
    - Read frontmatter from each `RULE.mdc` file
@@ -84,7 +84,7 @@ Systematic audit that goes through **every single RULE.mdc file** in the `.curso
    - Request approval for significant changes
 
 7. **Generate Comprehensive Audit Report**
-   - **Complete Rule Inventory**: List all 39+ rules with their status
+   - **Complete Rule Inventory**: List all 42+ rules with their status
    - **Relevance Analysis**: Which rules apply to current codebase
    - **Compliance Matrix**: Detailed compliance status for each relevant rule
    - **Gap Analysis**: All missing implementations with severity
@@ -95,7 +95,7 @@ Systematic audit that goes through **every single RULE.mdc file** in the `.curso
    - **Next Steps**: Prioritized action items
 
 ## Data Sources
-- All `RULE.mdc` files in `.cursor/rules` directory (39+ rules)
+- All `RULE.mdc` files in `.cursor/rules` directory (42+ rules)
 - Source code files (Python files, configuration files)
 - Test files (`tests/` directory)
 - Documentation files
@@ -105,7 +105,7 @@ Systematic audit that goes through **every single RULE.mdc file** in the `.curso
 ## Output
 A comprehensive rules audit report including:
 
-- **Complete Rule Inventory**: All 39+ rules with metadata (type, category, description)
+- **Complete Rule Inventory**: All 42+ rules with metadata (type, category, description)
 - **Relevance Matrix**: Which rules apply to current codebase (with justification)
 - **Compliance Status Per Rule**: 
   - ✅ Fully Compliant

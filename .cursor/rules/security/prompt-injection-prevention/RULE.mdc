@@ -202,7 +202,7 @@ All agentic systems **MUST** implement prompt injection prevention and input san
 
 * **Security Framework:** Integrate with security governance framework.
 
-* **Audit Logging:** Log all sanitization and detection events using **structlog** for structured logging.
+* **Audit Logging:** Log all sanitization and detection events as structured JSON to Splunk HEC (see @monitoring-and-observability for mandatory fields).
 
 * **See:** `security-governance-and-observability.md` and `audit-protocol.md` for security integration.
 

@@ -2,19 +2,17 @@
 Performance Timing Implementation Example
 
 This file demonstrates the PerformanceTimer context manager for latency measurement
-with structlog per monitoring-and-observability requirements. Logs are
-suitable for Splunk ingestion (e.g., via HEC); optionally pass a Splunk HEC client
-to send timed events directly to Splunk.
+per monitoring-and-observability requirements. Events are sent directly to Splunk
+via HEC; optionally pass a Splunk HEC client to send timed events.
 Reference this example from RULE.mdc using @examples_performance_timing syntax.
 """
 
+import logging
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
-import structlog
-
-logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class PerformanceTimer:

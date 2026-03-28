@@ -65,7 +65,6 @@ alwaysApply: true
 - `error-handling-and-resilience` - Error handling patterns
 - `security-governance-and-observability` - Security standards
 - `audit-protocol` - Audit procedures
-- `final-review-protocol` - Final review process
 
 ### 2. Apply Intelligently
 
@@ -85,8 +84,8 @@ alwaysApply: false
 - `code-review-and-collaboration` - Code review standards
 - `multi-agent-systems` - Multi-agent architecture patterns
 - `contract-scope-and-boundaries` - When to define explicit API contracts
-- `llm-judge-protocol` - LLM-as-a-Judge evaluation
-- `performance-optimization` - Performance best practices
+- `redis-cache` - Redis data structures and usage patterns
+- `oracle-database` - Oracle DB bind variables and bulk operations
 
 ### 3. Apply to Specific Files
 
@@ -222,26 +221,23 @@ Agent-specific architecture:
 
 Deployment and operations:
 
-- **`uvicorn-asgi-server`** (Apply Intelligently)
-  - Uvicorn as default ASGI server; install `uvicorn[standard]`; `--reload` (dev), `--workers` (prod)
-
 - **`deployment-and-infrastructure`** (Apply Intelligently)
   - CI/CD, Docker, Kubernetes standards
   - Infrastructure deployment patterns
   - Docker is the **default** for containerization; defaults include full Python base image (pinned), non-root, image scanning in CI, layer cache order, API-only (no model weights when using external APIs), logging to stdout/stderr, Docker Compose for local multi-service dev, BuildKit, and versioned registry
 
 - **`monitoring-and-observability`** (Apply Intelligently)
-  - **Splunk** and **SPL** as the default platform for metrics, logging, tracing, and alerting
-  - Ingestion via Splunk HEC; analysis and dashboards with SPL
-  - PerformanceTimer for latency measurement (start/end/duration_ms); structured logging with timestamps per operation
+  - **Splunk HEC** as the single destination for all metrics, logs, and traces (direct HTTP POST, no stdout pipeline)
+  - Mandatory event fields: `timestamp`, `correlation_id`, `operation_name`; timed operations add `duration_ms`
+  - Use `@splunk-instrumentation` skill to add HEC instrumentation to existing code on demand
 
-- **`rate-limiting-and-queue-management`** (Apply Intelligently)
-  - Multi-agent rate limiting and queue management
-  - API key protection and exponential backoff
+- **`redis-cache`** (Apply Intelligently)
+  - Redis data structures: when to use strings, hashes, sorted sets, lists, sets
+  - TTL, serialization with orjson
 
-- **`performance-optimization`** (Apply Intelligently)
-  - Performance optimization strategies
-  - Caching, query optimization, resource pooling
+- **`oracle-database`** (Apply Intelligently)
+  - Bind variables (`:param` syntax) for cached execution plans and SQL injection prevention
+  - Bulk operations with `executemany()` instead of looped `execute()`
 
 - **`multi-tenancy-and-isolation`** (Apply Intelligently)
   - Multi-tenant architecture patterns
@@ -273,9 +269,8 @@ Development workflow:
 API development:
 
 - **`api-interface-and-streaming`** (Apply to Specific Files)
-  - FastAPI as default framework; Uvicorn, Pydantic, OpenAPI, SSE/WebSocket streaming
-  - Server run defaults (Uvicorn, `uvicorn[standard]`, `--reload`, `--workers`) are defined by **`uvicorn-asgi-server`** (infrastructure)
-  - API design and interface standards, rate limiting (slowapi/fastapi-limiter)
+  - FastAPI as default framework; Uvicorn with `uvicorn[standard]` (uvloop, httptools, watchfiles)
+  - Pydantic, OpenAPI, SSE/WebSocket streaming, rate limiting (slowapi/fastapi-limiter)
   - Applied to API route files and `main.py`
 
 - **`api-documentation-standards`** (Apply to Specific Files)
@@ -310,24 +305,7 @@ LLM evaluation and testing:
   - Metrics and scoring standards
   - Applied to evaluation files
 
-- **`llm-judge-protocol`** (Apply Intelligently)
-  - LLM-as-a-Judge evaluation protocol
-  - Performance, safety, and logic analysis
-
-- **`graph-traversal-testing`** (Apply Intelligently)
-  - Graph traversal tests for agent workflow paths
-  - Node sequence validation
-
-- **`simulation-and-property-testing`** (Apply Intelligently)
-  - Property-based and chaos testing
-  - Edge case simulation
-
-- **`bias-detection-and-ethics`** (Apply Intelligently)
-  - Bias detection and ethical AI practices
-
-- **`final-review-protocol`** (Always Apply)
-  - Final review process before commit
-  - Compliance verification
+- **LLM-as-a-Judge** — **not** a Cursor Rule; canonical workflow is the Skill **`@evaluate-with-llm-judge`** (`.cursor/skills/evaluate-with-llm-judge/SKILL.md`).
 
 ### Configuration Rules (`configuration/`)
 

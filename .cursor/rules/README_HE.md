@@ -16,7 +16,6 @@
 | **error-handling-and-resilience** | טיפול בשגיאות, retry, circuit breaker | Always | Tenacity, circuitbreaker, Splunk |
 | **security-governance-and-observability** | אבטחה, governance, OWASP LLM | Always | — |
 | **audit-protocol** | ביקורות, compliance, audit trail | Always | Splunk, HEC |
-| **final-review-protocol** | לפני שליחת תשובה סופית — בדיקת ציות | Always | pydantic-settings, pytest, Docker, FastAPI |
 | **prompt-injection-prevention** | מניעת הזרקת פרומפטים, סניטציית קלט | לפי הקשר | — |
 | **planner-strategic-planning** | תכנון אסטרטגי לפני פירוק משימות | לפי הקשר | LangGraph |
 | **executor-action-translation** | תרגום תוכניות לאקשנים קונקרטיים | לפי הקשר | LangChain |
@@ -31,16 +30,14 @@
 | **reflection-and-self-critique** | Reviewer Node, self-critique לפני סינתזה | לפי הקשר | — |
 | **data-schemas-and-interfaces** | סכמות Pydantic, מודלים מובנים | לפי הקשר | Pydantic BaseModel, Field |
 | **configuration-and-dependency-injection** | קונפיגורציה והזרקת תלויות | לפי הקשר | pydantic-settings, SecretStr |
-| **uvicorn-asgi-server** | הרצת אפליקציות ASGI (FastAPI) | לפי הקשר | Uvicorn, uvloop, httptools, watchfiles |
 | **deployment-and-infrastructure** | CI/CD, Docker, Kubernetes | לפי הקשר | Docker, Kubernetes, Uvicorn, Trivy/Snyk, Splunk |
 | **monitoring-and-observability** | מטריקות, לוגים, tracing | לפי הקשר | Splunk, HEC, SPL |
-| **rate-limiting-and-queue-management** | rate limiting, תורים, multi-agent | לפי הקשר | FastAPI (middleware) |
-| **performance-optimization** | קאשינג, אופטימיזציה, connection pooling | לפי הקשר | Redis, functools.lru_cache, CDN |
+| **redis-cache** | Redis data structures ושימושים | לפי הקשר | Redis, orjson |
+| **oracle-database** | bind variables, bulk operations | לפי הקשר | python-oracledb / cx_Oracle |
 | **multi-tenancy-and-isolation** | בידוד tenant, אסטרטגיות DB | לפי הקשר | PostgreSQL (schema/row-level) |
 | **code-review-and-collaboration** | code review, Git workflow | לפי הקשר | ruff, black, GitFlow |
 | **versioning-and-release-management** | גרסאות סמנטיות, CHANGELOG | לפי הקשר | Keep a Changelog |
 | **gitflow-branching-model** | מודל ענפים: master, develop, release, hotfix | לפי הקשר | Git |
-| **llm-judge-protocol** | הערכת ביצועים/בטיחות/לוגיקה (LLM-as-Judge) | לפי הקשר | — |
 | **mcp-protocol-implementation** | שרתים ולקוחות MCP לכלים דינמיים | לפי הקשר | MCP (mcp.server), JSON-RPC |
 | **langgraph-architecture-and-nodes** | מבנה workflow, READ→DO→WRITE→CONTROL | לפי קבצים (workflows/nodes) | LangGraph, TypedDict, PydanticAI |
 | **memory-feedback-node** | Memory Node כ־LangGraph node (feedback ל־Planner) | לפי קבצים (workflows/nodes) | LangGraph |
@@ -51,13 +48,12 @@
 | **llm-evaluation-and-metrics** | Evals ל־LLM, מטריקות איכות | לפי קבצים (evals, evaluation) | Ragas, DeepEval, pytest, Splunk |
 | **data-migration-and-compatibility** | מיגרציות סכמה, תאימות לאחור | לפי קבצים (migrations, alembic) | Alembic, Flyway/Liquibase |
 | **prompt-engineering-and-management** | ניהול פרומפטים, גרסאות, A/B | לפי קבצים (prompts) | Jinja2, LangChain PromptTemplates |
-| **graph-traversal-testing** | בדיקות מסלול ב-workflow (רצף nodes) | לפי הקשר | LangGraph, Splunk/SPL |
-| **simulation-and-property-testing** | בדיקות property, edge cases, chaos | לפי הקשר | Hypothesis, pytest |
-| **bias-detection-and-ethics** | זיהוי הטיה, אתיקה, fairness | לפי הקשר | Splunk (דשבורדים) |
 | **rules-management** | יצירה/עדכון של Rules (פורמט, מבנה) | לפי קבצים (RULE.mdc) | — |
 | **helper-files-guide** | שימוש בקובצי עזר (examples) ל־Rules | לפי הקשר | — |
 | **frontmatter-reference** | תבניות frontmatter לכל סוגי החוקים | לפי הקשר | — |
 | **commands-management** | יצירה/עדכון של Commands | לפי קבצים (.cursor/commands/*.md) | — |
+
+**Skills (לא חוקים):** LLM-as-a-Judge — `@evaluate-with-llm-judge` (קובץ: `.cursor/skills/evaluate-with-llm-judge/SKILL.md`).
 
 ---
 
@@ -191,10 +187,7 @@
 
 ### Infrastructure (`infrastructure/`)
 
-#### uvicorn-asgi-server
-- **מה החוק אומר:** Uvicorn כשרת ASGI היחיד; התקנה עם `uvicorn[standard]` (uvloop, httptools, watchfiles). פיתוח: `--reload`; פרודקשן: `--workers` בלי `--reload`.
-- **מתי נשתמש:** Apply Intelligently — בהרצת אפליקציות FastAPI/ASGI.
-- **ספריות וטכנולוגיות:** Uvicorn, uvloop, httptools, watchfiles.
+
 - **למחליט (האם לאמץ?):** מקבע שרת אחד להרצת FastAPI — אותו כלי בפיתוח ובפרודקשן, עם הגדרות ברורות (reload בפיתוח, workers בפרודקשן). מונע בלבול ובעיות תאימות. מתאים לכל פרויקט שמריץ API ב־Python.
 
 #### deployment-and-infrastructure
@@ -204,21 +197,21 @@
 - **למחליט (האם לאמץ?):** מגדיר איך בונים, סורקים ומפריסים את האפליקציה — צינור אוטומטי, קונטיינרים מאובטחים, ולוגים שניתן לאסוף. מתאים לפרויקטים שמועלים לפרודקשן או ל־staging. מפחית טעויות ידניות וחשיפת סודות.
 
 #### monitoring-and-observability
-- **מה החוק אומר:** Splunk כפלטפורמה אחת למטריקות, לוגים ו־tracing. HEC להזנה; SPL לשאילתות. שדות חובה: timestamp, correlation_id, duration_ms; PerformanceTimer; span events.
+- **מה החוק אומר:** Splunk HEC כיעד יחיד למטריקות, לוגים ו־traces (שליחה ישירה, ללא stdout pipeline). שדות חובה: `timestamp`, `correlation_id`, `operation_name`; פעולות מתוזמנות גם `duration_ms`. Health checks, alerting ו־SLO.
 - **מתי נשתמש:** Apply Intelligently — בניטור ו־observability.
-- **ספריות וטכנולוגיות:** Splunk, HEC, SPL.
-- **למחליט (האם לאמץ?):** מקבע מקום אחד לכל הלוגים והמטריקות — אפשר לעקוב אחרי בקשה מקצה לקצה, למדוד זמנים ולחפש תקלות. חובה כשיש צורך לאבחן בעיות בפרודקשן או לעמוד ב־SLA. דורש Splunk (או תשתית דומה).
+- **ספריות וטכנולוגיות:** Splunk HEC (httpx), SPL.
+- **סקיל:** `@splunk-instrumentation` — להוספת HEC instrumentation לקוד קיים on demand.
+- **למחליט (האם לאמץ?):** מקבע מקום אחד לכל הלוגים והמטריקות — אפשר לעקוב אחרי בקשה מקצה לקצה, למדוד זמנים ולחפש תקלות. חובה כשיש צורך לאבחן בעיות בפרודקשן או לעמוד ב־SLA. דורש Splunk.
 
-#### rate-limiting-and-queue-management
-- **מה החוק אומר:** rate limiting ברמת agent וגלובלית; תורים (FIFO/priority) כשמגיעים למגבלות; exponential backoff. בשכבת HTTP — FastAPI middleware (מפנה ל־api-interface-and-streaming).
-- **מתי נשתמש:** Apply Intelligently — במערכות multi-agent ו־API.
-- **ספריות וטכנולוגיות:** FastAPI (middleware/dependencies).
-- **למחליט (האם לאמץ?):** מונע "הצפה" של קריאות ל־API חיצוני (למשל OpenAI) — חלוקה הוגנת בין אג'נטים ותור כשמגיעים למגבלה. חובה כשיש הרבה אג'נטים במקביל או מגבלות ספק. מפחית 429 ותקלות רשת.
+#### redis-cache
+- **מה החוק אומר:** מתי להשתמש בכל data structure של Redis (String, Hash, Sorted Set, List, Set). TTL חובה, serialization עם orjson.
+- **מתי נשתמש:** Apply Intelligently — בעבודה עם Redis.
+- **ספריות וטכנולוגיות:** Redis, orjson.
 
-#### performance-optimization
-- **מה החוק אומר:** קאשינג (Redis, in-memory, CDN); cache-aside/write-through/write-back; אופטימיזציית שאילתות; connection pooling; msgpack/orjson.
-- **מתי נשתמש:** Apply Intelligently — באופטימיזציית ביצועים.
-- **ספריות וטכנולוגיות:** Redis, functools.lru_cache, CDN.
+#### oracle-database
+- **מה החוק אומר:** bind variables (`:param`) חובה — לביצועים (soft parse) ולאבטחה (SQL injection). bulk operations עם `executemany()` במקום לולאות.
+- **מתי נשתמש:** Apply Intelligently — בעבודה עם Oracle DB.
+- **ספריות וטכנולוגיות:** python-oracledb / cx_Oracle.
 - **למחליט (האם לאמץ?):** מגדיר מתי לשמור תוצאות (cache), איך לנצל חיבורים מחדש (pooling), ואיך להאיץ שאילתות. מתאים כשיש צוואר בקבוק ב־DB או ב־API. מפחית עומס ולטנציה בלי לשנות לוגיקה עסקית.
 
 #### multi-tenancy-and-isolation
@@ -260,7 +253,7 @@
 ### API (`api/`)
 
 #### api-interface-and-streaming
-- **מה החוק אומר:** FastAPI כפריימוורק; streaming (SSE/WebSocket) חובה לאג'נטים; Pydantic ל־request/response; OpenAPI ב־/openapi.json ו־/docs; Uvicorn (ראה uvicorn-asgi-server); rate limiting (slowapi/fastapi-limiter); אירועים מובנים (token, tool_start, tool_end, error); LangChain astream_events.
+- **מה החוק אומר:** FastAPI כפריימוורק; Uvicorn עם `uvicorn[standard]` (uvloop, httptools, watchfiles); streaming (SSE/WebSocket) חובה לאג'נטים; Pydantic ל־request/response; OpenAPI ב־/openapi.json ו־/docs; rate limiting (slowapi/fastapi-limiter); אירועים מובנים (token, tool_start, tool_end, error); LangChain astream_events.
 - **מתי נשתמש:** Apply to Specific Files — `**/api/**/*.py`, `**/routes/**/*.py`, `**/main.py`.
 - **ספריות וטכנולוגיות:** FastAPI, Pydantic, Uvicorn, slowapi או fastapi-limiter, LangChain (astream_events).
 - **למחליט (האם לאמץ?):** מקבע stack ל־API: FastAPI, streaming כדי שהלקוח יקבל עדכונים בזמן אמת (חשוב לאג'נטים), תיעוד אוטומטי ו־rate limiting. מתאים לכל שירות API ב־Python, במיוחד כשיש אג'נטים או תגובות ארוכות.
@@ -303,35 +296,13 @@
 - **ספריות וטכנולוגיות:** Ragas, DeepEval, pytest, Splunk.
 - **למחליט (האם לאמץ?):** מודד איכות תשובות האג'נט — נאמנות למקור, רלוונטיות, שימוש נכון בכלים — לא רק "הקוד רץ". מתאים כשאיכות התוכן קריטית או יש דרישות איכות. עוזר לתפוס הולוצינציות ורגרסיות לפני פרודקשן.
 
-#### llm-judge-protocol
-- **מה החוק אומר:** פרוטוקול LLM-as-Judge: הערכת correctness, tool usage, יעילות, אבטחה ופרטיות על בסיס execution logs, audit tables, מטריקות ו־final output.
-- **מתי נשתמש:** Apply Intelligently — בהערכת מערכות אג'נטיות.
-- **ספריות וטכנולוגיות:** אין ספריות חובה.
-- **למחליט (האם לאמץ?):** מגדיר איך "שופט" (LLM או אדם) מעריך ריצות אג'נט — נכונות, שימוש בכלים, יעילות ואבטחה. מתאים ל־QA מתקדם, ביקורות לפני שחרור, או ניתוח אחרי תקלה. משלים טסטים אוטומטיים בהערכת איכות ורציונל.
-
-#### graph-traversal-testing
-- **מה החוק אומר:** בדיקות שמאמתות רצף nodes ב־workflow (expected path, forbidden path, coverage); שימוש ב־traces (למשל מ־Splunk/SPL) לאימות.
-- **מתי נשתמש:** Apply Intelligently — בבדיקות workflow.
-- **ספריות וטכנולוגיות:** LangGraph, Splunk/SPL.
-- **למחליט (האם לאמץ?):** בודק שלא רק התוצאה נכונה אלא שהאג'נט עבר במסלול הנכון ב־workflow (הצמתים והסדר). מתאים כשיש הרבה ענפים או סיכון ששינוי קטן ישבור את הזרימה. תופס באגים שטסטים על פלט סופי לא יתפסו.
-
-#### simulation-and-property-testing
-- **מה החוק אומר:** בדיקות property-based עם Hypothesis; edge cases, chaos; invariants (פורמט פלט, state consistency); אינטגרציה עם pytest.
-- **מתי נשתמש:** Apply Intelligently — בבדיקות resilience ו־edge cases.
-- **ספריות וטכנולוגיות:** Hypothesis, pytest.
-- **למחליט (האם לאמץ?):** מייצר אוטומטית הרבה מקרי קיצון (ריק, ארוך, שגיאות) ובודק שהמערכת לא נשברת. מתאים למערכות שצריכות לעמוד בתנאים קשים או כשיש חשש לבאגים נדירים. משלים טסטים ידניים בגילוי בעיות לא צפויות.
-
-#### bias-detection-and-ethics
-- **מה החוק אומר:** זיהוי והפחתת הטיה (דמוגרפית, תרבותית, זיכרון ארוך טווח); מטריקות fairness; דשבורדים ב־Splunk.
-- **מתי נשתמש:** Apply Intelligently — באתיקה והגינות.
+#### `@evaluate-with-llm-judge` (Skill — לא RULE)
+- **מה זה:** פרוטוקול LLM-as-a-Judge מלא (Supreme AI Adjudicator): קלט Session Context, רובריקה משוקללת, `<reasoning>`, פלט JSON מובנה. אין חוק נפרד — הכל בקובץ ה-Skill תחת `.cursor/skills/evaluate-with-llm-judge/`.
+- **מתי להשתמש:** כשמעריכים ריצת אג'נט לפי traces, audit, מטריקות ופלט סופי.
+- **ספריות וטכנולוגיות:** משתלב עם **`llm-evaluation-and-metrics`** (מונחים: Hallucination ↔ Faithfulness וכו').
+- **למחליט:** מקור אמת יחיד לשיפוט; מפעילים עם `@evaluate-with-llm-judge`.
 - **ספריות וטכנולוגיות:** Splunk (מטריקות, דשבורדים).
 - **למחליט (האם לאמץ?):** מגדיר איך למדוד ולהקטין הטיה בתשובות האג'נט (למשל לפי קבוצות אוכלוסייה או לאורך זמן). מתאים למוצרים עם השפעה על אנשים או דרישות הגינות. עוזר לעמוד בדרישות אתיות ורגולטוריות.
-
-#### final-review-protocol
-- **מה החוק אומר:** צ'קליסט חובה לפני שליחת תשובה: פונקציות עד 20 שורות, asyncio/ProcessPoolExecutor, typing, logger, nodes READ→DO→WRITE→CONTROL, Tenacity, pydantic-settings, pytest, Docker, API docs, וכו'.
-- **מתי נשתמש:** מופעל **תמיד** (Always Apply).
-- **ספריות וטכנולוגיות:** pydantic-settings, pytest, Docker, FastAPI (תיעוד), Tenacity.
-- **למחליט (האם לאמץ?):** מאלץ סיבוב בדיקה אחרון לפני שהאג'נט "מגיש" — שהקוד עומד בסטנדרטים (אורך פונקציות, טיפול בשגיאות, תיעוד, טסטים). מתאים כשהרובוט (Cursor) מייצר קוד ורוצים שלא יישכחו פריטים בסיסיים. משמש כ־safety net.
 
 ---
 

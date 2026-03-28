@@ -6,12 +6,12 @@ Reference this example from RULE.mdc using @examples_splunk_hec.py syntax.
 All events MUST include mandatory fields: timestamp, correlation_id, operation_name (or equivalent).
 """
 
+import logging
 from typing import Any, Dict, Optional
 
 import httpx
-import structlog
 
-logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class SplunkHECClient:

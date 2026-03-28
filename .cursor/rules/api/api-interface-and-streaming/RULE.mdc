@@ -1,4 +1,5 @@
 ---
+description: "FastAPI + Uvicorn API standards: streaming, response format, rate limiting"
 globs: **/api/**/*.py, **/routes/**/*.py, **/main.py
 alwaysApply: false
 ---
@@ -20,7 +21,10 @@ alwaysApply: false
     * **Pydantic:** Use for request/response models and validation (built into FastAPI). Define schemas for all API boundaries.
     * **OpenAPI/Swagger:** Rely on FastAPI's automatic OpenAPI schema generation; expose at `/openapi.json` and `/docs`.
 
-* **ASGI Server:** Use **Uvicorn** as the ASGI server to run the FastAPI app (development and production). Do not reference Starlette directly—it is the underlying layer of FastAPI. For Uvicorn installation (`uvicorn[standard]`), development (`--reload`), and production (`--workers`) defaults, **see:** `@uvicorn-asgi-server`.
+* **ASGI Server:** Use **Uvicorn** as the ASGI server. Do not use another ASGI server or `python main.py`. Ensure `pyproject.toml` declares `uvicorn[standard]`, not plain `uvicorn`.
+    * **uvloop** — Replaces Python's default asyncio event loop (x2-4 faster, based on libuv).
+    * **httptools** — Replaces h11 HTTP parser (x5-10 faster, C-based).
+    * **watchfiles** — Rust-based file watcher for reliable `--reload` in development.
 
 * **Streaming:** Use FastAPI's `StreamingResponse` for SSE or WebSocket support. Endpoints must be implemented as `async def` that `yield` chunks (generators) or return a `StreamingResponse`.
 

@@ -256,7 +256,7 @@ All agentic systems **MUST** implement a reflection and self-critique step befor
 
 * **Comparative Evaluation:** Compare outputs using Judge protocol.
 
-* **See:** `llm-judge-protocol.md` for LLM Judge integration.
+* **See:** `@evaluate-with-llm-judge` skill for the canonical LLM-as-a-Judge workflow (mandate, rubric, JSON verdict).
 
 ## 8. Best Practices
 

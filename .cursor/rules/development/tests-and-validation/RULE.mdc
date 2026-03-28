@@ -31,4 +31,6 @@ alwaysApply: false
 * **Assert:** Verify the result strictly. Use clear assertion messages.
     * *Bad:* `assert result == 5`
     * *Good:* `assert result == 5, f"Expected 5 but got {result}"`
-* **Mocking:** Use mocks/fakes for external API calls (LLMs, Databases) to ensure tests are fast and deterministic. Only integration tests should hit real APIs.
+* **LLM-First Testing:** For LLM behavior validation, tests must call real LLM endpoints (no mocks/fakes for LLM responses).
+* **Stability Guardrails:** To reduce flaky outcomes when using real LLMs, pin model/version where possible, keep prompts fixed, and assert on clear acceptance criteria (structure, required facts, policy constraints) rather than exact wording.
+* **Mocking Scope:** Mocking is allowed only for non-LLM infrastructure dependencies when needed (e.g., unavailable third-party systems), and must not replace real LLM validation.

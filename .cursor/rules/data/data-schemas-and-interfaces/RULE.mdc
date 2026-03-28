@@ -22,7 +22,8 @@ alwaysApply: false
 
 ## 3. Reusability & Serialization
 * **Inheritance:** Create base classes for shared fields to avoid duplication.
-* **Serialization:** Rely on Pydantic's built-in `.json()` and `.parse_raw()` methods.
+* **Serialization (Pydantic v2):** Use `.model_dump()`, `.model_dump_json()`, and `.model_validate_json()` for serialization and parsing.
+* **Compatibility Note:** If a legacy codepath still uses `.json()` / `.parse_raw()`, treat it as technical debt and migrate gradually to v2 methods.
 
 ## 4. Integration with LLMs & Tools
 * **Binding:** Use `.bind_tools(tools=[Schema])` when connecting schemas to LLMs.

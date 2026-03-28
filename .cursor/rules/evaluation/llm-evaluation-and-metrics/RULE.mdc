@@ -29,6 +29,8 @@ For every generative task, you must define and measure:
 
 * **Golden Datasets:** Create a dedicated test set (`datasets/golden_qa.json`) with inputs and "expected ideal answers" (Ground Truth).
 
+* **LLM-as-a-Judge (traces, audit tables, verdict JSON):** Use the **`@evaluate-with-llm-judge`** skill only—full mandate, rubric, and output schema live in that skill (not in a separate rule).
+
 * **CI/CD Integration:** Evals must run on a subset of data during PR checks. They are slower/costlier than unit tests, so treat them as integration tests.
 
 * **Synthetic Data:** Use the LLM to generate test cases for itself (e.g., "Given this document, generate 5 questions and answers") to bootstrap coverage.

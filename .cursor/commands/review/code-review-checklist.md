@@ -6,7 +6,7 @@ Comprehensive code review using a structured checklist to ensure code quality, f
 ## Rules Applied
 - `code-review-and-collaboration` - Code review standards, PR review checklist, Git workflow
 - `core-python-standards` - Code quality standards, function length, type hints, logging
-- `final-review-protocol` - Final review compliance checklist
+- `core-python-standards` - Core coding standards with final compliance check
 - `error-handling-and-resilience` - Error handling review, error classification, retry strategies
 - `tests-and-validation` - Test coverage review, test quality standards
 - `security-governance-and-observability` - Security review, vulnerability checks, access control

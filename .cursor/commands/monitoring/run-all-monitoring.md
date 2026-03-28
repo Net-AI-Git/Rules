@@ -1,7 +1,7 @@
 # Run All Monitoring
 
 ## Overview
-Execute all monitoring commands in sequence: LangSmith trace analysis, performance analysis, and comprehensive system analysis. This master command runs the complete monitoring workflow to analyze system performance, identify bottlenecks, and provide holistic insights.
+Execute all monitoring commands in sequence: LangSmith trace analysis, performance analysis, prompt registry/Splunk audit, and comprehensive system analysis. This master command runs the complete monitoring workflow to analyze system performance, prompt observability health, identify bottlenecks, and provide holistic insights.
 
 ## Rules Applied
 - `monitoring-and-observability` - Metrics, tracing, log aggregation, LangSmith integration
@@ -38,7 +38,16 @@ Execute all monitoring commands in sequence: LangSmith trace analysis, performan
      - If analysis completes: Proceed to next step
    - **Output**: Performance analysis report with latency, throughput, resource usage
 
-3. **Comprehensive System Analysis**
+3. **Audit Prompt Registry and Splunk Observability**
+   - Execute `/monitoring/audit-prompt-registry-splunk` command
+   - Wait for completion and review results
+   - **Error Handling**:
+     - If audit fails: Continue with warning, report observability coverage gaps
+     - If Splunk data is partially unavailable: Continue with partial audit findings
+     - If audit completes: Proceed to next step
+   - **Output**: Prompt registry observability audit with telemetry coverage and governance findings
+
+4. **Comprehensive System Analysis**
    - Execute `/monitoring/comprehensive-system-analysis` command (uses results from steps 1 and 2)
    - Wait for completion and review results
    - **Error Handling**:
@@ -46,11 +55,11 @@ Execute all monitoring commands in sequence: LangSmith trace analysis, performan
      - If analysis completes: Generate final report
    - **Output**: Comprehensive system analysis report with cross-system correlations
 
-4. **Generate Comprehensive Monitoring Report**
+5. **Generate Comprehensive Monitoring Report**
    - **System Health Dashboard**: Create dashboard with key metrics and health indicators
    - **Trend Analysis**: Analyze trends across all monitoring dimensions
    - **Alerting Recommendations**: Provide recommendations for setting up alerts based on findings
-   - Aggregate results from all three commands
+   - Aggregate results from all four commands
    - Create summary with overall system health status (Healthy/Degraded/Critical)
    - Highlight performance bottlenecks and anomalies with severity classification
    - Provide prioritized optimization recommendations with impact assessment
@@ -60,6 +69,7 @@ Execute all monitoring commands in sequence: LangSmith trace analysis, performan
 ## Data Sources
 - Results from `/monitoring/analyze-langsmith-traces` command
 - Results from `/monitoring/performance-analysis` command
+- Results from `/monitoring/audit-prompt-registry-splunk` command
 - Results from `/monitoring/comprehensive-system-analysis` command
 - LangSmith traces (JSON format)
 - Performance metrics
@@ -71,6 +81,7 @@ A comprehensive monitoring report including:
 - **System Health Dashboard**: Key metrics, health indicators, component health status
 - **LangSmith Analysis Summary**: LLM calls, tool usage, agent steps, bottlenecks, cost analysis, model selection
 - **Performance Analysis Summary**: Latency, throughput, resource usage, SLI/SLO compliance, capacity planning, optimization opportunities
+- **Prompt Registry/Splunk Audit Summary**: Registry coverage, event quality, prompt metrics observability, governance findings
 - **Comprehensive Analysis Summary**: Cross-system correlations, patterns, anomalies, system health scoring, predictive analysis
 - **Trend Analysis**: Performance trends, cost trends, error trends, health trends
 - **Critical Issues**: Performance bottlenecks and system issues with severity classification
@@ -81,9 +92,9 @@ A comprehensive monitoring report including:
 
 ## Execution Flow
 ```
-analyze-langsmith-traces → performance-analysis → comprehensive-system-analysis → Final Report
-           ↓                        ↓                           ↓
-      [Continue]              [Continue]                  [Aggregate Results]
+analyze-langsmith-traces → performance-analysis → audit-prompt-registry-splunk → comprehensive-system-analysis → Final Report
+           ↓                        ↓                          ↓                           ↓
+      [Continue]              [Continue]                 [Continue]                 [Aggregate Results]
 ```
 
 ## Notes

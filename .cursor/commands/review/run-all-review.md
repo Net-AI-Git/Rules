@@ -5,8 +5,7 @@ Execute all review commands in sequence: code review checklist and final complia
 
 ## Rules Applied
 - `code-review-and-collaboration` - Code review standards, PR review checklist, Git workflow
-- `final-review-protocol` - Final review compliance checklist
-- `core-python-standards` - Code quality standards, function length, type hints, logging
+- `core-python-standards` - Code quality standards, function length, type hints, logging, final compliance check
 - `error-handling-and-resilience` - Error handling review, error classification, retry strategies
 - `tests-and-validation` - Test coverage review, test quality standards
 - `security-governance-and-observability` - Security review, vulnerability checks, access control

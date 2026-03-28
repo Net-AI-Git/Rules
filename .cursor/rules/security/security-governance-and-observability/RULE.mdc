@@ -30,7 +30,7 @@ alwaysApply: true
 
 * **Rate Limits:** Enforce budgets and rate limits to prevent runaway loops. See @api-interface-and-streaming for implementation details.
 
-* **Auditing:** Enable full auditing and tracing to attribute every action to a specific agent and context. Use **structlog** for all logging and audit trail construction. See @monitoring-and-observability for comprehensive auditing and tracing strategies; see @audit-protocol for audit log structure.
+* **Auditing:** Enable full auditing and tracing to attribute every action to a specific agent and context. Use structured JSON logging sent to **Splunk via HEC** for all audit trail construction. See @monitoring-and-observability for mandatory fields and tracing strategies; see @audit-protocol for audit log structure.
 ## AI Risk Management Framework (NIST AI RMF)
 
 * **Compliance:** Adhere to NIST AI RMF + Generative AI Profile for risk management, pre-deployment testing, and governance.

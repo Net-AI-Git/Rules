@@ -4,8 +4,7 @@
 Comprehensive final review before commit to verify solution complies with all active governance files and project standards. This command performs a complete compliance check covering all critical aspects of the codebase.
 
 ## Rules Applied
-- `final-review-protocol` - Final review compliance checklist
-- `core-python-standards` - Core Python standards and best practices
+- `core-python-standards` - Core Python standards and final compliance check
 - `error-handling-and-resilience` - Error handling and resilience patterns
 - `langgraph-architecture-and-nodes` - LangGraph architecture standards
 - `multi-agent-systems` - Multi-agent system patterns

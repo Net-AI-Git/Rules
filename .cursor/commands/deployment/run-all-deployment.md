@@ -5,7 +5,7 @@ Execute all deployment commands in sequence: pre-deployment check and post-deplo
 
 ## Rules Applied
 - `deployment-and-infrastructure` - Deployment standards, CI/CD, Docker, Kubernetes, rollback procedures
-- `final-review-protocol` - Final review compliance checklist
+- `core-python-standards` - Core coding standards with final compliance check
 - `security-governance-and-observability` - Security governance, security verification
 - `monitoring-and-observability` - Health checks, monitoring, metrics, alerting, tracing
 - `tests-and-validation` - Testing requirements

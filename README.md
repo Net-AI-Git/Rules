@@ -128,7 +128,7 @@ Data management:
 ### Evaluation Rules
 LLM evaluation and testing:
 - `llm-evaluation-and-metrics` - Evaluation metrics
-- `llm-judge-protocol` - LLM judging
+- LLM-as-a-Judge — Cursor Command `/testing/evaluate-with-llm-judge` (not a rule; see `.cursor/commands/testing/evaluate-with-llm-judge.md`)
 - `final-review-protocol` - Final review (always applied)
 
 ### Configuration Rules

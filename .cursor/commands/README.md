@@ -23,7 +23,8 @@ Commands are stored in three locations:
 ├── testing/          # Testing and evaluation commands
 │   ├── run-test-suite.md
 │   ├── run-evaluation-suite.md
-│   ├── evaluate-with-llm-judge.md
+│   ├── run-prompt-test-suite.md
+│   ├── evaluate-runtime-prompt-ab.md
 │   └── run-all-testing.md (Master Command)
 ├── security/         # Security audit and compliance commands
 │   ├── security-audit.md
@@ -38,6 +39,7 @@ Commands are stored in three locations:
 │   ├── analyze-langsmith-traces.md
 │   ├── comprehensive-system-analysis.md
 │   ├── performance-analysis.md
+│   ├── audit-prompt-registry-splunk.md
 │   ├── profile-code-bottlenecks.md
 │   └── run-all-monitoring.md (Master Command)
 ├── deployment/       # Deployment and infrastructure commands
@@ -87,15 +89,23 @@ Execute the full test suite and systematically analyze results, identify failure
 #### `/testing/run-evaluation-suite`
 Execute the complete LLM evaluation suite using specialized evaluation frameworks (Ragas, DeepEval, LangSmith). Includes evaluation framework validation, cost tracking, and comparison with previous evaluations.
 
-**Rules Applied**: `llm-evaluation-and-metrics`, `llm-judge-protocol`, `monitoring-and-observability`, `data-schemas-and-interfaces`, `error-handling-and-resilience`, `performance-optimization`
+**Rules Applied**: `llm-evaluation-and-metrics`, `monitoring-and-observability`, `data-schemas-and-interfaces`, `error-handling-and-resilience`, `performance-optimization`
 
-#### `/testing/evaluate-with-llm-judge`
-Comprehensive evaluation using LLM-as-a-Judge protocol to analyze agent system performance, safety, and logic. Includes enhanced trace analysis, security/privacy evaluation, and cost efficiency analysis.
+#### `@evaluate-with-llm-judge` (Skill)
+**Migrated to Skill** (`.cursor/skills/evaluate-with-llm-judge/SKILL.md`). Trigger with `@evaluate-with-llm-judge`. Comprehensive LLM-as-a-Judge evaluation with weighted rubric, chain-of-thought reasoning, and structured JSON verdict.
 
-**Rules Applied**: `llm-judge-protocol`, `audit-protocol`, `llm-evaluation-and-metrics`, `monitoring-and-observability`, `error-handling-and-resilience`, `performance-optimization`, `security-governance-and-observability`
+#### `/testing/run-prompt-test-suite`
+Run structured prompt test suites for deterministic validation, runtime quality checks, and regression detection before prompt rollout.
+
+**Rules Applied**: `prompt-engineering-and-management`, `llm-evaluation-and-metrics`, `tests-and-validation`, `monitoring-and-observability`
+
+#### `/testing/evaluate-runtime-prompt-ab`
+Evaluate runtime A/B prompt experiments inside agentic workflows with per-version quality, latency, cost, and reliability metrics to support promotion or rollback decisions.
+
+**Rules Applied**: `prompt-engineering-and-management`, `llm-evaluation-and-metrics`, `monitoring-and-observability`, `cost-and-budget-management`
 
 #### `/testing/run-all-testing` (Master Command)
-Runs all testing commands in sequence: write targeted tests → test suite → evaluation suite → LLM Judge evaluation. Includes comprehensive error handling, aggregated reporting, and dependency management.
+Runs all testing commands in sequence: write targeted tests → test suite → evaluation suite → prompt test suite. LLM Judge evaluation is available separately via the `@evaluate-with-llm-judge` skill. Includes comprehensive error handling, aggregated reporting, and dependency management.
 
 ### 2. Security Commands (`/security/`)
 
@@ -126,12 +136,12 @@ Code review and compliance check workflows.
 #### `/review/code-review-checklist`
 Comprehensive code review using a structured checklist to ensure code quality, functionality, testing, documentation, security, and maintainability. Includes comprehensive checklist with all standards, automated checks, and review approval workflow.
 
-**Rules Applied**: `code-review-and-collaboration`, `core-python-standards`, `final-review-protocol`, `error-handling-and-resilience`, `tests-and-validation`, `security-governance-and-observability`, `performance-optimization`, `data-schemas-and-interfaces`
+**Rules Applied**: `code-review-and-collaboration`, `core-python-standards`, `error-handling-and-resilience`, `tests-and-validation`, `security-governance-and-observability`, `performance-optimization`, `data-schemas-and-interfaces`
 
 #### `/review/final-compliance-check`
 Comprehensive final review before commit to verify solution complies with all active governance files and project standards. Uses results from code review checklist. Includes comprehensive compliance matrix, automated compliance validation, and compliance scoring.
 
-**Rules Applied**: `final-review-protocol`, `core-python-standards`, `error-handling-and-resilience`, `langgraph-architecture-and-nodes`, `multi-agent-systems`, `configuration-and-dependency-injection`, `prompt-engineering-and-management`, `data-schemas-and-interfaces`, `api-interface-and-streaming`, `performance-optimization`, `deployment-and-infrastructure`, `security-governance-and-observability`, `human-in-the-loop-approval`, `versioning-and-release-management`, `rate-limiting-and-queue-management`, `tests-and-validation`, `llm-evaluation-and-metrics`, `monitoring-and-observability`
+**Rules Applied**: `core-python-standards`, `error-handling-and-resilience`, `langgraph-architecture-and-nodes`, `multi-agent-systems`, `configuration-and-dependency-injection`, `prompt-engineering-and-management`, `data-schemas-and-interfaces`, `api-interface-and-streaming`, `performance-optimization`, `deployment-and-infrastructure`, `security-governance-and-observability`, `human-in-the-loop-approval`, `versioning-and-release-management`, `rate-limiting-and-queue-management`, `tests-and-validation`, `llm-evaluation-and-metrics`, `monitoring-and-observability`
 
 #### `/review/run-all-review` (Master Command)
 Runs all review commands in sequence: code review checklist → final compliance check. Includes review workflow orchestration, approval status tracking, and comprehensive review report.
@@ -160,8 +170,13 @@ Complete cross-system analysis combining all available data sources to provide h
 
 **Rules Applied**: All relevant rules, `monitoring-and-observability`, `audit-protocol`, `llm-evaluation-and-metrics`, `tests-and-validation`, `security-governance-and-observability`, `performance-optimization`, `cost-and-budget-management`, `error-handling-and-resilience`, `human-in-the-loop-approval`
 
+#### `/monitoring/audit-prompt-registry-splunk`
+Audit prompt registry lifecycle events and Splunk observability signals to validate traceability, governance compliance, and prompt telemetry completeness.
+
+**Rules Applied**: `prompt-engineering-and-management`, `monitoring-and-observability`, `audit-protocol`, `security-governance-and-observability`
+
 #### `/monitoring/run-all-monitoring` (Master Command)
-Runs all monitoring commands in sequence: LangSmith trace analysis → performance analysis → comprehensive system analysis. Includes system health dashboard, trend analysis, and alerting recommendations.
+Runs all monitoring commands in sequence: LangSmith trace analysis → performance analysis → prompt registry/Splunk audit → comprehensive system analysis. Includes system health dashboard, trend analysis, and alerting recommendations.
 
 ### 5. Deployment Commands (`/deployment/`)
 
@@ -170,7 +185,7 @@ Deployment and infrastructure verification workflows.
 #### `/deployment/pre-deployment-check`
 Comprehensive pre-deployment verification to ensure code is ready for production deployment. Calls testing, security, and review commands. Includes infrastructure validation, rollback readiness check, and deployment risk assessment.
 
-**Rules Applied**: `deployment-and-infrastructure`, `final-review-protocol`, `security-governance-and-observability`, `tests-and-validation`, `llm-evaluation-and-metrics`, `monitoring-and-observability`, `performance-optimization`, `configuration-and-dependency-injection`, `versioning-and-release-management`, `rate-limiting-and-queue-management`
+**Rules Applied**: `deployment-and-infrastructure`, `core-python-standards`, `security-governance-and-observability`, `tests-and-validation`, `llm-evaluation-and-metrics`, `monitoring-and-observability`, `performance-optimization`, `configuration-and-dependency-injection`, `versioning-and-release-management`, `rate-limiting-and-queue-management`
 
 #### `/deployment/post-deployment-verification`
 Comprehensive post-deployment verification to ensure successful deployment and system stability. Includes automated smoke tests, performance baseline comparison, and rollback decision support.
@@ -211,7 +226,6 @@ To use a command, type `/` followed by the command path in the Cursor chat input
 ```
 /testing/run-test-suite
 /security/security-audit
-/testing/evaluate-with-llm-judge
 /testing/run-all-testing
 ```
 
