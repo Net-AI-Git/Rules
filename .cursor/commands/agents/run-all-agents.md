@@ -1,26 +1,32 @@
 # Run All Agents
 
 ## Overview
-Execute all agent development commands in sequence: setup new agent system, create agent node, and implement agent tool. This master command provides a complete workflow for developing new agent systems from scratch.
+
+Sequences `/agents/setup-new-agent-system` → `/agents/create-agent-node` → `/agents/implement-agent-tool` and aggregates. **Does not** duplicate their step lists.
+
+## Scope and boundaries
+
+- **In scope:** Orchestration for greenfield agent feature work.
+- **Out of scope:** Production release gates → run `/testing/*`, `/security/security-audit`, `/review/final-compliance-check`, and CI/CD as defined by the project.
 
 ## Rules Applied
-- `multi-agent-systems` - Multi-agent architecture patterns, Orchestrator/Worker/Synthesizer
-- `langgraph-architecture-and-nodes` - LangGraph workflow design, node implementation
-- `agentic-logic-and-tools` - LangChain fundamentals, tool definitions, agent internals
-- `core-python-standards` - Code quality standards, function length, type hints, logging
-- `configuration-and-dependency-injection` - Configuration setup, pydantic-settings
-- `data-schemas-and-interfaces` - Schema definitions, Pydantic models
-- `prompt-engineering-and-management` - Prompt setup, prompt templates
-- `error-handling-and-resilience` - Error handling, retry strategies, error classification
-- `human-in-the-loop-approval` - Human-in-the-loop setup, approval workflows
-- `cost-and-budget-management` - Budget setup, cost tracking
-- `rate-limiting-and-queue-management` - Rate limiting setup, queue management
-- `tests-and-validation` - Test creation, test structure
-- `monitoring-and-observability` - Node instrumentation, tool instrumentation
-- `performance-optimization` - Node performance, tool performance
-- `reflection-and-self-critique` - Self-critique patterns
-- `security-governance-and-observability` - Tool security, access control
-- `prompt-injection-prevention` - Tool input validation
+
+- `multi-agent-systems`
+- `langgraph-architecture-and-nodes`
+- `agentic-logic-and-tools`
+- `core-python-standards`
+- `configuration-and-dependency-injection`
+- `data-schemas-and-interfaces`
+- `prompt-engineering-and-management`
+- `error-handling-and-resilience`
+- `human-in-the-loop-approval`
+- `cost-and-budget-management`
+- `tests-and-validation`
+- `monitoring-and-observability`
+- `reflection-and-self-critique`
+- `security-governance-and-observability`
+- `prompt-injection-prevention`
+- `api-interface-and-streaming` *(when tools expose HTTP-backed clients)*
 
 ## Steps
 

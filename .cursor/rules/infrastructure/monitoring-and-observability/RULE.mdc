@@ -64,4 +64,4 @@ Implement with FastAPI dependency injection; cache results briefly (5s).
 * **SLI/SLO:** Track availability, latency (P95/P99), error rate in SPL dashboards. Error budget = 100% − SLO; alert when approaching limits.
 * **Alert Targets:** PagerDuty, Opsgenie, Slack, email as needed.
 
-**See:** @security-governance-and-observability for auditing requirements.
+**See:** `@audit-protocol` for audit-specific fields and mandatory audit events; `@security-governance-and-observability` for agent security policy (references only, no duplicated field specs).

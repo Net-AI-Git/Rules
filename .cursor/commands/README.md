@@ -1,6 +1,6 @@
 # Cursor Commands Documentation
 
-This directory contains custom commands for the Cursor AI agent. Commands are reusable workflows that can be triggered with a `/` prefix in the chat input box, providing standardized processes for development, testing, security, deployment, and agent development.
+This directory contains custom commands for the Cursor AI agent. Commands are reusable workflows that can be triggered with a `/` prefix in the chat input box, providing standardized processes for development, testing, security, review, monitoring, and agent development.
 
 ## What are Cursor Commands?
 
@@ -21,20 +21,15 @@ Commands are stored in three locations:
 ```
 .cursor/commands/
 ├── testing/          # Testing and evaluation commands
+│   ├── write-targeted-tests.md
 │   ├── run-test-suite.md
-│   ├── run-evaluation-suite.md
-│   ├── run-prompt-test-suite.md
-│   ├── evaluate-runtime-prompt-ab.md
-│   └── run-all-testing.md (Master Command)
-├── security/         # Security audit and compliance commands
+│   └── run-evaluation-suite.md
+├── security/         # Security audit commands
 │   ├── security-audit.md
-│   ├── analyze-audit-logs.md
-│   ├── compliance-check.md
-│   └── run-all-security.md (Master Command)
+│   └── analyze-audit-logs.md
 ├── review/           # Code review and compliance check commands
 │   ├── code-review-checklist.md
-│   ├── final-compliance-check.md
-│   └── run-all-review.md (Master Command)
+│   └── final-compliance-check.md
 ├── monitoring/       # Monitoring and observability commands
 │   ├── analyze-langsmith-traces.md
 │   ├── comprehensive-system-analysis.md
@@ -42,10 +37,6 @@ Commands are stored in three locations:
 │   ├── audit-prompt-registry-splunk.md
 │   ├── profile-code-bottlenecks.md
 │   └── run-all-monitoring.md (Master Command)
-├── deployment/       # Deployment and infrastructure commands
-│   ├── pre-deployment-check.md
-│   ├── post-deployment-verification.md
-│   └── run-all-deployment.md (Master Command)
 ├── agents/          # Agent development commands
 │   ├── setup-new-agent-system.md
 │   ├── create-agent-node.md
@@ -79,55 +70,34 @@ Testing and evaluation workflows for ensuring code quality and functionality.
 #### `/testing/write-targeted-tests`
 Systematically identify new or modified code and automatically generate comprehensive, targeted test cases following project testing standards. Ensures every new feature, function, or code change has corresponding test coverage. Includes test generation, coverage analysis, and test execution validation.
 
-**Rules Applied**: `tests-and-validation`, `core-python-standards`, `error-handling-and-resilience`, `monitoring-and-observability`, `code-review-and-collaboration`
+**Rules Applied**: `tests-and-validation`, `core-python-standards`, `error-handling-and-resilience`, `monitoring-and-observability`
 
 #### `/testing/run-test-suite`
 Execute the full test suite and systematically analyze results, identify failures, and provide actionable recommendations. Includes test coverage analysis and performance metrics collection.
 
-**Rules Applied**: `tests-and-validation`, `core-python-standards`, `error-handling-and-resilience`, `monitoring-and-observability`, `performance-optimization`
+**Rules Applied**: `tests-and-validation`, `core-python-standards`, `error-handling-and-resilience`, `monitoring-and-observability`
 
 #### `/testing/run-evaluation-suite`
 Execute the complete LLM evaluation suite using specialized evaluation frameworks (Ragas, DeepEval, LangSmith). Includes evaluation framework validation, cost tracking, and comparison with previous evaluations.
 
-**Rules Applied**: `llm-evaluation-and-metrics`, `monitoring-and-observability`, `data-schemas-and-interfaces`, `error-handling-and-resilience`, `performance-optimization`
+**Rules Applied**: `llm-evaluation-and-metrics` (reference; commands/skills), `monitoring-and-observability`, `data-schemas-and-interfaces`, `error-handling-and-resilience`, `cost-and-budget-management`
 
 #### `@evaluate-with-llm-judge` (Skill)
 **Migrated to Skill** (`.cursor/skills/evaluate-with-llm-judge/SKILL.md`). Trigger with `@evaluate-with-llm-judge`. Comprehensive LLM-as-a-Judge evaluation with weighted rubric, chain-of-thought reasoning, and structured JSON verdict.
 
-#### `/testing/run-prompt-test-suite`
-Run structured prompt test suites for deterministic validation, runtime quality checks, and regression detection before prompt rollout.
-
-**Rules Applied**: `prompt-engineering-and-management`, `llm-evaluation-and-metrics`, `tests-and-validation`, `monitoring-and-observability`
-
-#### `/testing/evaluate-runtime-prompt-ab`
-Evaluate runtime A/B prompt experiments inside agentic workflows with per-version quality, latency, cost, and reliability metrics to support promotion or rollback decisions.
-
-**Rules Applied**: `prompt-engineering-and-management`, `llm-evaluation-and-metrics`, `monitoring-and-observability`, `cost-and-budget-management`
-
-#### `/testing/run-all-testing` (Master Command)
-Runs all testing commands in sequence: write targeted tests → test suite → evaluation suite → prompt test suite. LLM Judge evaluation is available separately via the `@evaluate-with-llm-judge` skill. Includes comprehensive error handling, aggregated reporting, and dependency management.
-
 ### 2. Security Commands (`/security/`)
 
-Security audit and compliance verification workflows.
-
-#### `/security/compliance-check`
-Comprehensive compliance verification to ensure the system meets regulatory requirements (GDPR, HIPAA, SOC 2). Includes automated compliance validation, compliance gap analysis, and remediation tracking.
-
-**Rules Applied**: `audit-protocol`, `security-governance-and-observability`, `data-schemas-and-interfaces`, `multi-tenancy-and-isolation`, `monitoring-and-observability`, `error-handling-and-resilience`
+Security review and audit-log analysis aligned with `.cursor/rules/security` (`security-governance-and-observability`, `prompt-injection-prevention`) and related cross-cutting Rules. For a **broad governance pass** against all active Rules (not only security), use `/review/final-compliance-check`.
 
 #### `/security/analyze-audit-logs`
-Comprehensive analysis of audit logs to identify security incidents, compliance issues, anomalies, and operational patterns. Includes forensic analysis capabilities, timeline reconstruction, and incident correlation.
+Analysis of audit logs for incidents, anomalies, and traceability, aligned with governance and observability expectations (structured fields, correlation). Not a substitute for legal/regulatory compliance attestation.
 
-**Rules Applied**: `audit-protocol`, `monitoring-and-observability`, `security-governance-and-observability`, `error-handling-and-resilience`, `performance-optimization`, `human-in-the-loop-approval`
+**Rules Applied**: `security-governance-and-observability`, `monitoring-and-observability`, `error-handling-and-resilience`, `human-in-the-loop-approval`, `audit-protocol` (reference; commands/skills)
 
 #### `/security/security-audit`
-Comprehensive security review to identify and fix vulnerabilities in the codebase, infrastructure, and dependencies. Uses results from compliance check and audit log analysis. Includes enhanced OWASP Top 10 coverage, supply chain security checks, and security testing recommendations.
+Comprehensive security review: dependencies, OWASP Top 10 for LLM applications, infrastructure, and integration with `/security/analyze-audit-logs`. Maps findings to current security Rules and observability expectations.
 
-**Rules Applied**: `security-governance-and-observability`, `audit-protocol`, `configuration-and-dependency-injection`, `prompt-injection-prevention`, `data-schemas-and-interfaces`, `error-handling-and-resilience`, `multi-tenancy-and-isolation`
-
-#### `/security/run-all-security` (Master Command)
-Runs all security commands in sequence: compliance check → audit log analysis → security audit. Includes comprehensive security status aggregation, risk prioritization, and security metrics dashboard.
+**Rules Applied**: `security-governance-and-observability`, `prompt-injection-prevention`, `configuration-and-dependency-injection`, `data-schemas-and-interfaces`, `error-handling-and-resilience`, `monitoring-and-observability`, `api-interface-and-streaming`
 
 ### 3. Review Commands (`/review/`)
 
@@ -136,15 +106,12 @@ Code review and compliance check workflows.
 #### `/review/code-review-checklist`
 Comprehensive code review using a structured checklist to ensure code quality, functionality, testing, documentation, security, and maintainability. Includes comprehensive checklist with all standards, automated checks, and review approval workflow.
 
-**Rules Applied**: `code-review-and-collaboration`, `core-python-standards`, `error-handling-and-resilience`, `tests-and-validation`, `security-governance-and-observability`, `performance-optimization`, `data-schemas-and-interfaces`
+**Rules Applied**: `core-python-standards`, `error-handling-and-resilience`, `tests-and-validation`, `security-governance-and-observability`, `prompt-injection-prevention`, `data-schemas-and-interfaces`, `monitoring-and-observability`
 
 #### `/review/final-compliance-check`
-Comprehensive final review before commit to verify solution complies with all active governance files and project standards. Uses results from code review checklist. Includes comprehensive compliance matrix, automated compliance validation, and compliance scoring.
+Governance pass before commit: map changes to applicable Rules; uses `/review/code-review-checklist` output without duplicating it. Produces a compliance matrix by domain.
 
-**Rules Applied**: `core-python-standards`, `error-handling-and-resilience`, `langgraph-architecture-and-nodes`, `multi-agent-systems`, `configuration-and-dependency-injection`, `prompt-engineering-and-management`, `data-schemas-and-interfaces`, `api-interface-and-streaming`, `performance-optimization`, `deployment-and-infrastructure`, `security-governance-and-observability`, `human-in-the-loop-approval`, `versioning-and-release-management`, `rate-limiting-and-queue-management`, `tests-and-validation`, `llm-evaluation-and-metrics`, `monitoring-and-observability`
-
-#### `/review/run-all-review` (Master Command)
-Runs all review commands in sequence: code review checklist → final compliance check. Includes review workflow orchestration, approval status tracking, and comprehensive review report.
+**Rules Applied**: `core-python-standards`, `error-handling-and-resilience`, `tests-and-validation`, `langgraph-architecture-and-nodes`, `multi-agent-systems`, `configuration-and-dependency-injection`, `prompt-engineering-and-management`, `data-schemas-and-interfaces`, `api-interface-and-streaming`, `api-documentation-standards`, `monitoring-and-observability`, `security-governance-and-observability`, `prompt-injection-prevention`, `agentic-logic-and-tools`, `human-in-the-loop-approval`, `cost-and-budget-management`, `llm-evaluation-and-metrics` (reference; commands/skills)
 
 ### 4. Monitoring Commands (`/monitoring/`)
 
@@ -153,61 +120,44 @@ Monitoring and observability analysis workflows.
 #### `/monitoring/analyze-langsmith-traces`
 Comprehensive analysis of LangSmith traces to understand LLM operations, tool usage, agent behavior, and performance. Includes cost optimization recommendations, model selection analysis, and token usage optimization.
 
-**Rules Applied**: `monitoring-and-observability`, `agentic-logic-and-tools`, `error-handling-and-resilience`, `performance-optimization`, `cost-and-budget-management`, `model-routing-and-selection`
+**Rules Applied**: `monitoring-and-observability`, `agentic-logic-and-tools`, `error-handling-and-resilience`, `cost-and-budget-management`, `model-routing-and-selection`
 
 #### `/monitoring/performance-analysis`
 Comprehensive performance analysis to identify bottlenecks, optimize resource usage, and improve system efficiency. Includes SLI/SLO compliance checks, capacity planning recommendations, and performance regression detection.
 
-**Rules Applied**: `performance-optimization`, `monitoring-and-observability`, `core-python-standards`, `error-handling-and-resilience`, `deployment-and-infrastructure`, `rate-limiting-and-queue-management`
+**Rules Applied**: `monitoring-and-observability`, `core-python-standards`, `error-handling-and-resilience`, `api-interface-and-streaming`, `redis-cache`
 
 #### `/monitoring/profile-code-bottlenecks`
 Run a code profiler (e.g., `cProfile`) on target code to identify real performance bottlenecks through measurement rather than guessing. Follows the principle that every optimization must start with measurement: profile first, identify 1–2 bottleneck functions, understand their Big-O complexity, then perform targeted refactoring.
 
-**Rules Applied**: `performance-optimization`, `monitoring-and-observability`, `core-python-standards`
+**Rules Applied**: `core-python-standards`, `monitoring-and-observability`
 
 #### `/monitoring/comprehensive-system-analysis`
-Complete cross-system analysis combining all available data sources to provide holistic insights. Uses results from trace and performance analysis. Includes cross-system correlation, predictive analysis, and system health scoring.
+Synthesis across traces, logs, tests, and evaluations—correlates artifacts; does not replace specialized monitoring commands.
 
-**Rules Applied**: All relevant rules, `monitoring-and-observability`, `audit-protocol`, `llm-evaluation-and-metrics`, `tests-and-validation`, `security-governance-and-observability`, `performance-optimization`, `cost-and-budget-management`, `error-handling-and-resilience`, `human-in-the-loop-approval`
+**Rules Applied**: `monitoring-and-observability`, `security-governance-and-observability`, `error-handling-and-resilience`, `cost-and-budget-management`, `human-in-the-loop-approval`, `tests-and-validation`, `llm-evaluation-and-metrics` (reference; commands/skills), `audit-protocol` (reference; commands/skills)
 
 #### `/monitoring/audit-prompt-registry-splunk`
 Audit prompt registry lifecycle events and Splunk observability signals to validate traceability, governance compliance, and prompt telemetry completeness.
 
-**Rules Applied**: `prompt-engineering-and-management`, `monitoring-and-observability`, `audit-protocol`, `security-governance-and-observability`
+**Rules Applied**: `prompt-engineering-and-management`, `monitoring-and-observability`, `security-governance-and-observability`, `audit-protocol` (reference; commands/skills)
 
 #### `/monitoring/run-all-monitoring` (Master Command)
-Runs all monitoring commands in sequence: LangSmith trace analysis → performance analysis → prompt registry/Splunk audit → comprehensive system analysis. Includes system health dashboard, trend analysis, and alerting recommendations.
+Runs monitoring subcommands in order (LangSmith → performance → prompt registry/Splunk → comprehensive synthesis). Does not include `profile-code-bottlenecks`.
 
-### 5. Deployment Commands (`/deployment/`)
-
-Deployment and infrastructure verification workflows.
-
-#### `/deployment/pre-deployment-check`
-Comprehensive pre-deployment verification to ensure code is ready for production deployment. Calls testing, security, and review commands. Includes infrastructure validation, rollback readiness check, and deployment risk assessment.
-
-**Rules Applied**: `deployment-and-infrastructure`, `core-python-standards`, `security-governance-and-observability`, `tests-and-validation`, `llm-evaluation-and-metrics`, `monitoring-and-observability`, `performance-optimization`, `configuration-and-dependency-injection`, `versioning-and-release-management`, `rate-limiting-and-queue-management`
-
-#### `/deployment/post-deployment-verification`
-Comprehensive post-deployment verification to ensure successful deployment and system stability. Includes automated smoke tests, performance baseline comparison, and rollback decision support.
-
-**Rules Applied**: `deployment-and-infrastructure`, `monitoring-and-observability`, `error-handling-and-resilience`, `performance-optimization`, `security-governance-and-observability`, `audit-protocol`
-
-#### `/deployment/run-all-deployment` (Master Command)
-Runs all deployment commands in sequence: pre-deployment check → [deploy] → post-deployment verification. Includes deployment workflow orchestration, deployment approval workflow, and deployment metrics tracking.
-
-### 6. Agent Development Commands (`/agents/`)
+### 5. Agent Development Commands (`/agents/`)
 
 Agent development and setup workflows.
 
 #### `/agents/setup-new-agent-system`
 Systematic setup of a new multi-agent system from initial planning through implementation structure. Includes comprehensive setup checklist, architecture validation, and setup verification steps.
 
-**Rules Applied**: `multi-agent-systems`, `langgraph-architecture-and-nodes`, `agentic-logic-and-tools`, `core-python-standards`, `configuration-and-dependency-injection`, `data-schemas-and-interfaces`, `prompt-engineering-and-management`, `error-handling-and-resilience`, `human-in-the-loop-approval`, `cost-and-budget-management`, `rate-limiting-and-queue-management`
+**Rules Applied**: `multi-agent-systems`, `langgraph-architecture-and-nodes`, `agentic-logic-and-tools`, `core-python-standards`, `configuration-and-dependency-injection`, `data-schemas-and-interfaces`, `prompt-engineering-and-management`, `error-handling-and-resilience`, `human-in-the-loop-approval`, `cost-and-budget-management`, `api-interface-and-streaming`
 
 #### `/agents/create-agent-node`
 Create a new LangGraph node following the four-part structure (READ → DO → WRITE → CONTROL). Includes node validation checklist, performance considerations, and node testing requirements.
 
-**Rules Applied**: `langgraph-architecture-and-nodes`, `core-python-standards`, `error-handling-and-resilience`, `multi-agent-systems`, `tests-and-validation`, `monitoring-and-observability`, `performance-optimization`, `reflection-and-self-critique`
+**Rules Applied**: `langgraph-architecture-and-nodes`, `core-python-standards`, `error-handling-and-resilience`, `multi-agent-systems`, `tests-and-validation`, `monitoring-and-observability`, `reflection-and-self-critique`
 
 #### `/agents/implement-agent-tool`
 Implement a new tool for agent use following LangChain tool definition standards. Includes tool security validation, tool performance considerations, and tool access control setup.
@@ -226,7 +176,7 @@ To use a command, type `/` followed by the command path in the Cursor chat input
 ```
 /testing/run-test-suite
 /security/security-audit
-/testing/run-all-testing
+/testing/write-targeted-tests
 ```
 
 ### With Additional Context
@@ -236,7 +186,7 @@ You can provide additional context after the command name:
 ```
 /testing/run-test-suite and fix any failures
 /security/security-audit focusing on OWASP Top 10
-/deployment/pre-deployment-check before merging to main
+/review/final-compliance-check before merging to main
 ```
 
 ### Master Commands
@@ -244,11 +194,7 @@ You can provide additional context after the command name:
 Master commands execute all commands in a category in the proper sequence:
 
 ```
-/testing/run-all-testing
-/security/run-all-security
-/review/run-all-review
 /monitoring/run-all-monitoring
-/deployment/run-all-deployment
 /agents/run-all-agents
 ```
 
@@ -263,21 +209,22 @@ Master commands:
 
 Each command follows a consistent structure:
 
-1. **Overview** (H1): Brief description of what the command does
-2. **Rules Applied**: List of Rules that are integrated into the command
-3. **Steps**: Detailed workflow steps the command follows
-4. **Data Sources**: Sources of data the command analyzes
-5. **Output**: Description of the expected output
+1. **`#` Title** — Short heading.
+2. **`## Overview`** — What the command does.
+3. **`## Scope and boundaries`** — In scope vs out of scope (other `/commands` or Rules).
+4. **`## Rules Applied`** — Existing rule folder names under `.cursor/rules/`; reference-only specs labeled per `commands-management`.
+5. **`## Steps`** — Workflow; orchestrators defer to subcommands instead of duplicating steps.
+6. **`## Data Sources`**
+7. **`## Output`**
 
-See `.cursor/rules/commands-management/RULE.md` for detailed format specifications.
+See `.cursor/rules/commands-management/RULE.mdc` for the full specification and duplication policy.
 
 ## Command Dependencies and Overlap Prevention
 
 Commands are designed to avoid duplication:
 
-- **`pre-deployment-check`** calls `/testing/run-test-suite`, `/testing/run-evaluation-suite`, `/security/security-audit`, and `/review/final-compliance-check` instead of duplicating their checks
-- **`security-audit`** calls `/security/compliance-check` and `/security/analyze-audit-logs` instead of duplicating their analysis
-- **`final-compliance-check`** calls `/review/code-review-checklist` instead of duplicating code review checks
+- **`security-audit`** calls `/security/analyze-audit-logs` instead of duplicating audit log analysis
+- **`final-compliance-check`** ingests `/review/code-review-checklist` results and adds cross-cutting governance; it does not repeat the PR checklist
 
 This ensures:
 - No redundant checks are performed
@@ -309,18 +256,18 @@ Commands integrate with the project's Rules (`.cursor/rules`) to:
 
 ## Best Practices
 
-1. **Use Master Commands for Complete Workflows**: Use master commands (e.g., `/testing/run-all-testing`) when you need to run all commands in a category. Master commands orchestrate sub-commands in the correct order and aggregate results.
+1. **Use Master Commands for Complete Workflows**: Use master commands (e.g., `/monitoring/run-all-monitoring`) when you need to run all commands in a category. Master commands orchestrate sub-commands in the correct order and aggregate results.
 2. **Use Individual Commands for Specific Tasks**: Use individual commands when you need to run a specific check or analysis. Each command can be run independently for focused analysis.
 3. **Review Output**: Always review command output and recommendations before taking action. Commands provide detailed reports with prioritized recommendations.
-4. **Understand Command Dependencies**: Some commands call other commands (e.g., `security-audit` calls `compliance-check` and `analyze-audit-logs`). Understanding dependencies helps avoid redundant executions.
+4. **Understand Command Dependencies**: Some commands call other commands (e.g., `security-audit` calls `analyze-audit-logs`). Understanding dependencies helps avoid redundant executions.
 5. **Update Commands**: Keep commands updated as Rules and requirements evolve. Commands should reference all relevant rules for comprehensive coverage.
 6. **Avoid Duplication**: When creating new commands, check if existing commands can be reused instead of duplicating functionality. Commands are designed to be composable.
 
 ## Command Development
 
-When creating or updating commands, follow the format defined in `.cursor/rules/commands-management/RULE.md`:
+When creating or updating commands, follow the format defined in `.cursor/rules/commands-management/RULE.mdc`:
 
-1. Follow the standard command structure (Overview, Rules Applied, Steps, Data Sources, Output)
+1. Follow the standard command structure (Overview, Scope and boundaries, Rules Applied, Steps, Data Sources, Output)
 2. Integrate relevant Rules in the "Rules Applied" section
 3. Specify data sources clearly
 4. Provide detailed, actionable steps
@@ -334,6 +281,6 @@ When creating or updating commands, follow the format defined in `.cursor/rules/
 
 - **[Root README](../README.md)** - Overview of the entire repository
 - **[Rules Documentation](../rules/README.md)** - Complete guide to Cursor Rules
-- **[Commands Management Rule](../rules/commands-management/RULE.md)** - Format specifications for creating/updating commands
+- **[Commands Management Rule](../rules/commands-management/RULE.mdc)** - Format specifications for creating/updating commands
 - **[Cursor Commands Documentation](https://cursor.com/docs/agent/chat/commands)** - Official Cursor documentation
 - **[Cursor Rules Documentation](https://cursor.com/docs/context/rules)** - Official Cursor documentation

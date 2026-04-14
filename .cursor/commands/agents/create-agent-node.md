@@ -3,15 +3,20 @@
 ## Overview
 Create a new LangGraph node following the four-part structure (READ → DO → WRITE → CONTROL) with proper state management, error handling, and integration into the existing workflow.
 
+## Scope and boundaries
+
+- **In scope:** One node module, tests, observability hooks for that node.
+- **Out of scope — use instead:** Greenfield repo layout → `/agents/setup-new-agent-system`.
+
 ## Rules Applied
-- `langgraph-architecture-and-nodes` - Node implementation rules, four-part structure, state field ownership
-- `core-python-standards` - Code quality standards, function length, type hints, logging
-- `error-handling-and-resilience` - Error handling patterns, retry strategies, error classification
-- `multi-agent-systems` - Multi-agent patterns, node role in multi-agent system
-- `tests-and-validation` - Test creation, test structure, test coverage
-- `monitoring-and-observability` - Node instrumentation, metrics collection
-- `performance-optimization` - Node performance, efficiency considerations
-- `reflection-and-self-critique` - Self-critique patterns, reflection mechanisms
+
+- `langgraph-architecture-and-nodes`
+- `core-python-standards`
+- `error-handling-and-resilience`
+- `multi-agent-systems`
+- `tests-and-validation`
+- `monitoring-and-observability`
+- `reflection-and-self-critique`
 
 ## Steps
 

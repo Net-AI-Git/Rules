@@ -3,12 +3,17 @@
 ## Overview
 Execute the full test suite and systematically analyze results, identify failures, and provide actionable recommendations for fixes. This command ensures code quality and functionality before proceeding with development or deployment.
 
+## Scope and boundaries
+
+- **In scope:** `pytest` (or project test runner) execution, failure triage, coverage summary when configured.
+- **Out of scope — use instead:** Generating tests for a diff → `/testing/write-targeted-tests`. LLM quality metrics → `/testing/run-evaluation-suite`.
+
 ## Rules Applied
-- `tests-and-validation` - Testing framework standards and validation requirements
-- `core-python-standards` - Code quality standards and best practices
-- `error-handling-and-resilience` - Error handling patterns for test failures, error classification
-- `monitoring-and-observability` - Test execution metrics and logging
-- `performance-optimization` - Test performance analysis
+
+- `tests-and-validation`
+- `core-python-standards`
+- `error-handling-and-resilience`
+- `monitoring-and-observability`
 
 ## Steps
 

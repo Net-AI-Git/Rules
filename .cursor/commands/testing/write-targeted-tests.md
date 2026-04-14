@@ -3,12 +3,17 @@
 ## Overview
 Systematically identify new or modified code and automatically generate comprehensive, targeted test cases following project testing standards. This command ensures every new feature, function, or code change has corresponding test coverage before approval.
 
+## Scope and boundaries
+
+- **In scope:** Generating/updating `pytest` tests for changed code paths; running those tests; coverage signal for **new** code.
+- **Out of scope — use instead:** Full-suite run and triage → `/testing/run-test-suite`. LLM eval metrics → `/testing/run-evaluation-suite`.
+
 ## Rules Applied
-- `tests-and-validation` - Testing framework standards, atomic tests, Arrange-Act-Assert pattern
-- `core-python-standards` - Code quality standards, function structure
-- `error-handling-and-resilience` - Error handling test cases, edge cases
-- `monitoring-and-observability` - Test execution metrics and logging
-- `code-review-and-collaboration` - Test quality standards
+
+- `tests-and-validation`
+- `core-python-standards`
+- `error-handling-and-resilience`
+- `monitoring-and-observability`
 
 ## Steps
 

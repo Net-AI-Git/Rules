@@ -3,12 +3,18 @@
 ## Overview
 Execute the complete LLM evaluation suite using specialized evaluation frameworks (Ragas, DeepEval, LangSmith) to measure agent performance, quality, and compliance. This command provides comprehensive evaluation metrics for generative AI systems. For **trace-based LLM-as-a-Judge** (execution logs, rubric weights, structured verdict JSON), use the **`@evaluate-with-llm-judge`** skill instead.
 
+## Scope and boundaries
+
+- **In scope:** Dataset/eval harness metrics (faithfulness, relevance, etc.) per project setup.
+- **Out of scope — use instead:** LangSmith trace exploration → `/monitoring/analyze-langsmith-traces`. Unit tests → `/testing/run-test-suite`.
+
 ## Rules Applied
-- `llm-evaluation-and-metrics` - LLM evaluation standards and mandatory metrics
-- `monitoring-and-observability` - LangSmith integration and tracing
-- `data-schemas-and-interfaces` - Evaluation data structures and Pydantic schemas
-- `error-handling-and-resilience` - Evaluation error handling and retry strategies
-- `performance-optimization` - Evaluation performance metrics and optimization
+
+- `llm-evaluation-and-metrics` *(reference under `reference-for-commands-and-skills/evaluation/` — do not `@` manually)*
+- `monitoring-and-observability`
+- `data-schemas-and-interfaces`
+- `error-handling-and-resilience`
+- `cost-and-budget-management` *(eval cost/token usage when applicable)*
 
 ## Steps
 

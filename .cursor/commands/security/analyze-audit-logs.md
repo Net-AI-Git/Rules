@@ -1,15 +1,21 @@
 # Analyze Audit Logs
 
 ## Overview
-Comprehensive analysis of audit logs to identify security incidents, compliance issues, anomalies, and operational patterns. This command examines audit trails from local JSON files to ensure accountability, traceability, and regulatory compliance.
+
+Parse and assess **audit trail** JSON (or equivalent) for traceability, anomalies, and governance alignment with structured telemetry expectations. Field-level audit semantics for products using the reference spec: `audit-protocol` *(reference under `reference-for-commands-and-skills/security/` — do not `@` manually)*.
+
+## Scope and boundaries
+
+- **In scope:** Log shape, correlation, security-relevant sequences, HITL-related events, masking gaps.
+- **Out of scope — use instead:** LangSmith trace analytics → `/monitoring/analyze-langsmith-traces`. Full codebase security scan → `/security/security-audit`.
 
 ## Rules Applied
-- `audit-protocol` - Audit trail requirements, log structure, compliance checks
-- `monitoring-and-observability` - Log aggregation, correlation IDs, distributed tracing
-- `security-governance-and-observability` - Security event monitoring and incident detection
-- `error-handling-and-resilience` - Error pattern analysis, error classification
-- `performance-optimization` - Performance anomaly detection, resource usage analysis
-- `human-in-the-loop-approval` - Human intervention tracking, approval workflow analysis
+
+- `security-governance-and-observability`
+- `monitoring-and-observability`
+- `error-handling-and-resilience`
+- `human-in-the-loop-approval`
+- `audit-protocol` *(reference; use via this command — do not `@` manually)*
 
 ## Steps
 
@@ -20,7 +26,7 @@ Comprehensive analysis of audit logs to identify security incidents, compliance 
      - Identify log file formats and structures
    - Parse audit log entries
      - Extract structured log data (JSON format)
-     - Validate log structure against audit protocol requirements
+     - Validate log structure against governance and observability expectations (required fields, correlation, actor/resource/action/result where applicable)
      - Handle different log formats if present
 
 2. **Validate Log Structure**
@@ -88,20 +94,11 @@ Comprehensive analysis of audit logs to identify security incidents, compliance 
      - Detect potential DoS attempts
      - Flag excessive tool usage
 
-5. **Compliance Verification**
-   - **GDPR Compliance**:
-     - Verify data access logging for data subject rights
-     - Check consent management tracking
-     - Validate data processing records
-     - Review data deletion audit trails
-   - **HIPAA Compliance** (if applicable):
-     - Verify PHI access logging
-     - Check access control enforcement
-     - Validate audit trail completeness
-   - **SOC 2 Compliance**:
-     - Verify access control change logging
-     - Check system configuration change tracking
-     - Review incident response logging
+5. **Governance & observability alignment**
+   - Verify entries support end-to-end traceability (correlation IDs, request/session linkage)
+   - Check for required semantic fields for audit-style events (actor, resource, action, result) consistent with project observability rules
+   - Flag PII or secrets in log payloads (should follow masking/redaction rules)
+   - Note gaps that would block incident response or dashboard use — not a GDPR/HIPAA/SOC 2 attestation
 
 6. **Security Incident Detection**
    - **Automated Detection**:
@@ -122,7 +119,7 @@ Comprehensive analysis of audit logs to identify security incidents, compliance 
    - Create comprehensive audit log analysis report
    - Include event statistics and patterns
    - Highlight anomalies and security incidents
-   - Provide compliance status assessment
+   - Summarize governance/observability alignment gaps (field coverage, masking, correlation)
    - Include recommendations for improvements
 
 ## Data Sources
@@ -139,7 +136,7 @@ A comprehensive audit log analysis report including:
   - Error patterns with classification (transient vs permanent)
   - Performance anomalies with resource usage analysis
   - Human intervention patterns and approval workflow analysis
-- **Compliance Status**: GDPR, HIPAA, SOC 2 compliance verification results
+- **Governance & observability alignment**: Gaps vs expected structured audit/telemetry fields and traceability (not regulatory certification)
 - **Security Incidents**: Detected incidents with detailed timeline reconstruction, impact analysis, and root cause identification
 - **Forensic Analysis**: Timeline reconstruction, activity tracking, incident correlation
 - **Patterns and Trends**: Operational patterns, usage trends, behavioral analysis, performance trends

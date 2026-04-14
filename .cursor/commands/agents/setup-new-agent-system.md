@@ -3,18 +3,24 @@
 ## Overview
 Systematic setup of a new multi-agent system from initial planning through implementation structure. This command creates the foundation for a new agent system following multi-agent architecture patterns and LangGraph best practices.
 
+## Scope and boundaries
+
+- **In scope:** Structure, config hooks, prompts, tools/nodes layout per Rules.
+- **Out of scope — use instead:** Single node implementation → `/agents/create-agent-node`. Single tool → `/agents/implement-agent-tool`.
+
 ## Rules Applied
-- `multi-agent-systems` - Multi-agent architecture patterns, Orchestrator/Worker/Synthesizer, SECTIONS pattern
-- `langgraph-architecture-and-nodes` - LangGraph workflow design, state definition, node implementation
-- `agentic-logic-and-tools` - LangChain fundamentals, tool definitions, agent internals
-- `core-python-standards` - Code quality standards, project structure
-- `configuration-and-dependency-injection` - Configuration setup, pydantic-settings, dependency injection
-- `data-schemas-and-interfaces` - Schema definitions, Pydantic models, structured interfaces
-- `prompt-engineering-and-management` - Prompt setup, prompt templates, prompt versioning
-- `error-handling-and-resilience` - Error handling setup, retry strategies, error classification
-- `human-in-the-loop-approval` - Human-in-the-loop setup, approval workflows
-- `cost-and-budget-management` - Budget setup, cost tracking configuration
-- `rate-limiting-and-queue-management` - Rate limiting setup, queue management configuration
+
+- `multi-agent-systems`
+- `langgraph-architecture-and-nodes`
+- `agentic-logic-and-tools`
+- `core-python-standards`
+- `configuration-and-dependency-injection`
+- `data-schemas-and-interfaces`
+- `prompt-engineering-and-management`
+- `error-handling-and-resilience`
+- `human-in-the-loop-approval`
+- `cost-and-budget-management`
+- `api-interface-and-streaming` *(when the system exposes HTTP APIs)*
 
 ## Steps
 

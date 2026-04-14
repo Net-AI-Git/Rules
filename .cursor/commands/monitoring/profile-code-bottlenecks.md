@@ -1,12 +1,18 @@
 # Profile Code Bottlenecks
 
 ## Overview
-Run a code profiler (e.g., `cProfile`) on target code to identify real performance bottlenecks through measurement rather than guessing. This command follows the engineering principle that every optimization must start with measurement: profile first, identify 1–2 bottleneck functions, understand their Big-O complexity, then perform targeted refactoring for meaningful production improvement.
+
+Run a **Python profiler** (e.g. `cProfile`, `pyinstrument`) on a representative workload. Measure before optimizing: find 1–2 hot functions, assess complexity, refactor, re-measure.
+
+## Scope and boundaries
+
+- **In scope:** CPU/time profiling of Python code paths.
+- **Out of scope — use instead:** Distributed trace analytics → `/monitoring/analyze-langsmith-traces`. Infra/service metrics → `/monitoring/performance-analysis`.
 
 ## Rules Applied
-- `performance-optimization` - Performance optimization strategies, query optimization, resource pooling
-- `monitoring-and-observability` - Profiling, metrics collection, latency measurement
-- `core-python-standards` - Concurrency patterns (asyncio, ProcessPoolExecutor), code quality standards
+
+- `core-python-standards`
+- `monitoring-and-observability`
 
 ## Steps
 

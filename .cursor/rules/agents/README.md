@@ -8,10 +8,10 @@ Rules in this folder are organized by **development phase** so you know when to 
 
 - **must/** – Required for every agentic system:
   - `langgraph-architecture-and-nodes` – Workflow design, READ→DO→WRITE→CONTROL, TypedDict state
-  - `agentic-logic-and-tools` – LangChain basics, LCEL, tools, PydanticAI in nodes
+  - `agentic-logic-and-tools` – LCEL, `@tool`, Pydantic v2; Splunk HEC for traces (no print logging)
   - `contract-scope-and-boundaries` – When to use explicit contracts vs implicit (replaceability test)
 - **interfaces/** – Use when defining boundaries between Planner/Memory/Executor:
-  - `agent-component-interfaces` – API contracts (ABCs) for Planner, Memory, Executor
+  - `agent-component-interfaces` – API contracts (ABCs) for Planner, Memory, Executor; Splunk HEC at boundaries (no print logging)
 
 ## Phase 2 – Core Components (`02-core-components/`)
 

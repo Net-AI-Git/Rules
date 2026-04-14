@@ -10,7 +10,7 @@ This repository contains two main components:
 System-level instructions for the Cursor AI Agent. Rules define coding standards, architectural patterns, security requirements, and development workflows. They are automatically applied based on their configuration (always, intelligently, or for specific files).
 
 ### ⚡ Commands (`.cursor/commands/`)
-Reusable workflows that can be triggered with a `/` prefix in the chat. Commands provide standardized processes for testing, security audits, code reviews, deployment, and agent development.
+Reusable workflows that can be triggered with a `/` prefix in the chat. Commands provide standardized processes for testing, security audits, code reviews, monitoring, and agent development.
 
 ## Quick Start
 
@@ -28,7 +28,7 @@ Copy only what you need:
 
 **For agent projects:**
 - `.cursor/rules/agents/` - Multi-agent patterns
-- `.cursor/rules/evaluation/` - LLM evaluation
+- `.cursor/rules/reference-for-commands-and-skills/evaluation/` - LLM evaluation metrics (used by commands/skills; do not `@` manually)
 
 **For API projects:**
 - `.cursor/rules/api/` - API design and documentation
@@ -49,14 +49,13 @@ Rules/
 │   │   ├── development/     # Testing, code review, versioning
 │   │   ├── api/        # API-related rules
 │   │   ├── data/       # Data schemas, migrations
-│   │   ├── evaluation/ # LLM evaluation, judging
+│   │   ├── reference-for-commands-and-skills/  # Specs for commands/skills only
 │   │   └── configuration/  # Configuration, DI, prompts
 │   └── commands/       # Cursor Commands (see .cursor/commands/README.md)
 │       ├── testing/    # Testing and evaluation
 │       ├── security/   # Security audit and compliance
 │       ├── review/     # Code review and compliance
 │       ├── monitoring/ # Monitoring and observability
-│       ├── deployment/ # Deployment workflows
 │       └── agents/    # Agent development
 └── README.md          # This file
 ```
@@ -79,7 +78,7 @@ Commands are triggered with a `/` prefix in the chat input:
 ```
 /testing/run-test-suite
 /security/security-audit
-/deployment/pre-deployment-check
+/review/final-compliance-check
 ```
 
 Each command follows a standardized workflow and integrates with relevant Rules. See [`.cursor/commands/README.md`](.cursor/commands/README.md) for detailed documentation.
@@ -93,14 +92,14 @@ Essential rules for all projects:
 
 ### Security Rules
 Security and governance:
-- `security-governance-and-observability` - Security standards (always applied)
-- `audit-protocol` - Audit procedures (always applied)
+- `security-governance-and-observability` - Agent security policy + pointers to other rules (always applied)
+- `audit-protocol` - Lives under `reference-for-commands-and-skills/security/`; use commands or `@splunk-instrumentation` (not manual `@`)
 
 ### Agent Rules
 Agent-specific architecture:
 - `multi-agent-systems` - Multi-agent patterns
 - `langgraph-architecture-and-nodes` - LangGraph workflows
-- `agentic-logic-and-tools` - Agent tools and logic
+- `agentic-logic-and-tools` - LangChain tools + Splunk HEC observability
 
 ### Infrastructure Rules
 Deployment and operations:
@@ -127,9 +126,8 @@ Data management:
 
 ### Evaluation Rules
 LLM evaluation and testing:
-- `llm-evaluation-and-metrics` - Evaluation metrics
-- LLM-as-a-Judge — Cursor Command `/testing/evaluate-with-llm-judge` (not a rule; see `.cursor/commands/testing/evaluate-with-llm-judge.md`)
-- `final-review-protocol` - Final review (always applied)
+- `llm-evaluation-and-metrics` - Under `reference-for-commands-and-skills/evaluation/`; use evaluation commands or `@evaluate-with-llm-judge` (not manual `@`)
+- LLM-as-a-Judge — Skill `@evaluate-with-llm-judge` (see `.cursor/skills/evaluate-with-llm-judge/SKILL.md`)
 
 ### Configuration Rules
 Configuration and setup:
@@ -150,7 +148,7 @@ When creating or updating Rules:
 - Use appropriate rule types (Always Apply, Apply Intelligently, etc.)
 
 When creating or updating Commands:
-- Follow the format defined in `.cursor/rules/commands-management/RULE.md`
+- Follow the format defined in `.cursor/rules/commands-management/RULE.mdc`
 - Integrate with relevant Rules
 - Avoid duplication by reusing existing commands
 

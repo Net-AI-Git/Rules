@@ -1,15 +1,21 @@
 # Performance Analysis
 
 ## Overview
-Comprehensive performance analysis to identify bottlenecks, optimize resource usage, and improve system efficiency. This command analyzes latency, throughput, resource consumption, and cache performance to provide actionable optimization recommendations.
+
+Analyze **service/workload** performance: latency distributions, throughput, resources, queues, cache behavior—using metrics, logs, or benchmarks available in the repo or runtime. Complements LangSmith-specific analysis.
+
+## Scope and boundaries
+
+- **In scope:** End-to-end operation latency, capacity signals, resource saturation, SLI/SLO-style checks where data exists.
+- **Out of scope — use instead:** LLM trace token/latency from LangSmith exports → `/monitoring/analyze-langsmith-traces`. Hot Python functions → `/monitoring/profile-code-bottlenecks`.
 
 ## Rules Applied
-- `performance-optimization` - Performance optimization strategies, caching, query optimization, resource pooling
-- `monitoring-and-observability` - Performance metrics, SLI/SLO definitions, profiling
-- `core-python-standards` - Concurrency patterns (asyncio, ProcessPoolExecutor)
-- `error-handling-and-resilience` - Error impact on performance, error recovery performance
-- `deployment-and-infrastructure` - Infrastructure performance, resource limits
-- `rate-limiting-and-queue-management` - Queue performance, rate limiting impact
+
+- `monitoring-and-observability`
+- `core-python-standards`
+- `error-handling-and-resilience`
+- `api-interface-and-streaming` *(HTTP latency, rate limits, middleware when applicable)*
+- `redis-cache` *(when caching is relevant to the codebase)*
 
 ## Steps
 

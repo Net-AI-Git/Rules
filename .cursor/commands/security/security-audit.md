@@ -1,16 +1,23 @@
 # Security Audit
 
 ## Overview
-Comprehensive security review to identify and fix vulnerabilities in the codebase, infrastructure, and dependencies. This command performs a thorough security audit following OWASP Top 10 for LLM Applications and compliance requirements.
+
+Security review of dependencies, code (including **OWASP Top 10 for LLM** concerns), and configuration surface (secrets, env, network). Aligns with `.cursor/rules/security` and related Rules. **Not** a full governance matrix—that is `/review/final-compliance-check`. **Not** duplicate deep audit-log parsing—use `/security/analyze-audit-logs` (invoked in this workflow).
+
+## Scope and boundaries
+
+- **In scope:** CVE/supply chain checks, prompt injection and unsafe tool handling, secrets hygiene, data exposure, infra-relevant misconfigurations, structured audit log review via the dedicated command.
+- **Out of scope — use instead:** Broad Rule-by-rule compliance → `/review/final-compliance-check`. LangSmith optimization → `/monitoring/analyze-langsmith-traces`.
 
 ## Rules Applied
-- `security-governance-and-observability` - Security governance, OWASP Top 10, NIST AI RMF, blast radius containment
-- `audit-protocol` - Audit trail requirements and compliance checks
-- `configuration-and-dependency-injection` - Secrets management and configuration security
-- `prompt-injection-prevention` - Prompt injection vulnerability checks and prevention
-- `data-schemas-and-interfaces` - Data security validation, PII protection
-- `error-handling-and-resilience` - Security error handling, error classification
-- `multi-tenancy-and-isolation` - Isolation security checks, multi-tenant security
+
+- `security-governance-and-observability`
+- `prompt-injection-prevention`
+- `configuration-and-dependency-injection`
+- `data-schemas-and-interfaces`
+- `error-handling-and-resilience`
+- `monitoring-and-observability`
+- `api-interface-and-streaming` *(HTTP surface, when the codebase exposes APIs)*
 
 ## Steps
 
@@ -88,19 +95,13 @@ Comprehensive security review to identify and fix vulnerabilities in the codebas
    - Identify security incidents and anomalies
    - Use audit log findings in security assessment
 
-5. **Compliance Verification**
-   - Execute `/security/compliance-check` command
-   - Review compliance check results
-   - Integrate compliance findings into security assessment
-   - Verify compliance requirements are met
-
-6. **Security Testing Recommendations**
+5. **Security Testing Recommendations**
    - **Penetration Testing**: Recommend areas for penetration testing
    - **Vulnerability Scanning**: Suggest automated vulnerability scanning tools
    - **Security Code Review**: Identify areas needing deeper security code review
    - **Red Team Exercises**: Recommend red team testing scenarios
 
-7. **Generate Security Report**
+6. **Generate Security Report**
    - Create comprehensive security audit report
    - Categorize findings by severity (Critical, High, Medium, Low)
    - Provide specific recommendations for each finding
@@ -113,7 +114,6 @@ Comprehensive security review to identify and fix vulnerabilities in the codebas
 - Source code files (Python, configuration files)
 - Environment configuration files (`.env`, configuration files)
 - Results from `/security/analyze-audit-logs` command
-- Results from `/security/compliance-check` command
 - Infrastructure configuration (Docker, Kubernetes, cloud configs)
 - Security scanning tool outputs
 
@@ -125,7 +125,7 @@ A comprehensive security audit report including:
 - **Infrastructure Security Assessment**: Access controls, network security, secrets management, multi-tenancy security
 - **Security Error Handling**: Error classification, security error logging, recovery mechanisms
 - **Audit Log Review**: Summary from `/security/analyze-audit-logs` (implementation status and security event analysis)
-- **Compliance Status**: Summary from `/security/compliance-check` (GDPR, HIPAA, SOC 2 compliance checks)
+- **Governance alignment**: Findings mapped to `security-governance-and-observability` and `prompt-injection-prevention` (plus referenced observability/schema expectations)
 - **Security Testing Recommendations**: Penetration testing, vulnerability scanning, code review, red team exercises
 - **Prioritized Recommendations**: Actionable fixes with severity levels and risk assessment
 - **Remediation Guide**: Step-by-step instructions for addressing findings with code examples

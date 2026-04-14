@@ -1,17 +1,23 @@
 # Code Review Checklist
 
 ## Overview
-Comprehensive code review using a structured checklist to ensure code quality, functionality, testing, documentation, security, and maintainability. This command provides thorough code analysis following project standards and best practices.
+
+Structured **PR-style** review: style, correctness, tests, docs, and local security/data handling. This is the **canonical** detailed checklist. `/review/final-compliance-check` consumes this output and adds cross-cutting governance—do not duplicate that command’s matrix here.
+
+## Scope and boundaries
+
+- **In scope:** Code quality, tests next to changes, obvious security/data issues in diff.
+- **Out of scope — use instead:** Full Rule-domain matrix → `/review/final-compliance-check`. CVE/dependency audit → `/security/security-audit`.
 
 ## Rules Applied
-- `code-review-and-collaboration` - Code review standards, PR review checklist, Git workflow
-- `core-python-standards` - Code quality standards, function length, type hints, logging
-- `core-python-standards` - Core coding standards with final compliance check
-- `error-handling-and-resilience` - Error handling review, error classification, retry strategies
-- `tests-and-validation` - Test coverage review, test quality standards
-- `security-governance-and-observability` - Security review, vulnerability checks, access control
-- `performance-optimization` - Performance review, efficiency checks
-- `data-schemas-and-interfaces` - Data handling review, schema validation
+
+- `core-python-standards`
+- `error-handling-and-resilience`
+- `tests-and-validation`
+- `security-governance-and-observability`
+- `prompt-injection-prevention`
+- `data-schemas-and-interfaces`
+- `monitoring-and-observability` *(logging vs `print`, structured context when touching observability code)*
 
 ## Steps
 

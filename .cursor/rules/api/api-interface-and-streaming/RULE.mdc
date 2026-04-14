@@ -101,4 +101,4 @@ alwaysApply: false
     * **Redis:** Use Redis for distributed rate limiting (recommended for multi-instance deployments).
     * **In-Memory:** Use in-memory storage for single-instance deployments (simpler but not distributed).
 
-* **See:** `@security-governance-and-observability` for governance-level rate limiting requirements. `@api-documentation-standards` for documenting rate limits in API documentation.
+* **Policy:** `@security-governance-and-observability` requires API/agent throttling to exist; **implementation** is this section (and `@cost-and-budget-management` for in-workflow token budgets). `@api-documentation-standards` for documenting rate limits in API documentation.

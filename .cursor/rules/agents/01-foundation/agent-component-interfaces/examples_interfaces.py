@@ -1,13 +1,17 @@
 """
-Component Interfaces Examples
+Component interface examples (ABCs + dataclass DTOs).
 
-This file demonstrates complete ABC interface definitions for Planner, Memory, and Executor components.
-Reference this example from RULE.mdc using @examples_interfaces.py syntax.
+DTOs use stdlib dataclasses for readability. At HTTP/tool boundaries prefer Pydantic v2
+models (@data-schemas-and-interfaces, @examples_contracts.py).
+
+Reference from RULE.mdc: @examples_interfaces.py
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass
+from typing import Any, Dict, List, Optional
 
 
 # ============================================================================

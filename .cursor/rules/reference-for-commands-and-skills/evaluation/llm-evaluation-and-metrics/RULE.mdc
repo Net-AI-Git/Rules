@@ -1,4 +1,5 @@
 ---
+description: "LLM evaluation metrics and Splunk reporting — for commands/skills only (do not @ manually)"
 globs: **/evals/**/*.py, **/evaluation/**/*.py
 alwaysApply: false
 ---
@@ -48,4 +49,4 @@ For every generative task, you must define and measure:
 
 * **Resources:** Reference OpenAI Evaluation best practices for detailed guidance on building evals to monitor quality and compliance in production.
 
-* **See:** `security-governance-and-observability.md` for governance-level evaluation requirements.
+* **See:** `@security-governance-and-observability` for release/eval posture alongside agent security.

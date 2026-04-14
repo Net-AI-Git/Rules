@@ -1,24 +1,28 @@
 """
-Modularity and Implementation Swapping Examples
+Modularity and implementation swapping (factory, DI, A/B).
 
-This file demonstrates implementation swapping patterns, dependency injection, and A/B testing examples.
-Reference this example from RULE.mdc using @examples_modularity.py syntax.
+Logging: structured JSON lines via stdlib `logging` (align with Splunk HEC field names in
+@monitoring-and-observability). For a full HEC client + timer, see @examples_performance_timing.
+
+Reference from RULE.mdc: @examples_modularity.py
 """
 
+from __future__ import annotations
+
+import json
+import logging
 import time
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, Optional
+import uuid
 
-import structlog
-
-# See @examples_performance_timing in monitoring-and-observability for full implementation.
-logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class PerformanceTimer:
-    """Minimal PerformanceTimer for structured latency logging (start/end/duration_ms)."""
+    """Minimal timer: emits one JSON log line per operation (Splunk-friendly shape)."""
 
     def __init__(self, operation_name: str, **extra: Any) -> None:
         self.operation_name = operation_name
@@ -26,8 +30,9 @@ class PerformanceTimer:
         self.duration_seconds: float = 0.0
         self._start: float = 0.0
         self._start_ts: str = ""
+        self._correlation_id = str(uuid.uuid4())
 
-    def __enter__(self) -> "PerformanceTimer":
+    def __enter__(self) -> PerformanceTimer:
         self._start = time.perf_counter()
         self._start_ts = datetime.now(timezone.utc).isoformat()
         return self
@@ -36,15 +41,17 @@ class PerformanceTimer:
         end_ts = datetime.now(timezone.utc).isoformat()
         self.duration_seconds = time.perf_counter() - self._start
         duration_ms = self.duration_seconds * 1000
-        log_data = {
+        payload = {
             "timestamp": end_ts,
+            "correlation_id": self._correlation_id,
             "operation_name": self.operation_name,
-            "start_timestamp": self._start_ts,
-            "end_timestamp": end_ts,
-            "duration_ms": round(duration_ms, 2),
+            "start_time": self._start_ts,
+            "end_time": end_ts,
+            "duration_ms": round(duration_ms, 3),
             **self.extra,
         }
-        logger.info("operation_completed", **log_data)
+        # Single JSON line — typical preprocessing for Splunk; production: POST same dict to HEC.
+        logger.info(json.dumps(payload))
 
 
 # ============================================================================

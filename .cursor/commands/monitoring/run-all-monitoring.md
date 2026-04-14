@@ -1,104 +1,44 @@
 # Run All Monitoring
 
 ## Overview
-Execute all monitoring commands in sequence: LangSmith trace analysis, performance analysis, prompt registry/Splunk audit, and comprehensive system analysis. This master command runs the complete monitoring workflow to analyze system performance, prompt observability health, identify bottlenecks, and provide holistic insights.
+
+Sequences the **monitoring** subcommands in a recommended order and aggregates a single summary. **Does not** duplicate their steps—see each command for details. **Does not** include `/monitoring/profile-code-bottlenecks` (Python profiler); run that separately when optimizing hot paths.
+
+## Scope and boundaries
+
+- **In scope:** Orchestration + consolidated report.
+- **Out of scope:** Re-deriving metrics that belong to `/monitoring/analyze-langsmith-traces` or `/monitoring/performance-analysis`.
 
 ## Rules Applied
-- `monitoring-and-observability` - Metrics, tracing, log aggregation, LangSmith integration
-- `performance-optimization` - Performance optimization strategies, bottleneck identification
-- `agentic-logic-and-tools` - Tool usage patterns, agent internals
-- `error-handling-and-resilience` - Error patterns, retry strategies, error impact analysis
-- `cost-and-budget-management` - Cost analysis, token usage optimization
-- `model-routing-and-selection` - Model selection analysis
-- `deployment-and-infrastructure` - Infrastructure performance
-- `rate-limiting-and-queue-management` - Queue performance
-- `audit-protocol` - Audit trail analysis
-- `llm-evaluation-and-metrics` - Evaluation results
-- `tests-and-validation` - Test results
-- `security-governance-and-observability` - Security analysis
-- `human-in-the-loop-approval` - Human intervention analysis
+
+- `monitoring-and-observability`
+- `agentic-logic-and-tools`
+- `error-handling-and-resilience`
+- `cost-and-budget-management`
+- `model-routing-and-selection`
+- `security-governance-and-observability`
+- `human-in-the-loop-approval`
+- `tests-and-validation`
+- `llm-evaluation-and-metrics` *(reference; do not `@` manually)*
+- `audit-protocol` *(reference; do not `@` manually)*
 
 ## Steps
 
-1. **Analyze LangSmith Traces**
-   - Execute `/monitoring/analyze-langsmith-traces` command
-   - Wait for completion and review results
-   - **Error Handling**:
-     - If trace analysis fails: Continue with warning, report data availability issues
-     - If traces unavailable: Skip this step, continue with available data
-     - If analysis completes: Proceed to next step
-   - **Output**: LangSmith trace analysis report with LLM calls, tool usage, agent steps
-
-2. **Performance Analysis**
-   - Execute `/monitoring/performance-analysis` command
-   - Wait for completion and review results
-   - **Error Handling**:
-     - If performance analysis fails: Continue with warning, report data availability issues
-     - If metrics unavailable: Skip this step, continue with available data
-     - If analysis completes: Proceed to next step
-   - **Output**: Performance analysis report with latency, throughput, resource usage
-
-3. **Audit Prompt Registry and Splunk Observability**
-   - Execute `/monitoring/audit-prompt-registry-splunk` command
-   - Wait for completion and review results
-   - **Error Handling**:
-     - If audit fails: Continue with warning, report observability coverage gaps
-     - If Splunk data is partially unavailable: Continue with partial audit findings
-     - If audit completes: Proceed to next step
-   - **Output**: Prompt registry observability audit with telemetry coverage and governance findings
-
-4. **Comprehensive System Analysis**
-   - Execute `/monitoring/comprehensive-system-analysis` command (uses results from steps 1 and 2)
-   - Wait for completion and review results
-   - **Error Handling**:
-     - If comprehensive analysis fails: Report error but include partial results
-     - If analysis completes: Generate final report
-   - **Output**: Comprehensive system analysis report with cross-system correlations
-
-5. **Generate Comprehensive Monitoring Report**
-   - **System Health Dashboard**: Create dashboard with key metrics and health indicators
-   - **Trend Analysis**: Analyze trends across all monitoring dimensions
-   - **Alerting Recommendations**: Provide recommendations for setting up alerts based on findings
-   - Aggregate results from all four commands
-   - Create summary with overall system health status (Healthy/Degraded/Critical)
-   - Highlight performance bottlenecks and anomalies with severity classification
-   - Provide prioritized optimization recommendations with impact assessment
-   - Include links to detailed reports from each command
-   - **Monitoring Insights**: Key insights and patterns identified across all monitoring data
+1. Run `/monitoring/analyze-langsmith-traces` — if traces missing, note and continue.
+2. Run `/monitoring/performance-analysis` — if metrics missing, note and continue.
+3. Run `/monitoring/audit-prompt-registry-splunk` — if Splunk/registry unavailable, partial findings only.
+4. Run `/monitoring/comprehensive-system-analysis` — synthesize using prior outputs where possible.
+5. Produce **one** aggregated dashboard-style summary: health (Healthy/Degraded/Critical), top issues, alerting recommendations, cross-links to each sub-report.
 
 ## Data Sources
-- Results from `/monitoring/analyze-langsmith-traces` command
-- Results from `/monitoring/performance-analysis` command
-- Results from `/monitoring/audit-prompt-registry-splunk` command
-- Results from `/monitoring/comprehensive-system-analysis` command
-- LangSmith traces (JSON format)
-- Performance metrics
-- Audit logs (JSON format)
+
+- Outputs of the four commands above; raw JSON traces/logs only when sub-reports are absent.
 
 ## Output
-A comprehensive monitoring report including:
-- **Overall System Health**: Healthy/Degraded/Critical with health score
-- **System Health Dashboard**: Key metrics, health indicators, component health status
-- **LangSmith Analysis Summary**: LLM calls, tool usage, agent steps, bottlenecks, cost analysis, model selection
-- **Performance Analysis Summary**: Latency, throughput, resource usage, SLI/SLO compliance, capacity planning, optimization opportunities
-- **Prompt Registry/Splunk Audit Summary**: Registry coverage, event quality, prompt metrics observability, governance findings
-- **Comprehensive Analysis Summary**: Cross-system correlations, patterns, anomalies, system health scoring, predictive analysis
-- **Trend Analysis**: Performance trends, cost trends, error trends, health trends
-- **Critical Issues**: Performance bottlenecks and system issues with severity classification
-- **Alerting Recommendations**: Suggested alerts based on findings with thresholds
-- **Prioritized Recommendations**: Optimization suggestions with impact assessment and implementation guidance
-- **Monitoring Insights**: Key insights and patterns identified across all monitoring data
-- **Next Steps**: Actionable performance improvements with priority levels
 
-## Execution Flow
-```
-analyze-langsmith-traces → performance-analysis → audit-prompt-registry-splunk → comprehensive-system-analysis → Final Report
-           ↓                        ↓                          ↓                           ↓
-      [Continue]              [Continue]                 [Continue]                 [Aggregate Results]
-```
+- Single executive summary plus pointers to each subcommand’s detailed findings
+- No duplicate metric tables already produced by step 1–2
 
-## Notes
-- Each command can be run independently if needed
-- Master command provides workflow orchestration
-- Comprehensive system analysis uses results from trace and performance analysis
-- All reports are preserved for detailed analysis
+## Execution order
+
+`analyze-langsmith-traces` → `performance-analysis` → `audit-prompt-registry-splunk` → `comprehensive-system-analysis` → aggregated summary

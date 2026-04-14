@@ -1,15 +1,21 @@
 # Analyze LangSmith Traces
 
 ## Overview
-Comprehensive analysis of LangSmith traces to understand LLM operations, tool usage, agent behavior, and performance. This command examines traces from local JSON files to identify bottlenecks, errors, and optimization opportunities.
+
+Analyze **LangSmith** export JSON (or equivalent) for LLM calls, tools, latency, tokens, cost, and routing. This is the **canonical** trace-metric pass for agent runs.
+
+## Scope and boundaries
+
+- **In scope:** Per-trace LLM/tool metrics, errors, cost hints, model choice.
+- **Out of scope — use instead:** Service-wide latency without trace files → `/monitoring/performance-analysis`. Python CPU profiling → `/monitoring/profile-code-bottlenecks`. Cross-system synthesis → `/monitoring/comprehensive-system-analysis`.
 
 ## Rules Applied
-- `monitoring-and-observability` - LangSmith integration, tracing, performance metrics
-- `agentic-logic-and-tools` - Tool usage patterns, agent internals, performance
-- `error-handling-and-resilience` - Error patterns and retry strategies
-- `performance-optimization` - Performance analysis, bottleneck identification
-- `cost-and-budget-management` - Cost analysis, token usage optimization
-- `model-routing-and-selection` - Model selection analysis, routing patterns
+
+- `monitoring-and-observability`
+- `agentic-logic-and-tools`
+- `error-handling-and-resilience`
+- `cost-and-budget-management`
+- `model-routing-and-selection`
 
 ## Steps
 

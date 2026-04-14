@@ -15,14 +15,16 @@ Rules in this repository are organized by category:
 ```
 .cursor/rules/
 ├── core/              # Always-applied core rules (Python standards, error handling)
-├── security/          # Security and governance rules
+├── security/          # Security and governance rules (manual @ when relevant)
 ├── agents/            # Agent-specific rules (multi-agent, LangGraph, agentic logic)
 ├── infrastructure/    # Deployment, monitoring, performance
 ├── development/       # Testing, code review, versioning
 ├── api/               # API-related rules
 ├── data/              # Data schemas, migrations
-├── evaluation/        # LLM evaluation, judging, auditing
 ├── configuration/     # Configuration, dependency injection, prompts
+├── reference-for-commands-and-skills/  # Specs for Commands/Skills only — do not @ manually
+│   ├── evaluation/    # e.g. llm-evaluation-and-metrics
+│   └── security/      # e.g. audit-protocol
 ├── rules-management/ # Meta-rule for managing rules
 └── commands-management/ # Meta-rule for managing commands
 ```
@@ -63,8 +65,7 @@ alwaysApply: true
 **Examples:**
 - `core-python-standards` - Python coding standards
 - `error-handling-and-resilience` - Error handling patterns
-- `security-governance-and-observability` - Security standards
-- `audit-protocol` - Audit procedures
+- `security-governance-and-observability` - Agent policy + pointers (no duplicate specs)
 
 ### 2. Apply Intelligently
 
@@ -150,71 +151,67 @@ Essential rules for all projects:
 Security and governance:
 
 - **`security-governance-and-observability`** (Always Apply)
-  - Security standards and governance requirements
-  - Blast radius containment, OWASP LLM, NIST AI RMF
+  - Agent security **policy** + routing table to other rules (no duplicated Splunk/sanitization/eval specs)
+  - Details: `@prompt-injection-prevention`, `@cost-and-budget-management`, `@api-interface-and-streaming`, `@human-in-the-loop-approval`, `@monitoring-and-observability`, `@audit-protocol`, `@llm-evaluation-and-metrics`
 
-- **`audit-protocol`** (Always Apply)
-  - Audit procedures and compliance verification
-  - Tool call auditing, state change auditing, LLM operation auditing
-
-- **`prompt-injection-prevention`** (Apply Intelligently)
-  - Prompt injection prevention and input sanitization
+- **`prompt-injection-prevention`** (Apply to Specific Files — `**/api/**/*.py`, `**/routes/**/*.py`, `**/main.py`, `**/agents/**/*.py`)
+  - Sanitize and validate user input before prompts; detect and log injection attempts
 
 ### Agent Rules (`agents/`)
 
 Agent-specific architecture:
 
-- **`multi-agent-systems`** (Apply Intelligently)
+- **`multi-agent-systems`** (Apply to Specific Files — `**/agents/**/*.py`, `**/langgraph/**/*.py`, `**/workflows/**/*.py`)
   - Multi-agent system architecture patterns
   - Orchestrator/Worker/Synthesizer patterns
   - Micro-agents over monolith principle
 
-- **`contract-scope-and-boundaries`** (Apply Intelligently)
+- **`contract-scope-and-boundaries`** (Apply to Specific Files — `**/agents/**/*.py`, `**/interfaces/**/*.py`, `**/schemas/**/*.py`, `**/contracts/**/*.py`)
   - When to define explicit API contracts vs implicit contracts
   - Boundary points, replaceability test, avoiding over-engineering
 
-- **`agent-component-interfaces`** (Apply Intelligently)
-  - API contracts between Planner, Memory, Executor
-  - ABC interfaces and implementation swapping
+- **`agent-component-interfaces`** (Apply to Specific Files — `**/agents/**/*.py`, `**/interfaces/**/*.py`, `**/contracts/**/*.py`, `**/schemas/**/*.py`)
+  - ABCs / Protocol for Planner, Memory Node, Executor; Pydantic v2 at boundaries
+  - Splunk HEC for cross-component spans (`correlation_id`, `operation_name`); no `print()` logging
+  - Summary table + pointers; full patterns in `@examples_*.py`
 
-- **`planner-strategic-planning`** (Apply Intelligently)
+- **`planner-strategic-planning`** (Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/nodes/**/*.py`)
   - Strategic goal setting and action planning
   - Risk assessment before task decomposition
 
-- **`executor-action-translation`** (Apply Intelligently)
+- **`executor-action-translation`** (Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/nodes/**/*.py`)
   - Translates strategic plans to concrete actions
   - Action execution and coordination
 
-- **`memory-feedback-node`** (Apply to Specific Files)
+- **`memory-feedback-node`** (Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/nodes/**/*.py`)
   - Memory Node for historical context and learning feedback
   - Applied to LangGraph/workflow/node files
 
-- **`memory-and-archival-management`** (Apply Intelligently)
+- **`memory-and-archival-management`** (Apply to Specific Files — `**/memory/**/*.py`, `**/agents/**/*.py`, `**/repositories/**/*.py`)
   - Long-term memory and archival strategies
 
-- **`langgraph-architecture-and-nodes`** (Apply to Specific Files)
-  - LangGraph workflow architecture
-  - Node structure (READ → DO → WRITE → CONTROL)
+- **`langgraph-architecture-and-nodes`** (Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/nodes/**/*.py`)
+  - LangGraph workflow architecture; node structure (READ → DO → WRITE → CONTROL)
+  - Pydantic v2 + LangChain (`with_structured_output` / `bind_tools`) in the DO phase
   - Applied to LangGraph node files
 
-- **`agentic-logic-and-tools`** (Apply Intelligently)
-  - LangChain fundamentals and tool definitions
-  - Agent internals and tool implementation
+- **`agentic-logic-and-tools`** (Apply to Specific Files — `**/agents/**/*.py`, `**/tools/**/*.py`, `**/chains/**/*.py`)
+  - LCEL, `@tool`, Pydantic v2 bindings; Splunk HEC for traces (no `print()` logging)
 
-- **`cost-and-budget-management`** (Apply Intelligently)
+- **`cost-and-budget-management`** (Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/agents/**/*.py`)
   - Token budget and cost guardrails
 
-- **`context-compression-and-optimization`** (Apply to Specific Files)
+- **`context-compression-and-optimization`** (Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/agents/**/*.py`)
   - Context window compression and optimization
   - Applied to LangGraph/workflow/agent files
 
-- **`human-in-the-loop-approval`** (Apply Intelligently)
+- **`human-in-the-loop-approval`** (Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/agents/**/*.py`)
   - Approval context schema for HITL interrupts
 
-- **`model-routing-and-selection`** (Apply Intelligently)
+- **`model-routing-and-selection`** (Apply to Specific Files — `**/agents/**/*.py`, `**/langgraph/**/*.py`, `**/services/**/*.py`)
   - Dynamic model routing based on task complexity
 
-- **`reflection-and-self-critique`** (Apply Intelligently)
+- **`reflection-and-self-critique`** (Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/nodes/**/*.py`)
   - Self-critique and reflection patterns for quality assurance
 
 ### Infrastructure Rules (`infrastructure/`)
@@ -296,16 +293,15 @@ Data management:
   - Compatibility and versioning strategies
   - Applied to migration files
 
-### Evaluation Rules (`evaluation/`)
+### Reference rules (`reference-for-commands-and-skills/`)
 
-LLM evaluation and testing:
+Authoritative rules for **Commands** and **Skills** only — **do not** `@` manually in chat; invoke the workflow that applies them.
 
-- **`llm-evaluation-and-metrics`** (Apply to Specific Files)
-  - LLM evaluation frameworks
-  - Metrics and scoring standards
-  - Applied to evaluation files
+- **`audit-protocol`** (`security/audit-protocol/`) — Mandatory audit events, audit-specific fields, PII masking. Applied via **`@splunk-instrumentation`** and security/monitoring commands; complements `@monitoring-and-observability`.
 
-- **LLM-as-a-Judge** — **not** a Cursor Rule; canonical workflow is the Skill **`@evaluate-with-llm-judge`** (`.cursor/skills/evaluate-with-llm-judge/SKILL.md`).
+- **`llm-evaluation-and-metrics`** (`evaluation/llm-evaluation-and-metrics/`) — Eval metrics, Splunk reporting. Applied via **`@evaluate-with-llm-judge`** and evaluation commands; globs: `**/evals/**/*.py`, `**/evaluation/**/*.py`.
+
+- **LLM-as-a-Judge** — **not** a separate rule file; canonical workflow is the Skill **`@evaluate-with-llm-judge`** (`.cursor/skills/evaluate-with-llm-judge/SKILL.md`).
 
 ### Configuration Rules (`configuration/`)
 

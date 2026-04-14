@@ -3,15 +3,21 @@
 ## Overview
 Implement a new tool for agent use following LangChain tool definition standards with proper Pydantic schemas, documentation, and integration into the tool registry.
 
+## Scope and boundaries
+
+- **In scope:** Tool schema, implementation, tests, governance (blast radius, validation).
+- **Out of scope — use instead:** Whole workflow/graph → `/agents/setup-new-agent-system` or `/agents/create-agent-node`.
+
 ## Rules Applied
-- `agentic-logic-and-tools` - LangChain fundamentals, tool definitions, tool documentation
-- `data-schemas-and-interfaces` - Pydantic schema standards, field descriptions, structured outputs
-- `core-python-standards` - Code quality standards, type hints, function length
-- `error-handling-and-resilience` - Tool error handling, error classification, retry strategies
-- `security-governance-and-observability` - Tool security, access control, input validation
-- `tests-and-validation` - Tool testing, test structure, test coverage
-- `monitoring-and-observability` - Tool instrumentation, metrics collection
-- `prompt-injection-prevention` - Tool input validation, prompt injection prevention
+
+- `agentic-logic-and-tools`
+- `data-schemas-and-interfaces`
+- `core-python-standards`
+- `error-handling-and-resilience`
+- `security-governance-and-observability`
+- `tests-and-validation`
+- `monitoring-and-observability`
+- `prompt-injection-prevention`
 
 ## Steps
 

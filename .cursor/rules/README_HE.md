@@ -14,20 +14,19 @@
 |---------|-------------|-----------|-----------------|
 | **core-python-standards** | כל משימת קוד Python | Always | asyncio, ProcessPoolExecutor, httpx, typing, Splunk (לוגים) |
 | **error-handling-and-resilience** | טיפול בשגיאות, retry, circuit breaker | Always | Tenacity, circuitbreaker, Splunk |
-| **security-governance-and-observability** | אבטחה, governance, OWASP LLM | Always | — |
-| **audit-protocol** | ביקורות, compliance, audit trail | Always | Splunk, HEC |
-| **prompt-injection-prevention** | מניעת הזרקת פרומפטים, סניטציית קלט | לפי הקשר | — |
-| **planner-strategic-planning** | תכנון אסטרטגי לפני פירוק משימות | לפי הקשר | LangGraph |
-| **executor-action-translation** | תרגום תוכניות לאקשנים קונקרטיים | לפי הקשר | LangChain |
-| **memory-and-archival-management** | זיכרון ארוך טווח, Vector DB, ארכיון | לפי הקשר | Vector DB, PostgreSQL, LangGraph |
-| **multi-agent-systems** | ארכיטקטורת multi-agent (Orchestrator/Worker/Synthesizer) | לפי הקשר | LangGraph, asyncio.gather |
-| **agentic-logic-and-tools** | יסודות LangChain, כלים, agent internals | לפי הקשר | LangChain, PydanticAI, LCEL |
-| **contract-scope-and-boundaries** | מתי להגדיר חוזים מפורשים (ABC/Schema) | לפי הקשר | ABC, Pydantic, JSON Schema |
-| **agent-component-interfaces** | חוזים בין Planner, Memory, Executor | לפי הקשר | abc.ABC, Pydantic |
-| **cost-and-budget-management** | תקציב טוקנים ועלויות בזמן אמת | לפי הקשר | LangGraph (BudgetState) |
-| **human-in-the-loop-approval** | סכמת Approval ל-HITL interrupts | לפי הקשר | LangGraph interrupts |
-| **model-routing-and-selection** | ניתוב דינמי לפי מורכבות משימה | לפי הקשר | Splunk (מטריקות) |
-| **reflection-and-self-critique** | Reviewer Node, self-critique לפני סינתזה | לפי הקשר | — |
+| **security-governance-and-observability** | מדיניות אג'נטים + טבלת הפניות (בלי כפילות) | Always | מפנה לחוקים אחרים |
+| **prompt-injection-prevention** | מניעת הזרקת פרומפטים, סניטציית קלט | לפי קבצים (api, routes, main, agents) | Pydantic, דוגמאות ב־examples_*.py |
+| **planner-strategic-planning** | תכנון אסטרטגי לפני פירוק משימות | לפי קבצים (langgraph, workflows, nodes) | LangGraph |
+| **executor-action-translation** | תרגום תוכניות לאקשנים קונקרטיים | לפי קבצים (langgraph, workflows, nodes) | LangChain |
+| **memory-and-archival-management** | זיכרון ארוך טווח, Vector DB, ארכיון | לפי קבצים (memory, agents, repositories) | Vector DB, PostgreSQL, LangGraph |
+| **multi-agent-systems** | ארכיטקטורת multi-agent (Orchestrator/Worker/Synthesizer) | לפי קבצים (agents, langgraph, workflows) | LangGraph, asyncio.gather |
+| **agentic-logic-and-tools** | LangChain, כלים, תיעוד ב-Splunk HEC | לפי קבצים (agents, tools, chains) | LangChain, Pydantic v2, Splunk |
+| **contract-scope-and-boundaries** | מתי להגדיר חוזים מפורשים (ABC/Schema) | לפי קבצים (agents, interfaces, schemas, contracts) | ABC, Pydantic, JSON Schema |
+| **agent-component-interfaces** | חוזים בין Planner, Memory, Executor; Splunk בגבולות | לפי קבצים (agents, interfaces, contracts, schemas) | abc.ABC, Pydantic v2, Splunk HEC |
+| **cost-and-budget-management** | תקציב טוקנים ועלויות בזמן אמת | לפי קבצים (langgraph, workflows, agents) | LangGraph (BudgetState) |
+| **human-in-the-loop-approval** | סכמת Approval ל-HITL interrupts | לפי קבצים (langgraph, workflows, agents) | LangGraph interrupts |
+| **model-routing-and-selection** | ניתוב דינמי לפי מורכבות משימה | לפי קבצים (agents, langgraph, services) | Splunk (מטריקות) |
+| **reflection-and-self-critique** | Reviewer Node, self-critique לפני סינתזה | לפי קבצים (langgraph, workflows, nodes) | — |
 | **data-schemas-and-interfaces** | סכמות Pydantic, מודלים מובנים | לפי הקשר | Pydantic BaseModel, Field |
 | **configuration-and-dependency-injection** | קונפיגורציה והזרקת תלויות | לפי הקשר | pydantic-settings, SecretStr |
 | **deployment-and-infrastructure** | CI/CD, Docker, Kubernetes | לפי הקשר | Docker, Kubernetes, Uvicorn, Trivy/Snyk, Splunk |
@@ -39,19 +38,25 @@
 | **versioning-and-release-management** | גרסאות סמנטיות, CHANGELOG | לפי הקשר | Keep a Changelog |
 | **gitflow-branching-model** | מודל ענפים: master, develop, release, hotfix | לפי הקשר | Git |
 | **mcp-protocol-implementation** | שרתים ולקוחות MCP לכלים דינמיים | לפי הקשר | MCP (mcp.server), JSON-RPC |
-| **langgraph-architecture-and-nodes** | מבנה workflow, READ→DO→WRITE→CONTROL | לפי קבצים (workflows/nodes) | LangGraph, TypedDict, PydanticAI |
+| **langgraph-architecture-and-nodes** | מבנה workflow, READ→DO→WRITE→CONTROL | לפי קבצים (workflows/nodes) | LangGraph, TypedDict, Pydantic v2 |
 | **memory-feedback-node** | Memory Node כ־LangGraph node (feedback ל־Planner) | לפי קבצים (workflows/nodes) | LangGraph |
 | **context-compression-and-optimization** | דחיסת context, חלון טוקנים | לפי קבצים (workflows/agents) | tiktoken, LangGraph |
 | **api-interface-and-streaming** | API עם streaming (SSE/WebSocket), FastAPI | לפי קבצים (api, main.py) | FastAPI, Pydantic, Uvicorn, slowapi/fastapi-limiter, LangChain astream_events |
 | **api-documentation-standards** | OpenAPI/Swagger, תיעוד API | לפי קבצים (api, routes) | FastAPI, Pydantic |
 | **tests-and-validation** | מבנה טסטים, pytest, Arrange-Act-Assert | לפי קבצים (tests, test_*.py) | pytest |
-| **llm-evaluation-and-metrics** | Evals ל־LLM, מטריקות איכות | לפי קבצים (evals, evaluation) | Ragas, DeepEval, pytest, Splunk |
 | **data-migration-and-compatibility** | מיגרציות סכמה, תאימות לאחור | לפי קבצים (migrations, alembic) | Alembic, Flyway/Liquibase |
 | **prompt-engineering-and-management** | ניהול פרומפטים, גרסאות, A/B | לפי קבצים (prompts) | Jinja2, LangChain PromptTemplates |
 | **rules-management** | יצירה/עדכון של Rules (פורמט, מבנה) | לפי קבצים (RULE.mdc) | — |
 | **helper-files-guide** | שימוש בקובצי עזר (examples) ל־Rules | לפי הקשר | — |
 | **frontmatter-reference** | תבניות frontmatter לכל סוגי החוקים | לפי הקשר | — |
 | **commands-management** | יצירה/עדכון של Commands | לפי קבצים (.cursor/commands/*.md) | — |
+
+### חוקי הפניה — לא ל־`@` ידני (פקודות וסקילים בלבד)
+
+| שם החוק | נתיב | איך מפעילים |
+|---------|------|-------------|
+| **audit-protocol** | `reference-for-commands-and-skills/security/audit-protocol/` | פקודות security/monitoring, `@splunk-instrumentation` |
+| **llm-evaluation-and-metrics** | `reference-for-commands-and-skills/evaluation/llm-evaluation-and-metrics/` | פקודות testing/evaluation, `@evaluate-with-llm-judge` |
 
 **Skills (לא חוקים):** LLM-as-a-Judge — `@evaluate-with-llm-judge` (קובץ: `.cursor/skills/evaluate-with-llm-judge/SKILL.md`).
 
@@ -78,22 +83,16 @@
 ### Security (`security/`)
 
 #### security-governance-and-observability
-- **מה החוק אומר:** הגבלת blast radius, least privilege, רישום כלים מפורש, sandboxing. NIST AI RMF, OWASP Top 10 ל־LLM, Red Teaming, הערכה רציפה.
+- **מה החוק אומר:** מדיניות אג'נטים (blast radius, registry, סביבות) + **טבלת הפניות** — לא חוזר על שדות Splunk, סניטציה, או מטריקות eval (אלה בחוקים המצוינים שם).
 - **מתי נשתמש:** מופעל **תמיד** (Always Apply).
-- **ספריות וטכנולוגיות:** אין ספריות ספציפיות; מפנה ל־api-interface-and-streaming (rate limits), monitoring-and-observability (audit/tracing).
-- **למחליט (האם לאמץ?):** מגדיר איך לאבטח מערכות עם אג'נטים ו־LLM: כל אג'נט מקבל רק את מה שצריך, יש בקרה על פעולות קריטיות, ומתבצעת הערכה לפני פריסה. מתאים לפרויקטים עם רגישות אבטחתית או דרישות compliance.
-
-#### audit-protocol
-- **מה החוק אומר:** חובת audit trail: tool calls, state changes, API requests, גישה לנתונים, אירועי auth. מבנה לוג (timestamp, event_type, actor_id, correlation_id, וכו'), אחסון ב־Splunk (HEC), compliance (GDPR, HIPAA, SOC 2).
-- **מתי נשתמש:** מופעל **תמיד** (Always Apply).
-- **ספריות וטכנולוגיות:** Splunk, HEC (HTTP Event Collector).
-- **למחליט (האם לאמץ?):** מבטיח שכל פעולה במערכת מתועדת וברת מעקב — מי עשה מה ומתי. חובה כשיש דרישות רגולטוריות או צורך לחקור תקלות ואחריות. דורש מערכת לוגים מרכזית (למשל Splunk).
+- **ספריות וטכנולוגיות:** `@prompt-injection-prevention`, `@data-schemas-and-interfaces`, `@cost-and-budget-management`, `@api-interface-and-streaming`, `@human-in-the-loop-approval`, `@monitoring-and-observability`, `@audit-protocol`, `@llm-evaluation-and-metrics`.
+- **למחליט (האם לאמץ?):** מקור מדיניות רזה; כל הפרטים בחוקים ייעודיים — מפחית כפילות.
 
 #### prompt-injection-prevention
-- **מה החוק אומר:** סניטציה ואימות של כל קלט משתמש לפני כניסה לפרומפטים; שכבות (escaping, filtering, validation); זיהוי דפוסי הזרקה; מניעת דליפת מידע ו־bypass של בקרות.
-- **מתי נשתמש:** Apply Intelligently — כשעוסקים באבטחת קלט ו־LLM.
-- **ספריות וטכנולוגיות:** אין ספריות חובה; דוגמאות ב־helper files.
-- **למחליט (האם לאמץ?):** מגן מפני משתמשים שמנסים "לפרוץ" לפרומפטים (להכתיב לאג'נט הוראות או לחלץ מידע). חובה אם הקלט מגיע ממשתמשים חיצוניים או ממקורות לא מהימנים. מפחית סיכון להזרקת פרומפט ולחשיפת מידע רגיש.
+- **מה החוק אומר:** סניטציה ואימות קלט לפני פרומפטים וקריאות לכלים; שכבות (גבול API → לפני פרומפט → לפני LLM/כלי); אורך מקסימלי, פילטר דפוסים, Pydantic; אימות פלט LLM לפני הרצת כלים; תיעוד ניסיונות (Splunk HEC).
+- **מתי נשתמש:** Apply to Specific Files — `**/api/**/*.py`, `**/routes/**/*.py`, `**/main.py`, `**/agents/**/*.py`.
+- **ספריות וטכנולוגיות:** Pydantic; דוגמאות: `@examples_input_sanitization.py`, `@examples_injection_detection.py`, `@examples_validation_patterns.py`.
+- **למחליט (האם לאמץ?):** חובה כשיש קלט משתמש ל-LLM או לאג'נט. מפחית הזרקת פרומפט ו-bypass של בקרות.
 
 ---
 
@@ -130,27 +129,27 @@
 - **למחליט (האם לאמץ?):** מגדיר איך לחלק עבודה בין אג'נטים: אחד מחלק משימות, אחרים מבצעים, ואחד מאחד תוצאות. מתאים כשיש משימות גדולות או צורך במומחיות שונה (למשל סיכום מול חיפוש). מונע "אג'נט ענק" אחד שעושה הכל.
 
 #### agentic-logic-and-tools
-- **מה החוק אומר:** LCEL, הגדרת כלים עם `@tool`, תיעוד כלים, binding ל־model. PydanticAI בתוך node ל־structured output; scratchpad ל־debug; cache ברמת מודול.
-- **מתי נשתמש:** Apply Intelligently — בעבודה עם LangChain וכלים.
-- **ספריות וטכנולוגיות:** LangChain, LCEL, PydanticAI.
-- **למחליט (האם לאמץ?):** מקבע איך מגדירים כלים לאג'נט ואיך הוא משתמש בהם — תיעוד, פורמט פלט, וקאשינג. מתאים לכל פרויקט עם אג'נטים ו־LangChain. עוזר לאג'נט לבחור כלים נכון ולחסוך קריאות חוזרות.
+- **מה החוק אומר:** LCEL, `@tool`, Pydantic v2 ל־structured output; **אין `print()` ללוגים** — רק אירועים מובנים ל־**Splunk HEC** (`@monitoring-and-observability`, `@audit-protocol`). verbose רק ב-dev; streaming/astream_events מזין מטריקות/לוגים. scratchpad מחוץ לקונטקסט; מעקב ב-Splunk. קאש מודולרי; Redis/Oracle לפי החוקים הרלוונטיים.
+- **מתי נשתמש:** Apply to Specific Files — `**/agents/**/*.py`, `**/tools/**/*.py`, `**/chains/**/*.py`.
+- **ספריות וטכנולוגיות:** LangChain, LCEL, Pydantic v2, Splunk HEC.
+- **למחליט (האם לאמץ?):** מיישר כלי LangChain עם תיעוד תפעולי בארגון — מתאים כשהמדיניות היא Splunk בלבד.
 
 #### contract-scope-and-boundaries
 - **מה החוק אומר:** להגדיר חוזים מפורשים (Interface/ABC/Schema) **רק** בגבולות אינטגרציה (replaceability test). לא over-engineering בפנימיות. דוגמאות: Agent↔Tool, Planner↔Executor, LLM↔Code.
-- **מתי נשתמש:** Apply Intelligently — בהחלטות ארכיטקטורה על חוזים.
+- **מתי נשתמש:** Apply to Specific Files — `**/agents/**/*.py`, `**/interfaces/**/*.py`, `**/schemas/**/*.py`, `**/contracts/**/*.py`.
 - **ספריות וטכנולוגיות:** ABC, Pydantic, JSON Schema.
 - **למחליט (האם לאמץ?):** עוזר להחליט איפה להשקיע בהגדרת ממשקים פורמליים ואיפה להשאיר קוד פשוט. מונע "יותר מדי" חוזים בפנימיות ומבטיח חוזים במקומות שבהם רוצים להחליף מימוש (ספק, צוות, טסטים).
 
 #### agent-component-interfaces
-- **מה החוק אומר:** חוזי API בין Planner, Memory Node, Executor באמצעות ABC ו־type hints. Pydantic למודלים מורכבים; החלפת מימושים ובדיקות עם mocks.
-- **מתי נשתמש:** Apply Intelligently — בעיצוב ממשקי רכיבים.
-- **ספריות וטכנולוגיות:** abc.ABC, Pydantic (מפנה ל־data-schemas-and-interfaces).
-- **למחליט (האם לאמץ?):** מגדיר חוזה ברור בין רכיבי האג'נט (תכנון, זיכרון, ביצוע) — כל רכיב יודע מה הוא מקבל ומה הוא מחזיר. מתאים כשיש כמה מפתחים או רוצים להחליף מימוש (למשל Planner אחר) או לבדוק עם mocks.
+- **מה החוק אומר:** ממשקים (ABC/Protocol) בין Planner, Memory Node, Executor; טבלת תפקידים ו־MUST NOT; Pydantic v2 בגבולות; **אין `print()`** — אירועים ל־**Splunk HEC** (`correlation_id`, `operation_name`, `duration_ms`) בקריאות חוצות־רכיבים; audit לנתיבים רגישים (`@audit-protocol`). הפניות ל־planner/memory/executor rules ול־`@examples_*.py`.
+- **מתי נשתמש:** Apply to Specific Files — `**/agents/**/*.py`, `**/interfaces/**/*.py`, `**/contracts/**/*.py`, `**/schemas/**/*.py`.
+- **ספריות וטכנולוגיות:** abc.ABC, Pydantic v2, Splunk HEC, `@data-schemas-and-interfaces`.
+- **למחליט (האם לאמץ?):** חוזה ברור בין רכיבים; מתאים לצוותים/החלפת מימוש/mocks. פרטים בדוגמאות.
 
 #### langgraph-architecture-and-nodes
-- **מה החוק אומר:** עיצוב workflow: state (TypedDict), edges, conditional routing. כל node: READ→DO→WRITE→CONTROL. PydanticAI אופציונלי בתוך node ל־DO (structured output). טיפול בשגיאות, checkpoints, interrupts. ויזואליזציה עם `get_graph().draw_png()`.
+- **מה החוק אומר:** עיצוב workflow: state (TypedDict), edges, conditional routing. כל node: READ→DO→WRITE→CONTROL. ב־DO: LLM עם **Pydantic v2** + LangChain (`with_structured_output` / `bind_tools`). טיפול בשגיאות, checkpoints, interrupts. ויזואליזציה עם `get_graph().draw_png()`.
 - **מתי נשתמש:** Apply to Specific Files — `**/langgraph/**/*.py`, `**/workflows/**/*.py`, `**/nodes/**/*.py`.
-- **ספריות וטכנולוגיות:** LangGraph, TypedDict, PydanticAI.
+- **ספריות וטכנולוגיות:** LangGraph, TypedDict, Pydantic v2.
 - **למחליט (האם לאמץ?):** מקבע מבנה אחיד ל־workflow: כל צומת קורא מידע, עושה עבודה, כותב ל־state, ומחליט לאן להמשיך. מתאים לכל פרויקט עם LangGraph. מקל על קריאה, דיבוג ותחזוקה — וגם על ויזואליזציה של הזרימה.
 
 #### cost-and-budget-management
@@ -288,13 +287,20 @@
 
 ---
 
-### Evaluation (`evaluation/`)
+### Reference (`reference-for-commands-and-skills/`)
 
-#### llm-evaluation-and-metrics
+חוקים אלה **לא** מיועדים ל־`@` ידני — רק כמפרט לפקודות ולסקילים.
+
+#### audit-protocol (`security/audit-protocol/`)
+- **מה החוק אומר:** אירועי audit חובה (API, auth, DB, tool calls, state changes, LLM, errors), שדות audit נוספים מעבר ל-Splunk הבסיסי (actor_id, event_type, resource, action, result), PII masking, immutable logs. משלים את `@monitoring-and-observability`.
+- **איך מפעילים:** `@splunk-instrumentation`, פקודות security/monitoring — לא `@audit-protocol` ידני.
+- **ספריות וטכנולוגיות:** Splunk, HEC.
+
+#### llm-evaluation-and-metrics (`evaluation/llm-evaluation-and-metrics/`)
 - **מה החוק אומר:** Evals ל־LLM (מעבר ל־pytest): Faithfulness, Answer Relevance, Context Precision, Tool Usage Accuracy. Ragas או DeepEval; תוצאות ל־Splunk (HEC, SPL). Golden datasets, CI על subset.
-- **מתי נשתמש:** Apply to Specific Files — `**/evals/**/*.py`, `**/evaluation/**/*.py`.
+- **מתי:** Apply to Specific Files — `**/evals/**/*.py`, `**/evaluation/**/*.py` (החוק נטען דרך הפקודות/הסקיל, לא ידנית).
 - **ספריות וטכנולוגיות:** Ragas, DeepEval, pytest, Splunk.
-- **למחליט (האם לאמץ?):** מודד איכות תשובות האג'נט — נאמנות למקור, רלוונטיות, שימוש נכון בכלים — לא רק "הקוד רץ". מתאים כשאיכות התוכן קריטית או יש דרישות איכות. עוזר לתפוס הולוצינציות ורגרסיות לפני פרודקשן.
+- **למחליט (האם לאמץ?):** מודד איכות תשובות האג'נט. להפעלה — `@evaluate-with-llm-judge` או פקודות evaluation.
 
 #### `@evaluate-with-llm-judge` (Skill — לא RULE)
 - **מה זה:** פרוטוקול LLM-as-a-Judge מלא (Supreme AI Adjudicator): קלט Session Context, רובריקה משוקללת, `<reasoning>`, פלט JSON מובנה. אין חוק נפרד — הכל בקובץ ה-Skill תחת `.cursor/skills/evaluate-with-llm-judge/`.

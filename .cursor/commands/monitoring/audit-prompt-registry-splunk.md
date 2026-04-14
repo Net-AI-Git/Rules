@@ -1,14 +1,20 @@
 # Audit Prompt Registry Splunk
 
 ## Overview
-Audit prompt registry usage and prompt-version observability in Splunk to verify traceability, detect anomalies, and ensure prompt governance compliance.
+
+Verify **prompt registry** coverage and **Splunk** (or HEC-aligned) telemetry for prompt lifecycle and version signals—per `prompt-engineering-and-management` and `monitoring-and-observability`.
+
+## Scope and boundaries
+
+- **In scope:** Registry vs runtime, event schema, masking, version/regression signals in logs.
+- **Out of scope — use instead:** General audit JSON files on disk → `/security/analyze-audit-logs`. LangSmith traces → `/monitoring/analyze-langsmith-traces`.
 
 ## Rules Applied
-- `prompt-engineering-and-management` - Prompt registry and observability mandates
-- `monitoring-and-observability` - Logging standards, telemetry practices, and analysis
-- `audit-protocol` - Audit trail integrity and evidence requirements
-- `security-governance-and-observability` - Sensitive data handling and governance controls
-- `commands-management` - Command format and operational consistency
+
+- `prompt-engineering-and-management`
+- `monitoring-and-observability`
+- `security-governance-and-observability`
+- `audit-protocol` *(reference under `reference-for-commands-and-skills/security/` — do not `@` manually)*
 
 ## Steps
 
