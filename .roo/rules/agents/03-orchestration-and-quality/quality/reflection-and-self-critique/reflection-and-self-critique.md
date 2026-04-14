@@ -1,0 +1,24 @@
+## Mandate
+
+Before **final synthesis**, run a **Reviewer** step on worker outputs: accuracy, completeness, coherence, constraints — with **bounded** revise loops (max iterations/timeouts) so quality improves without runaway cost.
+
+## Flow
+
+Workers → **Reviewer** (approve | revise | reject) → **Synthesizer** → user. Revisions go **back to Workers**, not forward to Synthesizer, until quality passes or limits hit.
+
+**See:** `@examples_reviewer_node.py`, `@examples_evaluation.py`.
+
+## Evaluation
+
+* **Checks:** Facts vs sources, logical consistency, schema/format, required sections, policy/business rules.
+* **Scoring:** Optional numeric thresholds (e.g. approve ≥ 0.8); escalate to HITL when stuck (`@human-in-the-loop-approval`).
+
+## Limits
+
+Cap revision rounds; on exhaustion use best-effort output, degrade gracefully, or route to human review.
+
+## Integration
+
+* **Multi-agent:** `@multi-agent-systems` (worker outputs as Reviewer input).
+* **Judge / metrics:** LLM-as-judge or frameworks when useful; optional `@evaluate-with-llm-judge` skill.
+* **Observability:** Review outcomes and scores via `@monitoring-and-observability`.

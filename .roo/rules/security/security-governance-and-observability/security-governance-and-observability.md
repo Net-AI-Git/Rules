@@ -1,0 +1,38 @@
+## Mandate
+
+Agent systems **MUST** limit blast radius (tools, data, side effects), use explicit governance (registry, env-based tool sets), and never treat LLM text as trusted for side effects. **This rule only states policy and where the full spec lives.** It does not repeat Splunk field lists, sanitization steps, rate-limit implementation, eval metrics, or HITL schemas—those belong to the rules below.
+
+**Out of scope here:** HTTP auth, CORS, CSRF, XSS, SQLi, security headers, secret rotation — use `@api-interface-and-streaming` and `@core-python-standards` when relevant.
+
+## 1. Blast radius & tools (policy)
+
+* **Least privilege:** Each agent/node gets only the tools and data scopes it needs.
+* **Explicit registry:** Allowlisted tools by name; no ad-hoc invocation built directly from raw user text without passing through validated paths.
+* **High-risk isolation:** Sandbox or restrict code/shell/file/network tools; isolate side effects from the rest of the graph.
+
+## 2. Environments (policy)
+
+* **Dev vs Prod:** Different tool sets from configuration (mocks/sandbox vs production guardrails). No manual tool toggles in prod—env-based only, auditable.
+* **Consistency:** Same governance pattern; only the tool *set* differs by environment.
+
+## 3. Trust boundaries — authoritative rules (do not duplicate here)
+
+| Topic | Rule |
+|-------|------|
+| Sanitization, injection detection, validating user input and LLM output before tools | `@prompt-injection-prevention` |
+| Structured request/tool args, schemas | `@data-schemas-and-interfaces` |
+| Token/USD budgets, runaway loop stops inside workflows | `@cost-and-budget-management` |
+| HTTP rate limits, 429, middleware (API surface) | `@api-interface-and-streaming` |
+| Irreversible or high-impact actions, approval context | `@human-in-the-loop-approval` |
+
+## 4. Observability & audit — authoritative rules (do not duplicate here)
+
+| Topic | Rule |
+|-------|------|
+| HEC mandatory fields, metrics, naming, health, alerting | `@monitoring-and-observability` |
+| Audit event types, `actor_*`, `resource`, `action`, `result`, PII masking | `@audit-protocol` |
+
+## 5. Evaluation & pre-release testing
+
+* **Metrics, golden sets, judge terminology:** `@llm-evaluation-and-metrics` only.
+* **Adversarial checks** (injection, tool misuse) are part of release discipline; execution detail remains under `@prompt-injection-prevention` and agent tests—not re-specified here.

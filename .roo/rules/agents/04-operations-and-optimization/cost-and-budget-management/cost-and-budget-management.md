@@ -1,0 +1,23 @@
+## Mandate
+
+Track **tokens and cost** in real time in **`BudgetState`** (or equivalent) on `GraphState`; enforce **warning / soft / hard** limits; **halt** before runaway spend. Persist budget with checkpoints when applicable.
+
+**See:** `@examples_budget_state.py`, `@examples_guardrails.py`.
+
+## Tracking
+
+After each LLM/tool step: update cumulative tokens/cost; attribute per node/agent/tenant; use model-specific pricing tables.
+
+## Thresholds
+
+Configurable per workflow/tenant: e.g. warn ~80%, optional degrade ~90%, **hard stop** at 100%. Pre-call checks in Workers: estimate next call; **fail fast** if budget would break.
+
+## On exceed
+
+Stop LLM/tool work; optional checkpoint; clear user message; audit event for analysis (`@monitoring-and-observability`).
+
+## Integration
+
+* **Routing:** cheaper models when appropriate (`@model-routing-and-selection`).
+* **Context:** `@context-compression-and-optimization`.
+* **Config:** `@configuration-and-dependency-injection`.

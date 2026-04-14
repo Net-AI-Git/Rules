@@ -1,156 +1,89 @@
-# Cursor Rules & Commands Repository
+# Rules & commands repository (Cursor + Roo Code)
 
-A comprehensive collection of Cursor AI Rules and Commands for Python development, agent systems, and production deployments. This repository provides standardized workflows, coding standards, and best practices that can be easily integrated into any project.
+A comprehensive collection of **AI coding standards** (rules), **slash commands**, and **skills** for Python development, agent systems, and production deployments. This repository supports **two editor layouts**:
 
-## Overview
+| Layout | Paths | Typical use |
+|--------|--------|-------------|
+| **Roo Code** | `.roo/rules/`, `.roo/commands/`, `.roo/skills/` | VS Code + Roo Code extension ([docs](https://docs.roocode.com/)) |
+| **Cursor** | `.cursor/rules/`, `.cursor/commands/`, `.cursor/skills/` | Cursor IDE |
 
-This repository contains two main components:
+Content is aligned between them; **Roo** uses plain Markdown rules and slash commands named from **filenames** (e.g. `/testing-run-test-suite`). **Cursor** uses `.mdc` rules with frontmatter and nested command paths (e.g. `/testing/run-test-suite`).
 
-### 📋 Rules (`.cursor/rules/`)
-System-level instructions for the Cursor AI Agent. Rules define coding standards, architectural patterns, security requirements, and development workflows. They are automatically applied based on their configuration (always, intelligently, or for specific files).
+## Quick start
 
-### ⚡ Commands (`.cursor/commands/`)
-Reusable workflows that can be triggered with a `/` prefix in the chat. Commands provide standardized processes for testing, security audits, code reviews, monitoring, and agent development.
+### Roo Code
 
-## Quick Start
+1. Copy or clone this repo and open it in VS Code with Roo Code installed.
+2. Custom instructions load from [`.roo/rules/`](.roo/rules/). Slash commands load from [`.roo/commands/`](.roo/commands/). Skills load from [`.roo/skills/`](.roo/skills/).
+3. Command index: [`.roo/commands/slash-commands-documentation.md`](.roo/commands/slash-commands-documentation.md).
+4. Workspace agent summary: [`AGENTS.md`](AGENTS.md).
 
-### Option 1: Copy Everything
-Simply copy the entire `.cursor` folder to your project root. Cursor will automatically:
-- Apply rules based on their configuration
-- Make commands available via `/` prefix
+### Cursor
 
-### Option 2: Copy by Category
-Copy only what you need:
+1. Copy the `.cursor/` folder to your project root.
+2. Rules apply per `.mdc` configuration; commands use `/category/command-name`.
 
-**For all projects:**
-- `.cursor/rules/core/` - Essential coding standards
-- `.cursor/rules/security/` - Security and governance
-
-**For agent projects:**
-- `.cursor/rules/agents/` - Multi-agent patterns
-- `.cursor/rules/reference-for-commands-and-skills/evaluation/` - LLM evaluation metrics (used by commands/skills; do not `@` manually)
-
-**For API projects:**
-- `.cursor/rules/api/` - API design and documentation
-
-**For production projects:**
-- `.cursor/rules/infrastructure/` - Deployment and monitoring
-
-## Directory Structure
+## Directory structure (simplified)
 
 ```
 Rules/
-├── .cursor/
-│   ├── rules/          # Cursor Rules (see .cursor/rules/README.md)
-│   │   ├── core/       # Always-applied core rules
-│   │   ├── security/   # Security and governance
-│   │   ├── agents/     # Agent-specific rules
-│   │   ├── infrastructure/  # Deployment, monitoring, performance
-│   │   ├── development/     # Testing, code review, versioning
-│   │   ├── api/        # API-related rules
-│   │   ├── data/       # Data schemas, migrations
-│   │   ├── reference-for-commands-and-skills/  # Specs for commands/skills only
-│   │   └── configuration/  # Configuration, DI, prompts
-│   └── commands/       # Cursor Commands (see .cursor/commands/README.md)
-│       ├── testing/    # Testing and evaluation
-│       ├── security/   # Security audit and compliance
-│       ├── review/     # Code review and compliance
-│       ├── monitoring/ # Monitoring and observability
-│       └── agents/    # Agent development
-└── README.md          # This file
+├── .roo/                      # Roo Code (VS Code)
+│   ├── rules/
+│   ├── commands/
+│   └── skills/
+├── .cursor/                   # Cursor IDE
+│   ├── rules/
+│   ├── commands/
+│   └── skills/
+├── AGENTS.md                  # High-level agent instructions (Roo loads from root)
+├── scripts/
+│   └── migrate_to_roo.py      # Regenerate .roo/ from .cursor/ when needed
+└── README.md
 ```
 
-## How Rules Work
+## Slash commands (Roo naming)
 
-Rules are applied automatically based on their type:
-
-- **Always Apply** (`alwaysApply: true`) - Active in every chat session
-- **Apply Intelligently** (`description` field) - Applied when Agent deems relevant
-- **Apply to Specific Files** (`globs` patterns) - Applied when working on matching files
-- **Apply Manually** - Applied only when explicitly mentioned (e.g., `@rule-name`)
-
-See [`.cursor/rules/README.md`](.cursor/rules/README.md) for detailed documentation.
-
-## How Commands Work
-
-Commands are triggered with a `/` prefix in the chat input:
+Invoke with `/` + **filename stem** of a file in `.roo/commands/`:
 
 ```
-/testing/run-test-suite
-/security/security-audit
-/review/final-compliance-check
+/testing-run-test-suite
+/security-security-audit
+/review-final-compliance-check
+/monitoring-run-all-monitoring
 ```
 
-Each command follows a standardized workflow and integrates with relevant Rules. See [`.cursor/commands/README.md`](.cursor/commands/README.md) for detailed documentation.
+See [`.roo/commands/slash-commands-documentation.md`](.roo/commands/slash-commands-documentation.md) for the full list.
 
-## Categories
+## Categories (rule topics)
 
-### Core Rules
-Essential rules for all projects:
-- `core-python-standards` - Python coding standards (always applied)
-- `error-handling-and-resilience` - Error handling patterns (always applied)
+Examples of rule **folders** (same names under `.roo/rules/` and `.cursor/rules/`):
 
-### Security Rules
-Security and governance:
-- `security-governance-and-observability` - Agent security policy + pointers to other rules (always applied)
-- `audit-protocol` - Lives under `reference-for-commands-and-skills/security/`; use commands or `@splunk-instrumentation` (not manual `@`)
-
-### Agent Rules
-Agent-specific architecture:
-- `multi-agent-systems` - Multi-agent patterns
-- `langgraph-architecture-and-nodes` - LangGraph workflows
-- `agentic-logic-and-tools` - LangChain tools + Splunk HEC observability
-
-### Infrastructure Rules
-Deployment and operations:
-- `deployment-and-infrastructure` - CI/CD, Docker, K8s
-- `monitoring-and-observability` - Monitoring and logging
-- `performance-optimization` - Performance best practices
-- `multi-tenancy-and-isolation` - Multi-tenancy patterns
-
-### Development Rules
-Development workflow:
-- `tests-and-validation` - Testing standards
-- `code-review-and-collaboration` - Code review process
-- `versioning-and-release-management` - Versioning strategy
-
-### API Rules
-API development:
-- `api-interface-and-streaming` - API design
-- `api-documentation-standards` - API docs
-
-### Data Rules
-Data management:
-- `data-schemas-and-interfaces` - Data schemas
-- `data-migration-and-compatibility` - Migrations
-
-### Evaluation Rules
-LLM evaluation and testing:
-- `llm-evaluation-and-metrics` - Under `reference-for-commands-and-skills/evaluation/`; use evaluation commands or `@evaluate-with-llm-judge` (not manual `@`)
-- LLM-as-a-Judge — Skill `@evaluate-with-llm-judge` (see `.cursor/skills/evaluate-with-llm-judge/SKILL.md`)
-
-### Configuration Rules
-Configuration and setup:
-- `configuration-and-dependency-injection` - DI patterns
-- `prompt-engineering-and-management` - Prompt management
+- **Core:** `core-python-standards`, `error-handling-and-resilience`
+- **Security:** `security-governance-and-observability`; reference specs under `reference-for-commands-and-skills/`
+- **Agents:** `multi-agent-systems`, `langgraph-architecture-and-nodes`, `agentic-logic-and-tools`
+- **Infrastructure:** `monitoring-and-observability`, `redis-cache`, `oracle-database`
+- **API / data / configuration:** see tree under `.roo/rules/`
 
 ## Documentation
 
-- **[Rules Documentation](.cursor/rules/README.md)** - Complete guide to Cursor Rules
-- **[Commands Documentation](.cursor/commands/README.md)** - Complete guide to Cursor Commands
-- **[Cursor Rules Docs](https://cursor.com/docs/context/rules)** - Official Cursor documentation
-- **[Cursor Commands Docs](https://cursor.com/docs/agent/chat/commands)** - Official Cursor documentation
+- **[Roo rules README](.roo/rules/README.md)** — Rules tree (Roo + Cursor notes)
+- **[Roo slash commands index](.roo/commands/slash-commands-documentation.md)**
+- **[Cursor rules README](.cursor/rules/README.md)** — Cursor-oriented details
+- **[Cursor commands README](.cursor/commands/README.md)** — Cursor path style `/category/name`
+- **[Roo Code docs](https://docs.roocode.com/)** — Skills, rules, slash commands
+- **[Cursor Rules docs](https://cursor.com/docs/context/rules)** / **[Commands](https://cursor.com/docs/agent/chat/commands)**
 
 ## Contributing
 
-When creating or updating Rules:
-- Follow the format defined in `.cursor/rules/rules-management/RULE.md`
-- Use appropriate rule types (Always Apply, Apply Intelligently, etc.)
+- **Roo layout:** follow [`.roo/rules/commands-management/commands-management.md`](.roo/rules/commands-management/commands-management.md) for commands; keep rule files as `{topic}.md` per folder.
+- **Cursor layout:** follow [`.cursor/rules/commands-management/RULE.mdc`](.cursor/rules/commands-management/RULE.mdc) for commands under `.cursor/commands/`.
+- After editing `.cursor/rules` or `.cursor/commands` or `.cursor/skills`, regenerate Roo files with:
 
-When creating or updating Commands:
-- Follow the format defined in `.cursor/rules/commands-management/RULE.mdc`
-- Integrate with relevant Rules
-- Avoid duplication by reusing existing commands
+```bash
+python scripts/migrate_to_roo.py
+```
+
+Then re-apply any manual doc fixes in `.roo/commands/slash-commands-documentation.md` or `AGENTS.md` if the script overwrote them.
 
 ## License
 

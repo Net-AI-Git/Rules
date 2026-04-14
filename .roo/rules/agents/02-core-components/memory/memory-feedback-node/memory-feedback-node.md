@@ -1,0 +1,29 @@
+## Mandate
+
+Implement **Memory Node** as a **LangGraph node** (orchestration), **not** the Vector DB/PostgreSQL layer. It loads context, stores experiences, extracts patterns, and sends **feedback** to the Planner. Persistence goes through `@memory-and-archival-management`.
+
+## Responsibilities
+
+* **Retrieve:** Semantic/filtered memories within token budget; coordinate with `@context-compression-and-optimization`.
+* **Store:** Format experiences (action, context, outcome); delegate persistence to the storage layer.
+* **Learn:** Surface patterns (success/failure) and feed **Planner** with actionable feedback.
+
+**See:** `@examples_memory_node.py`, `@examples_learning_patterns.py`, `@examples_feedback_loop.py`.
+
+## MUST NOT
+
+* **Implement** storage infrastructure (Vector DB/PostgreSQL) — delegate to archival rule/service.
+* **Decompose** tasks (Orchestrator) or **execute** external actions (Executor/Workers).
+
+## Node pattern
+
+**READ** state/context → **DO** retrieve | store | analyze feedback → **WRITE** memories/feedback fields → **CONTROL** route (e.g. Planner, Orchestrator). Single owner for memory-related state keys you define.
+
+**See:** `@langgraph-architecture-and-nodes`.
+
+## Integration
+
+* **Interface:** `@agent-component-interfaces` (`retrieve_memories`, `store_experience`, `provide_feedback` as appropriate).
+* **Storage:** `@memory-and-archival-management`.
+* **Planner:** `@planner-strategic-planning`.
+* **Errors:** `@error-handling-and-resilience`.

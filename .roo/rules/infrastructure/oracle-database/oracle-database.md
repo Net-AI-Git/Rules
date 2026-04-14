@@ -1,0 +1,32 @@
+## 1. Bind Variables
+
+Always use bind variables — never inline values into SQL strings.
+
+```python
+# BAD — hard parse every time, SQL injection risk
+cursor.execute(f"SELECT * FROM users WHERE id = {user_id}")
+
+# GOOD — cached execution plan (soft parse), safe
+cursor.execute("SELECT * FROM users WHERE id = :id", {"id": user_id})
+```
+
+* **Why:** Oracle caches execution plans in the shared pool keyed by SQL text. With bind variables, the same plan is reused (soft parse). Without them, Oracle re-parses every unique SQL string (hard parse) — expensive and fills the shared pool.
+* **Security:** Prevents SQL injection by separating SQL structure from data.
+* **Rule:** Every query MUST use `:param_name` bind syntax. No f-strings, no `%s` formatting, no string concatenation in SQL.
+
+## 2. Bulk Operations
+
+Use `executemany()` for batch inserts/updates — never loop with single `execute()`.
+
+```python
+# BAD — 1000 network round trips
+for row in data:
+    cursor.execute("INSERT INTO logs VALUES (:a, :b)", row)
+
+# GOOD — 1 network round trip
+cursor.executemany("INSERT INTO logs VALUES (:a, :b)", data)
+```
+
+* **Why:** Each `execute()` is a network round trip to Oracle (~1-5ms). With 1000 rows: 1-5 seconds vs ~10ms with `executemany()`.
+* **Batch size:** For very large datasets (100K+), chunk into batches of 10,000 to avoid memory issues.
+* **Rule:** Any loop that calls `execute()` with the same SQL and different parameters MUST be converted to `executemany()`.

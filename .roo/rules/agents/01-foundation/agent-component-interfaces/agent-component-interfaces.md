@@ -1,0 +1,47 @@
+## Mandate
+
+Define **explicit interfaces** between **Planner**, **Memory Node**, and **Executor** using `abc.ABC`, full **type hints**, and **Pydantic v2** models at boundaries for complex I/O. Enables swapping implementations, mocks, and parallel work. **When** to use formal contracts vs internal helpers: `@contract-scope-and-boundaries`.
+
+## 1. Interface rules
+
+* **ABC:** `abc.ABC` + `@abstractmethod` for nominal contracts; alternatively `typing.Protocol` for small, duck-typed surfaces.
+* **Methods:** Typed parameters and returns; document behavior and exceptions; validate complex payloads with Pydantic v2 — see `@data-schemas-and-interfaces`.
+* **No duplication:** Schemas live in Pydantic models; interfaces reference them, don’t redefine fields.
+
+## 2. Observability (Splunk)
+
+* **No `print()` for logging** at boundaries. Emit structured events to **Splunk via HEC** per `@monitoring-and-observability` (`timestamp`, `correlation_id`, `operation_name`, `duration_ms`) for Planner/Memory/Executor calls.
+* **Trace continuity:** Propagate `correlation_id` across the graph so cross-component spans join in Splunk. Log boundary failures with the same identifiers.
+* **Audit:** Memory retrieval, tool execution, and other sensitive paths follow `@audit-protocol` in addition to general observability.
+
+## 3. Component contracts (summary)
+
+| Component | Responsibility | MUST NOT |
+|-----------|----------------|----------|
+| **Planner** | Strategic plan, goals, action evaluation | Decompose for Orchestrator; execute tools (Executor) |
+| **Memory Node** | Retrieve/store feedback, `provide_feedback` | Own physical storage (→ `@memory-and-archival-management`) |
+| **Executor** | `translate_plan`, `execute_action`, monitor runs | Strategic planning (Planner); domain Worker logic |
+
+**Example method shapes** (adjust names/types to your codebase):  
+`plan(...) -> StrategicPlan` · `retrieve_memories(...) -> list[Memory]` · `translate_plan(...) -> list[ConcreteAction]` · `execute_action(...) -> ActionResult`
+
+**Implementation patterns:** `@planner-strategic-planning` · `@memory-feedback-node` · `@memory-and-archival-management` · `@executor-action-translation`
+
+## 4. Modularity & compatibility
+
+* **Swapping:** Multiple concrete classes + DI/factory/config; see `@examples_modularity.py`.
+* **Interfaces:** Prefer additive changes; breaking signature changes → version or deprecate; run `mypy`/`pyright` on interface packages.
+
+## 5. Testing
+
+* Test contracts with **mocks** or fake implementations; assert I/O types and errors at the boundary.
+
+## 6. Multi-agent
+
+* Planner/Executor/Memory connect to Orchestrator/Workers per `@multi-agent-systems`.
+
+## 7. Examples (full code)
+
+* `@examples_interfaces.py` — ABCs for Planner, Memory, Executor  
+* `@examples_contracts.py` — Pydantic I/O at boundaries  
+* `@examples_modularity.py` — DI, swapping, A/B-style wiring  
